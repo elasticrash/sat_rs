@@ -1,3 +1,4 @@
+// Literals
 use std::cmp::Ordering;
 use std::ops::Not;
 
@@ -10,13 +11,13 @@ pub trait ILit {
     fn simple(v: i32) -> Self;
     fn to_string() -> str;
     fn get_hash_code() -> i32;
-    fn equals(object:Lit) -> bool;
+    fn equals(object: Lit) -> bool;
 }
 
 impl Not for Lit {
     type Output = Lit;
     fn not(self) -> Lit {
-        let mut q:Lit = Lit{x:0};
+        let mut q: Lit = Lit { x: 0 };
         q.x = self.x ^ 1;
         return q;
     }
