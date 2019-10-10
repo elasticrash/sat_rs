@@ -1,13 +1,12 @@
-mod lit;
-use lit::Lit;
+mod models;
+use models::clause::Clause;
+use models::lit::ILit;
+use models::lit::Lit;
 
 static l_True: Lbool = Lbool::True;
 static l_False: Lbool = Lbool::False;
 static var_undefined: i32 = -1;
-
 pub trait Heap {}
-
-pub struct Clause {}
 
 pub enum Lbool {
     True = 1,
@@ -54,18 +53,8 @@ fn is_undefined(value: Lbool) -> bool {
     return value != Lbool::True && value != Lbool::False;
 }
 
-fn sign(lit: Lit) -> bool {
-    return (lit.x & 1) != 0;
-}
-
-fn var(lit: Lit) -> i32 {
-    return lit.x >> 1;
-}
-
-fn index(lit: Lit) -> i32 {
-    return lit.x;
-}
-
 fn main() {}
 
-fn solver() {}
+fn solver() {
+    let lit_undefined: Lit = Lit::new(var_undefined, true);
+}
