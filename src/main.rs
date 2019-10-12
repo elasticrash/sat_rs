@@ -1,25 +1,12 @@
 mod models;
 use models::clause::Clause;
+use models::lbool::Lbool;
 use models::lit::ILit;
 use models::lit::Lit;
 
 static l_True: Lbool = Lbool::True;
 static l_False: Lbool = Lbool::False;
 static var_undefined: i32 = -1;
-pub trait Heap {}
-
-pub enum Lbool {
-    True = 1,
-    False = -2,
-    Undef0 = 0,
-    Undef1 = -1,
-}
-
-impl PartialEq for Lbool {
-    fn eq(&self, other: &Self) -> bool {
-        self == other
-    }
-}
 
 pub struct Solver {
     clauses: Vec<Clause>,
@@ -39,18 +26,6 @@ pub struct Solver {
     addTernary_tmp: Vec<Lit>,
     model: Vec<Lbool>,
     conflict: Vec<Lit>,
-}
-
-fn to_bool(value: bool) -> Lbool {
-    if value {
-        return Lbool::True;
-    } else {
-        return Lbool::False;
-    }
-}
-
-fn is_undefined(value: Lbool) -> bool {
-    return value != Lbool::True && value != Lbool::False;
 }
 
 fn main() {}
