@@ -55,7 +55,7 @@ impl PartialOrd for Lit {
 
 impl PartialEq for Lit {
     fn eq(&self, other: &Self) -> bool {
-        self.x == other.x
+        return self.x == other.x;
     }
 }
 

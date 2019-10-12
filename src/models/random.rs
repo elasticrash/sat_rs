@@ -6,5 +6,5 @@ fn drand(mut seed: f64) -> f64 {
 }
 
 fn irand(seed: f64, size: i32) -> i32 {
-    return drand(seed * size as f64) as i32 ;
+    return drand(seed * size as f64) as i32;
 }
