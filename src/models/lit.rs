@@ -59,14 +59,14 @@ impl PartialEq for Lit {
     }
 }
 
-fn sign(lit: &Lit) -> bool {
+pub fn sign(lit: &Lit) -> bool {
     return (&lit.x & 1) != 0;
 }
 
-fn var(lit: &Lit) -> i32 {
+pub fn var(lit: &Lit) -> i32 {
     return lit.x >> 1;
 }
 
-fn index(lit: &Lit) -> i32 {
+pub fn index(lit: &Lit) -> i32 {
     return lit.x;
 }

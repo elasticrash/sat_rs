@@ -8,7 +8,7 @@ pub trait IHeap {
     fn new(v: fn(i32, i32) -> bool) -> Self;
     fn in_heap(&self, n: i32) -> bool;
     fn increase(&self, n: i32);
-    fn insert(mut self, n: i32);
+    fn insert(self, n: i32);
     fn percolate_up(i: i32);
     fn empty(&self) -> bool;
     fn getmin(&self) -> i32;
