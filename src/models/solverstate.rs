@@ -1,7 +1,7 @@
 use crate::functions::analyse_final::analyse_final;
 use crate::functions::enqueue::enqueue;
-use crate::functions::search::var_rescale_activity;
 use crate::functions::new_clause::new_clause;
+use crate::functions::search::var_rescale_activity;
 
 use crate::models::clause::Clause;
 use crate::models::lbool::Lbool;

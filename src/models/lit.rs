@@ -2,6 +2,7 @@
 use std::cmp::Ordering;
 use std::ops::Not;
 
+#[derive(Copy, Clone)]
 pub struct Lit {
     pub x: i32,
 }

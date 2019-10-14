@@ -1,3 +1,1 @@
-pub fn simplify_db(){
-    
-}
+pub fn simplify_db() {}

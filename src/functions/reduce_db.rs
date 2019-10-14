@@ -1,3 +1,1 @@
-fn reduceDB_lt(){
-    
-}
+fn reduceDB_lt() {}

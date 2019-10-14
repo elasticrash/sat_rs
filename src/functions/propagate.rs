@@ -1,3 +1,1 @@
-pub fn propagate() {
-    
-}
+pub fn propagate() {}
