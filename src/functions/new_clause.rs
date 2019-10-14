@@ -1,8 +1,26 @@
 use crate::models::lbool::*;
 use crate::models::lit::*;
 use crate::models::solverstate::*;
-
 use std::collections::HashMap;
+
+/*_________________________________________________________________________________________________
+|
+|  newClause : (ps : const vec<Lit>&) (learnt : bool)  .  [void]
+|
+|  Description:
+|    Allocate and add a new clause to the SAT solvers clause database. If a conflict is detected,
+|    the 'ok' flag is cleared and the solver is in an unusable state (must be disposed).
+|
+|  Input:
+|    ps     - The new clause as a vector of literals.
+|    learnt - Is the clause a learnt clause? For learnt clauses, 'ps[0]' is assumed to be the
+|             asserting literal. An appropriate 'enqueue()' operation will be performed on this
+|             literal. One of the watches will always be on this literal, the other will be set to
+|             the literal with the highest decision level.
+|
+|  Effect:
+|    Activity heuristics are updated.
+|________________________________________________________________________________________________@*/
 
 pub fn new_clause(_ps: Vec<Lit>, _learnt: bool) {}
 
