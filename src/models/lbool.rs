@@ -1,3 +1,7 @@
+use crate::models::lit::*;
+use crate::models::solverstate::SolverState;
+use std::ops::Not;
+
 #[derive(Copy, Clone)]
 pub enum Lbool {
     True = 1,
@@ -12,6 +16,17 @@ impl PartialEq for Lbool {
     }
 }
 
+impl Not for Lbool {
+    type Output = Lbool;
+    fn not(self) -> Lbool {
+        if self == Lbool::True {
+            return Lbool::False;
+        } else {
+            return Lbool::True;
+        }
+    }
+}
+
 pub fn to_bool(value: bool) -> Lbool {
     if value {
         return Lbool::True;
@@ -22,4 +37,16 @@ pub fn to_bool(value: bool) -> Lbool {
 
 pub fn is_undefined(value: Lbool) -> bool {
     return value != Lbool::True && value != Lbool::False;
+}
+
+pub fn value_by_var(x: i32, y: SolverState) -> Lbool {
+    return y.assigns[x as usize];
+}
+
+pub fn value_by_lit(x: Lit, y: &SolverState) -> Lbool {
+    if sign(&x) {
+        return !y.assigns[var(&x) as usize];
+    } else {
+        return y.assigns[var(&x) as usize];
+    }
 }

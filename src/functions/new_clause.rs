@@ -1,4 +1,7 @@
+use crate::models::lbool::*;
 use crate::models::lit::*;
+use crate::models::solverstate::*;
+
 use std::collections::HashMap;
 
 pub fn new_clause(_ps: Vec<Lit>, _learnt: bool) {}
@@ -34,7 +37,44 @@ pub fn basic_clause_simplification(_ps: Vec<Lit>, _copy: bool) -> Option<Vec<Lit
     return Some(qs);
 }
 
-pub fn reorder_by_level(_ps: Vec<Lit>) {}
+pub fn reorder_by_level(mut _ps: Vec<Lit>, solver_state: &mut SolverState) {
+    let mut max: i32 = std::i32::MIN;
+    let mut max_at: i32 = -1;
+    let mut max2: i32 = std::i32::MIN;
+    let mut max2_at: i32 = -1;
+
+    for i in 0.._ps.len() {
+        let mut lev: i32 = solver_state.level[var(&_ps[i]) as usize];
+        if lev == -1 {
+            lev = std::i32::MAX;
+        } else if value_by_lit(_ps[i], &solver_state) == Lbool::True {
+            lev = std::i32::MAX;
+        }
+
+        if lev >= max {
+            max2_at = max_at;
+            max2 = max;
+            max = lev;
+            max_at = i as i32;
+        } else if lev > max {
+            max2 = lev;
+            max2_at = i as i32;
+        }
+    }
+
+    if max_at == 0 {
+        swap(1, max2_at, &mut _ps);
+    } else if max_at == 1 {
+        swap(0, max2_at, &mut _ps);
+    } else if max2_at == 0 {
+        swap(1, max_at, &mut _ps);
+    } else if max2_at == 1 {
+        swap(0, max_at, &mut _ps);
+    } else {
+        swap(0, max_at, &mut _ps);
+        swap(1, max2_at, &mut _ps);
+    }
+}
 
 fn new_clause_pr(_ps: Vec<Lit>, _learnt: bool, _theory_clause: bool, _copy: bool) {}
 
