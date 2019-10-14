@@ -1,5 +1,5 @@
 use crate::models::lit::Lit;
 
-pub fn new_clause(ps: Vec<Lit>, learnt:bool){
+pub fn new_clause(_ps: Vec<Lit>, _learnt:bool){
     
 }
