@@ -32,7 +32,7 @@ impl ISearchParams for SearchParams {
         self.clause_decay = other.clause_decay;
         self.random_var_freq = other.random_var_freq;
     }
-    fn unit(mut self) {
+    fn unit(self) {
         self.new(1.0, 1.0, 0.0);
     }
 }

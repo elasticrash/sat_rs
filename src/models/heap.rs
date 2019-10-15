@@ -33,7 +33,7 @@ impl IHeap for Heap {
         self.heap.push(n);
         <Heap as IHeap>::percolate_up(self.indices[n as usize]);
     }
-    fn percolate_up(i: i32) {}
+    fn percolate_up(_i: i32) {}
     fn empty(&self) -> bool {
         return self.heap.len() == 1 as usize;
     }

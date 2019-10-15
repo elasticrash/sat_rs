@@ -22,8 +22,6 @@ use std::collections::HashMap;
 |    Activity heuristics are updated.
 |________________________________________________________________________________________________@*/
 
-pub fn new_clause(_ps: Vec<Lit>, _learnt: bool) {}
-
 pub fn basic_clause_simplification(_ps: Vec<Lit>, _copy: bool) -> Option<Vec<Lit>> {
     let mut qs: Vec<Lit>;
 
@@ -74,7 +72,7 @@ pub fn reorder_by_level(mut _ps: Vec<Lit>, solver_state: &mut SolverState) {
             max2 = max;
             max = lev;
             max_at = i as i32;
-        } else if lev > max {
+        } else if lev > max2 {
             max2 = lev;
             max2_at = i as i32;
         }
@@ -94,7 +92,25 @@ pub fn reorder_by_level(mut _ps: Vec<Lit>, solver_state: &mut SolverState) {
     }
 }
 
-fn new_clause_pr(_ps: Vec<Lit>, _learnt: bool, _theory_clause: bool, _copy: bool) {}
+pub fn new_clause(_ps: Vec<Lit>, _learnt: bool, solver_state: &mut SolverState) {
+    new_clause_pr(_ps, _learnt, false, true, solver_state);
+}
+
+fn new_clause_pr(
+    _ps: Vec<Lit>,
+    _learnt: bool,
+    _theory_clause: bool,
+    _copy: bool,
+    solver_state: &mut SolverState,
+) {
+    if !solver_state.ok {
+        return;
+    };
+
+    let ps: Vec<Lit> = Vec::new();
+
+    if !_learnt {}
+}
 
 pub fn remove() {}
 pub fn simplify() {}

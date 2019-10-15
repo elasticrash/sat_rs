@@ -7,4 +7,4 @@
 |    clauses are clauses that are reason to some assignment. Binary clauses are never removed.
 |________________________________________________________________________________________________@*/
 
-fn reduceDB_lt() {}
+fn reduce_db_lt() {}

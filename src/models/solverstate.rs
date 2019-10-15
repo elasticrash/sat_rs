@@ -41,7 +41,7 @@ pub trait Internal {
     fn var_bump_activity(&self, p: Lit);
     fn var_decay_activity(self);
     fn cla_decay_activity(self);
-    fn i_new_clause(ps: Vec<Lit>);
+    fn i_new_clause(self, ps: Vec<Lit>);
     fn cla_bump_activity(c: Clause);
     fn remove(c: Clause);
     fn locked(c: Clause) -> bool;
@@ -72,12 +72,12 @@ impl Internal for SolverState {
     fn cla_decay_activity(mut self) {
         self.cla_inc *= self.cla_decay;
     }
-    fn i_new_clause(ps: Vec<Lit>) {
-        new_clause(ps, false);
+    fn i_new_clause(mut self, ps: Vec<Lit>) {
+        new_clause(ps, false, &mut self);
     }
     fn cla_bump_activity(c: Clause) {}
-    fn remove(c: Clause) {}
-    fn locked(c: Clause) -> bool {
+    fn remove(_c: Clause) {}
+    fn locked(_c: Clause) -> bool {
         return true;
     }
     fn decision_level() -> i32 {
