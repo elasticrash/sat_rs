@@ -18,6 +18,10 @@ use crate::models::lit::Lit;
 |    TRUE if fact was enqueued without conflict, FALSE otherwise.
 |________________________________________________________________________________________________@*/
 
-pub fn enqueue(_fact: Lit, _from: Option<Clause>) -> bool {
+pub fn enqueue(_fact: &Lit, _from: Option<Clause>) -> bool {
     return true;
+}
+
+pub fn internal_enqueue(_fact: &Lit) -> bool {
+    return enqueue(&_fact, None);
 }

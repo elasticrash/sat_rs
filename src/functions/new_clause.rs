@@ -1,6 +1,9 @@
+use crate::functions::enqueue::*;
+use crate::models::clause::*;
 use crate::models::lbool::*;
 use crate::models::lit::*;
 use crate::models::solverstate::*;
+
 use std::collections::HashMap;
 
 /*_________________________________________________________________________________________________
@@ -53,7 +56,7 @@ pub fn basic_clause_simplification(_ps: Vec<Lit>, _copy: bool) -> Option<Vec<Lit
     return Some(qs);
 }
 
-pub fn reorder_by_level(mut _ps: Vec<Lit>, solver_state: &mut SolverState) {
+pub fn reorder_by_level(mut _ps: &mut Vec<Lit>, solver_state: &mut SolverState) {
     let mut max: i32 = std::i32::MIN;
     let mut max_at: i32 = -1;
     let mut max2: i32 = std::i32::MIN;
@@ -92,12 +95,12 @@ pub fn reorder_by_level(mut _ps: Vec<Lit>, solver_state: &mut SolverState) {
     }
 }
 
-pub fn new_clause(_ps: Vec<Lit>, _learnt: bool, solver_state: &mut SolverState) {
+pub fn new_clause(_ps: &mut Vec<Lit>, _learnt: bool, solver_state: &mut SolverState) {
     new_clause_pr(_ps, _learnt, false, true, solver_state);
 }
 
 fn new_clause_pr(
-    _ps: Vec<Lit>,
+    _ps: &mut Vec<Lit>,
     _learnt: bool,
     _theory_clause: bool,
     _copy: bool,
@@ -107,12 +110,77 @@ fn new_clause_pr(
         return;
     };
 
-    let ps: Vec<Lit> = Vec::new();
+    let mut ps: Vec<Lit> = Vec::new();
 
-    if !_learnt {}
+    if !_learnt {
+        let qs = basic_clause_simplification(_ps.to_vec(), _copy);
+
+        if qs == None {
+            return;
+        }
+
+        let mut unqs = qs.unwrap();
+        for i in 0..unqs.len() {
+            if solver_state.level[var(&unqs[i]) as usize] == 0
+                && value_by_lit(unqs[i], &solver_state) == Lbool::True
+            {
+                return;
+            }
+        }
+
+        {
+            let mut _i: usize = 0;
+            let mut _j: usize = 0;
+
+            for y in 0..unqs.len() {
+                if solver_state.level[var(&unqs[_i]) as usize] != 0
+                    || value_by_lit(unqs[_i], &solver_state) != Lbool::False
+                {
+                    _j += 1;
+                    unqs[_j] = unqs[_i];
+                }
+                unqs.truncate(_i - _j);
+
+                _i += 1;
+            }
+        }
+        ps = unqs;
+    } else {
+        ps = _ps.to_vec();
+    }
+
+    if ps.len() == 0 {
+        solver_state.ok = false;
+    } else if ps.len() == 1 {
+        if _theory_clause {
+            solver_state.level_to_backtrack = 0;
+            cancel_util();
+        }
+
+        let c: Clause = Clause::new(_learnt || _theory_clause, &ps);
+        new_clause_callback(c);
+
+        let ps_clone: &mut Vec<Lit> = &mut ps.to_vec();
+        if !internal_enqueue(&ps_clone[0]) {
+            solver_state.ok = false;
+        } else {
+            if _theory_clause {
+                reorder_by_level(ps_clone, solver_state)
+            }
+
+            let c: Clause = Clause::new(_learnt || _theory_clause, &ps);
+
+            if !_learnt && !_theory_clause {
+            } else {
+                if _learnt {}
+            }
+        }
+    }
 }
 
 pub fn remove() {}
 pub fn simplify() {}
 pub fn remove_watch() {}
 pub fn new_var() {}
+pub fn cancel_util() {}
+pub fn new_clause_callback(c: Clause) {}

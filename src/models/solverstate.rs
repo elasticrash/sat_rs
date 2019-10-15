@@ -33,6 +33,8 @@ pub struct SolverState {
     pub add_unit_tmp: Vec<Lit>,
     pub add_binary_tmp: Vec<Lit>,
     pub add_ternary_tmp: Vec<Lit>,
+    // DLPP(T)
+    pub level_to_backtrack: i32,
 }
 
 pub trait Internal {
@@ -41,7 +43,7 @@ pub trait Internal {
     fn var_bump_activity(&self, p: Lit);
     fn var_decay_activity(self);
     fn cla_decay_activity(self);
-    fn i_new_clause(self, ps: Vec<Lit>);
+    fn i_new_clause(self, ps: &mut Vec<Lit>);
     fn cla_bump_activity(c: Clause);
     fn remove(c: Clause);
     fn locked(c: Clause) -> bool;
@@ -53,7 +55,7 @@ impl Internal for SolverState {
         analyse_final(confl, false);
     }
     fn i_enqueue(fact: Lit) -> bool {
-        return enqueue(fact, None);
+        return enqueue(&fact, None);
     }
     fn var_bump_activity(&self, p: Lit) {
         if self.var_decay < 0.0 {
@@ -72,7 +74,7 @@ impl Internal for SolverState {
     fn cla_decay_activity(mut self) {
         self.cla_inc *= self.cla_decay;
     }
-    fn i_new_clause(mut self, ps: Vec<Lit>) {
+    fn i_new_clause(mut self, ps: &mut Vec<Lit>) {
         new_clause(ps, false, &mut self);
     }
     fn cla_bump_activity(c: Clause) {}
