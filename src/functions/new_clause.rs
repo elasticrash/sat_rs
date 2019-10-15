@@ -202,7 +202,14 @@ fn new_clause_pr(
 }
 
 pub fn remove() {}
-pub fn simplify() {}
+pub fn simplify(c: Clause, solver_state: &mut SolverState) -> bool {
+    for y in 0..c.size() {
+        if value_by_lit(c.data[y as usize], &solver_state) == Lbool::True {
+            return true;
+        }
+    }
+    return false;
+}
 pub fn remove_watch() {}
 pub fn new_var() {}
 pub fn cancel_util() {}
