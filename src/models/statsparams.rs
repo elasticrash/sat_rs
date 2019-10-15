@@ -1,3 +1,4 @@
+#[derive(Copy, Clone)]
 pub struct SolverStats {
     pub starts: f64,
     pub decisions: f64,

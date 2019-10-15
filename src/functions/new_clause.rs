@@ -3,7 +3,6 @@ use crate::models::clause::*;
 use crate::models::lbool::*;
 use crate::models::lit::*;
 use crate::models::solverstate::*;
-
 use std::collections::HashMap;
 
 /*_________________________________________________________________________________________________
@@ -169,14 +168,35 @@ fn new_clause_pr(
             }
 
             let c: Clause = Clause::new(_learnt || _theory_clause, &ps);
+            let c_clone: &mut Clause = &mut c.clone();
 
             if !_learnt && !_theory_clause {
-                let c_clone: &mut Clause = &mut c.clone();
-                solver_state.clauses.push(c);
+                solver_state.clauses.push(c.clone());
                 solver_state.solver_stats.clauses_literals += c_clone.size() as f64;
             } else {
-                if _learnt {}
+                if _learnt {
+                    let mut max_i: i32 = 1;
+                    let mut max: i32 = solver_state.level[var(&ps[1]) as usize];
+                    for y in 2..ps.len() {
+                        if solver_state.level[var(&ps[y]) as usize] > max {
+                            max = solver_state.level[var(&ps[y]) as usize];
+                            max_i = y as i32;
+                        }
+                    }
+                    c_clone.data[1] = ps[max_i as usize];
+                    c_clone.data[max_i as usize] = ps[1];
+                } else {
+                    move_back(c.clone().data[0], c.clone().data[1]);
+                }
+
+                solver_state.cla_bump_activity(c.clone());
+                solver_state.learnts.push(c.clone());
+                solver_state.solver_stats.learnts_literals += c.clone().size() as f64;
             }
+
+            solver_state.watches[index(!c.clone().data[0]) as usize].push(c.clone());
+            solver_state.watches[index(!c.clone().data[1]) as usize].push(c.clone());
+            new_clause_callback(c);
         }
     }
 }

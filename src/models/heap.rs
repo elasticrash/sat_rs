@@ -1,3 +1,4 @@
+#[derive(Clone)]
 pub struct Heap {
     pub comp: fn(i32, i32) -> bool,
     pub heap: Vec<i32>,

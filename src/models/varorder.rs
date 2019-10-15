@@ -5,6 +5,7 @@ use crate::models::lit::ILit;
 use crate::models::lit::Lit;
 use crate::models::random::{drand, irand};
 
+#[derive(Clone)]
 pub struct VarOrder {
     pub assigns: Vec<Lbool>,
     pub activity: Vec<f64>,

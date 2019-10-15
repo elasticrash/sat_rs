@@ -68,7 +68,7 @@ pub fn var(lit: &Lit) -> i32 {
     return lit.x >> 1;
 }
 
-pub fn index(lit: &Lit) -> i32 {
+pub fn index(lit: Lit) -> i32 {
     return lit.x;
 }
 

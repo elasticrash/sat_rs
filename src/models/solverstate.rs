@@ -9,9 +9,11 @@ use crate::models::lit::*;
 use crate::models::statsparams::*;
 use crate::models::varorder::VarOrder;
 
+#[derive(Clone)]
 pub struct SolverState {
     pub ok: bool,
     pub clauses: Vec<Clause>,
+    pub learnts: Vec<Clause>,
     pub cla_inc: f64,
     pub cla_decay: f64,
     pub activity: Vec<f64>,
@@ -46,7 +48,7 @@ pub trait Internal {
     fn var_decay_activity(self);
     fn cla_decay_activity(self);
     fn i_new_clause(self, ps: &mut Vec<Lit>);
-    fn cla_bump_activity(c: Clause);
+    fn cla_bump_activity(&mut self, c: Clause);
     fn remove(c: Clause);
     fn locked(c: Clause) -> bool;
     fn decision_level() -> i32;
@@ -79,7 +81,7 @@ impl Internal for SolverState {
     fn i_new_clause(mut self, ps: &mut Vec<Lit>) {
         new_clause(ps, false, &mut self);
     }
-    fn cla_bump_activity(c: Clause) {}
+    fn cla_bump_activity(&mut self, c: Clause) {}
     fn remove(_c: Clause) {}
     fn locked(_c: Clause) -> bool {
         return true;
@@ -88,3 +90,5 @@ impl Internal for SolverState {
         return 5;
     }
 }
+
+pub fn move_back(l1: Lit, l2: Lit) {}
