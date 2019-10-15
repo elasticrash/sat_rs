@@ -1,5 +1,6 @@
 use crate::models::lit::Lit;
 
+#[derive(Clone)]
 pub struct Clause {
     pub data: Vec<Lit>,
     is_learnt: bool,
@@ -8,7 +9,7 @@ pub struct Clause {
 
 pub trait IClause {
     fn new(learnt: bool, ps: &Vec<Lit>) -> Self;
-    fn size() -> i32;
+    fn size(&self) -> i32;
     fn learnt() -> bool;
     fn get_by_index(&self) -> Lit;
     fn to_string() -> String;
@@ -23,7 +24,7 @@ impl IClause for Clause {
             activity: 0.0,
         };
     }
-    fn size() -> i32 {
+    fn size(&self) -> i32 {
         return 0;
     }
     fn learnt() -> bool {

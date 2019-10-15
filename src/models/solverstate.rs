@@ -6,11 +6,12 @@ use crate::functions::search::var_rescale_activity;
 use crate::models::clause::Clause;
 use crate::models::lbool::Lbool;
 use crate::models::lit::*;
+use crate::models::statsparams::*;
 use crate::models::varorder::VarOrder;
 
 pub struct SolverState {
     pub ok: bool,
-    pub clasues: Vec<Clause>,
+    pub clauses: Vec<Clause>,
     pub cla_inc: f64,
     pub cla_decay: f64,
     pub activity: Vec<f64>,
@@ -35,6 +36,7 @@ pub struct SolverState {
     pub add_ternary_tmp: Vec<Lit>,
     // DLPP(T)
     pub level_to_backtrack: i32,
+    pub solver_stats: SolverStats,
 }
 
 pub trait Internal {

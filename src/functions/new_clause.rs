@@ -171,6 +171,9 @@ fn new_clause_pr(
             let c: Clause = Clause::new(_learnt || _theory_clause, &ps);
 
             if !_learnt && !_theory_clause {
+                let c_clone: &mut Clause = &mut c.clone();
+                solver_state.clauses.push(c);
+                solver_state.solver_stats.clauses_literals += c_clone.size() as f64;
             } else {
                 if _learnt {}
             }

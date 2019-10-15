@@ -1,12 +1,12 @@
 pub struct SolverStats {
-    starts: f64,
-    decisions: f64,
-    propagations: f64,
-    conflicts: f64,
-    clauses_literals: f64,
-    learnts_literals: f64,
-    max_literals: f64,
-    tot_literals: f64,
+    pub starts: f64,
+    pub decisions: f64,
+    pub propagations: f64,
+    pub conflicts: f64,
+    pub clauses_literals: f64,
+    pub learnts_literals: f64,
+    pub max_literals: f64,
+    pub tot_literals: f64,
 }
 
 pub struct SearchParams {
