@@ -22,8 +22,9 @@ pub struct SolverState {
     pub order: VarOrder,
     pub watches: Vec<Vec<Clause>>,
     pub assigns: Vec<Lbool>,
+    pub trail: Vec<Lit>,
     pub trail_lim: Vec<i32>,
-    pub reason: Vec<Clause>,
+    pub reason: Vec<Option<Clause>>,
     pub level: Vec<i32>,
     pub trail_pos: Vec<i32>,
     pub root_level: i32,
@@ -43,7 +44,7 @@ pub struct SolverState {
 
 pub trait Internal {
     fn i_analyze_final(confl: Clause);
-    fn i_enqueue(fact: Lit) -> bool;
+    fn i_enqueue(&mut self, fact: Lit) -> bool;
     fn var_bump_activity(&self, p: Lit);
     fn var_decay_activity(self);
     fn cla_decay_activity(self);
@@ -58,7 +59,7 @@ impl Internal for SolverState {
     fn i_analyze_final(confl: Clause) {
         analyse_final(confl, false);
     }
-    fn i_enqueue(fact: Lit) -> bool {
+    fn i_enqueue(&mut self, fact: Lit) -> bool {
         return enqueue(&fact, None);
     }
     fn var_bump_activity(&self, p: Lit) {

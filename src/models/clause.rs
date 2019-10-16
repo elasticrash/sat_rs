@@ -3,8 +3,8 @@ use crate::models::lit::Lit;
 #[derive(Clone)]
 pub struct Clause {
     pub data: Vec<Lit>,
-    is_learnt: bool,
-    activity: f64,
+    pub is_learnt: bool,
+    pub activity: f64,
 }
 
 pub trait IClause {

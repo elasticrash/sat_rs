@@ -201,7 +201,18 @@ fn new_clause_pr(
     }
 }
 
-pub fn remove() {}
+pub fn remove(c: Clause, just_dealloc: bool, solver_state: &mut SolverState) {
+    if !just_dealloc {
+        solver_state.watches[index(!c.clone().data[0]) as usize].push(c.clone());
+        solver_state.watches[index(!c.clone().data[1]) as usize].push(c.clone());
+    }
+
+    if c.is_learnt {
+        solver_state.solver_stats.learnts_literals -= c.size() as f64;
+    } else {
+        solver_state.solver_stats.clauses_literals -= c.size() as f64;
+    }
+}
 pub fn simplify(c: Clause, solver_state: &mut SolverState) -> bool {
     for y in 0..c.size() {
         if value_by_lit(c.data[y as usize], &solver_state) == Lbool::True {
@@ -210,7 +221,25 @@ pub fn simplify(c: Clause, solver_state: &mut SolverState) -> bool {
     }
     return false;
 }
-pub fn remove_watch() {}
-pub fn new_var() {}
+pub fn remove_watch(ws: Vec<Clause>, elem: Clause) {}
+pub fn new_var(solver_state: &mut SolverState) -> i32 {
+    let index: i32;
+    index = solver_state.assigns.len() as i32;
+    solver_state.watches.push(Vec::new());
+    solver_state.watches.push(Vec::new());
+    solver_state.reason.push(None);
+    solver_state.assigns.push(Lbool::Undef0);
+    solver_state.level.push(-1);
+    solver_state.trail_pos.push(-1);
+    solver_state.activity.push(0.0);
+    solver_state.analyze_seen.push(Lbool::Undef0);
+
+    return index;
+}
+pub fn assume(p: Lit, solver_state: &mut SolverState) -> bool {
+    solver_state.trail_lim.push(solver_state.trail.len() as i32);
+    return solver_state.i_enqueue(p);
+}
+
 pub fn cancel_util() {}
 pub fn new_clause_callback(c: Clause) {}
