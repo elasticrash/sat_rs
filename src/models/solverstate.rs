@@ -52,7 +52,7 @@ pub trait Internal {
     fn cla_bump_activity(&mut self, c: Clause);
     fn remove(c: Clause);
     fn locked(c: Clause) -> bool;
-    fn decision_level() -> i32;
+    fn decision_level(&mut self) -> i32;
 }
 
 impl Internal for SolverState {
@@ -87,7 +87,7 @@ impl Internal for SolverState {
     fn locked(_c: Clause) -> bool {
         return true;
     }
-    fn decision_level() -> i32 {
+    fn decision_level(&mut self) -> i32 {
         return 5;
     }
 }

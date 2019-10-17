@@ -250,5 +250,11 @@ pub fn assume(p: Lit, solver_state: &mut SolverState) -> bool {
     return solver_state.i_enqueue(p);
 }
 
-pub fn cancel_util() {}
-pub fn new_clause_callback(c: Clause) {}
+pub fn cancel_util(level:i32, solver_state: &mut SolverState) {
+    if solver_state.decision_level() > level {
+        
+    }
+}
+pub fn new_clause_callback(c: Clause) {
+    
+}
