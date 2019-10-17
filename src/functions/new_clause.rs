@@ -3,6 +3,7 @@ use crate::models::clause::*;
 use crate::models::lbool::*;
 use crate::models::lit::*;
 use crate::models::solverstate::*;
+use crate::models::varorder::*;
 use std::collections::HashMap;
 
 /*_________________________________________________________________________________________________
@@ -250,11 +251,14 @@ pub fn assume(p: Lit, solver_state: &mut SolverState) -> bool {
     return solver_state.i_enqueue(p);
 }
 
-pub fn cancel_util(level:i32, solver_state: &mut SolverState) {
+pub fn cancel_util(level: i32, solver_state: &mut SolverState) {
     if solver_state.decision_level() > level {
-
+        for y in (solver_state.trail_lim[level as usize])..(solver_state.trail.len() as i32) {
+            let x = var(&solver_state.trail[y as usize]) as usize;
+            solver_state.assigns[x] = Lbool::Undef0;
+            solver_state.reason[x] = None;
+            solver_state.order.clone().undo(x as i32); //revisit:: should no reason to clone here
+        }
     }
 }
-pub fn new_clause_callback(c: Clause) {
-    
-}
+pub fn new_clause_callback(c: Clause) {}
