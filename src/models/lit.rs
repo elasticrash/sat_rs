@@ -2,6 +2,8 @@
 use std::cmp::Ordering;
 use std::ops::Not;
 
+pub static VAR_UNDEFINED: i32 = -1;
+
 #[derive(Copy, Clone)]
 pub struct Lit {
     pub x: i32,

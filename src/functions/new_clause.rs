@@ -259,6 +259,13 @@ pub fn cancel_util(level: i32, solver_state: &mut SolverState) {
             solver_state.reason[x] = None;
             solver_state.order.clone().undo(x as i32); //revisit:: should no reason to clone here
         }
+        solver_state.trail.truncate(
+            (solver_state.trail.len() - solver_state.trail_lim[level as usize] as usize) as usize,
+        );
+        solver_state
+            .trail_lim
+            .truncate(solver_state.trail_lim.len() - level as usize);
+        solver_state.qhead = solver_state.trail.len() as i32;
     }
 }
 pub fn new_clause_callback(c: Clause) {}

@@ -2,6 +2,9 @@ use crate::models::lit::*;
 use crate::models::solverstate::SolverState;
 use std::ops::Not;
 
+pub static L_TRUE: Lbool = Lbool::True;
+pub static L_FALSE: Lbool = Lbool::False;
+
 #[derive(Copy, Clone)]
 pub enum Lbool {
     True = 1,
