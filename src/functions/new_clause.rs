@@ -221,7 +221,16 @@ pub fn simplify(c: Clause, solver_state: &mut SolverState) -> bool {
     }
     return false;
 }
-pub fn remove_watch(ws: Vec<Clause>, elem: Clause) {}
+pub fn remove_watch(ws: &mut Vec<Clause>, elem: Clause) -> bool {
+    if ws.len() == 0 {
+        return false;
+    }
+    for y in 0..ws.len() - 1 {
+        ws[y] = ws[y + 1].clone();
+    }
+    ws.pop();
+    return true;
+}
 pub fn new_var(solver_state: &mut SolverState) -> i32 {
     let index: i32;
     index = solver_state.assigns.len() as i32;
