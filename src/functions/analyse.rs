@@ -94,7 +94,7 @@ pub fn analyze(
             for y in (i as usize)..out_learnt.len() {
                 match solver_state.reason[var(&out_learnt[y]) as usize] {
                     Some(ref p) => {
-                        if !analyze_removeable(out_learnt[y], min_level) {
+                        if !analyze_removeable(out_learnt[y], min_level, solver_state) {
                             j += 1;
                             out_learnt[j as usize] = out_learnt[y];
                         }
@@ -109,23 +109,69 @@ pub fn analyze(
             solver_state.analyze_toclear.clear();
             i = 1;
             j = 1;
+            let mut keep: bool = false;
             for y in (i as usize)..out_learnt.len() {
                 match solver_state.reason[var(&out_learnt[y]) as usize] {
                     Some(ref p) => {
                         let c: Clause = p.clone();
-                        for k in 1..c.data.len() {}
+                        for k in 1..c.data.len() {
+                            if seen[var(&c.data[k]) as usize] == Lbool::Undef0
+                                && solver_state.level[var(&c.data[k]) as usize] != 0
+                            {
+                                j += 1;
+                                out_learnt[j as usize] = out_learnt[y];
+                                keep = true;
+                                break;
+                            }
+                        }
                     }
                     None => {
                         out_learnt[j as usize] = out_learnt[y];
                     }
                 }
+
+                if !keep {
+                    solver_state.analyze_toclear.push(out_learnt[y]);
+                }
             }
         }
+        {
+            for y in 0..out_learnt.len() {
+                seen[var(&out_learnt[y]) as usize] = Lbool::Undef0;
+            }
+
+            for y in 0..solver_state.analyze_toclear.len() {
+                seen[var(&solver_state.analyze_toclear[y]) as usize] = Lbool::Undef0;
+            }
+        }
+
+        solver_state.solver_stats.max_literals += out_learnt.len() as f64;
+        out_learnt.truncate((i - j) as usize);
+        solver_state.solver_stats.tot_literals += out_learnt.len() as f64;
     }
 
     return out_btlevel;
 }
 
-fn analyze_removeable(_p: Lit, min_level: u32) -> bool {
+fn analyze_removeable(_p: Lit, min_level: u32, solver_state: &mut SolverState) -> bool {
+    solver_state.analyze_stack.clear();
+    solver_state.analyze_stack.push(_p.clone());
+    let top: i32 = solver_state.analyze_toclear.len() as i32;
+
+    while solver_state.analyze_stack.len() > 0 {
+        let c: Clause;
+        if solver_state.analyze_stack.last() == None {
+            match &solver_state.reason[var(&_p) as usize] {
+                Some(clause) => {
+                    c = clause.clone();
+                    solver_state.analyze_stack.pop();
+                    for i in 1..c.clone().data.len() {
+                        let p: Lit = c.clone().data[i];
+                    }
+                }
+                None => {}
+            }
+        }
+    }
     return true;
 }
