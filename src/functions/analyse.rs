@@ -76,6 +76,56 @@ pub fn analyze(
         }
         path_c > 0
     } {}
+    out_learnt[0] = !p;
+
+    {
+        let mut i: i32 = 1;
+        let mut j: i32;
+
+        if solver_state.moo.expensive_ccmin {
+            let mut min_level: u32 = 0;
+            for y in (i as usize)..out_learnt.len() {
+                i = y as i32;
+                min_level |= (1 << (solver_state.level[var(&out_learnt[y]) as usize] & 31));
+            }
+            solver_state.analyze_toclear.clear();
+            i = 1;
+            j = 1;
+            for y in (i as usize)..out_learnt.len() {
+                match solver_state.reason[var(&out_learnt[y]) as usize] {
+                    Some(ref p) => {
+                        if !analyze_removeable(out_learnt[y], min_level) {
+                            j += 1;
+                            out_learnt[j as usize] = out_learnt[y];
+                        }
+                    }
+                    None => {
+                        j += 1;
+                        out_learnt[j as usize] = out_learnt[y];
+                    }
+                }
+            }
+        } else {
+            solver_state.analyze_toclear.clear();
+            i = 1;
+            j = 1;
+            for y in (i as usize)..out_learnt.len() {
+                match solver_state.reason[var(&out_learnt[y]) as usize] {
+                    Some(ref p) => {
+                        let c: Clause = p.clone();
+                        for k in 1..c.data.len() {}
+                    }
+                    None => {
+                        out_learnt[j as usize] = out_learnt[y];
+                    }
+                }
+            }
+        }
+    }
 
     return out_btlevel;
+}
+
+fn analyze_removeable(_p: Lit, min_level: u32) -> bool {
+    return true;
 }

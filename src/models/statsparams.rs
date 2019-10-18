@@ -10,6 +10,14 @@ pub struct SolverStats {
     pub tot_literals: f64,
 }
 
+#[derive(Copy, Clone)]
+pub struct MOO {
+    pub search_params: SearchParams,
+    pub expensive_ccmin: bool,
+    pub verbosity: i32,
+}
+
+#[derive(Copy, Clone)]
 pub struct SearchParams {
     var_decay: f64,
     clause_decay: f64,

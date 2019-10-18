@@ -40,6 +40,7 @@ pub struct SolverState {
     // DLPP(T)
     pub level_to_backtrack: i32,
     pub solver_stats: SolverStats,
+    pub moo: MOO,
 }
 
 pub trait Internal {
