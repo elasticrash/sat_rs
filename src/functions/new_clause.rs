@@ -161,7 +161,7 @@ fn new_clause_pr(
         new_clause_callback(c);
 
         let ps_clone: &mut Vec<Lit> = &mut ps.to_vec();
-        if !internal_enqueue(&ps_clone[0]) {
+        if !internal_enqueue(&ps_clone[0], solver_state) {
             solver_state.ok = false;
         } else {
             if _theory_clause {

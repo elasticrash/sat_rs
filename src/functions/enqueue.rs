@@ -1,5 +1,7 @@
-use crate::models::clause::Clause;
-use crate::models::lit::Lit;
+use crate::models::clause::*;
+use crate::models::lbool::*;
+use crate::models::lit::*;
+use crate::models::solverstate::*;
 
 /*_________________________________________________________________________________________________
 |
@@ -18,10 +20,20 @@ use crate::models::lit::Lit;
 |    TRUE if fact was enqueued without conflict, FALSE otherwise.
 |________________________________________________________________________________________________@*/
 
-pub fn enqueue(_fact: &Lit, _from: Option<Clause>) -> bool {
-    return true;
+pub fn enqueue(_fact: &Lit, _from: Option<Clause>, solver_state: &mut SolverState) -> bool {
+    if !is_undefined(value_by_lit(*_fact, solver_state)) {
+        return value_by_lit(*_fact, solver_state) != L_FALSE;
+    } else {
+        let x: usize = var(&_fact) as usize;
+        solver_state.assigns[x] = to_bool(!sign(_fact));
+        solver_state.level[x] = solver_state.decision_level();
+        solver_state.trail_pos[x] =  solver_state.trail.len() as i32;
+        solver_state.reason[x] =  _from;
+        solver_state.trail.push(*_fact);
+        return true;
+    }
 }
 
-pub fn internal_enqueue(_fact: &Lit) -> bool {
-    return enqueue(&_fact, None);
+pub fn internal_enqueue(_fact: &Lit, solver_state: &mut SolverState) -> bool {
+    return enqueue(&_fact, None, solver_state);
 }

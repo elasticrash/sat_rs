@@ -61,7 +61,7 @@ impl Internal for SolverState {
         analyse_final(confl, false);
     }
     fn i_enqueue(&mut self, fact: Lit) -> bool {
-        return enqueue(&fact, None);
+        return enqueue(&fact, None, self);
     }
     fn var_bump_activity(&self, p: Lit) {
         if self.var_decay < 0.0 {
