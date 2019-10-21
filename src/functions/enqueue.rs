@@ -27,8 +27,8 @@ pub fn enqueue(_fact: &Lit, _from: Option<Clause>, solver_state: &mut SolverStat
         let x: usize = var(&_fact) as usize;
         solver_state.assigns[x] = to_bool(!sign(_fact));
         solver_state.level[x] = solver_state.decision_level();
-        solver_state.trail_pos[x] =  solver_state.trail.len() as i32;
-        solver_state.reason[x] =  _from;
+        solver_state.trail_pos[x] = solver_state.trail.len() as i32;
+        solver_state.reason[x] = _from;
         solver_state.trail.push(*_fact);
         return true;
     }

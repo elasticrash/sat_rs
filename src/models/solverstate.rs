@@ -41,10 +41,14 @@ pub struct SolverState {
     pub level_to_backtrack: i32,
     pub solver_stats: SolverStats,
     pub moo: MOO,
+    // SOLVING
+    pub progress_estimate: f64,
+    pub mode: Vec<Lbool>,
+    pub conflict: Vec<Lit>,
 }
 
 pub trait Internal {
-    fn i_analyze_final(confl: Clause);
+    fn i_analyze_final(&mut self, confl: Clause);
     fn i_enqueue(&mut self, fact: Lit) -> bool;
     fn var_bump_activity(&self, p: Lit);
     fn var_decay_activity(self);
@@ -57,8 +61,8 @@ pub trait Internal {
 }
 
 impl Internal for SolverState {
-    fn i_analyze_final(confl: Clause) {
-        analyse_final(confl, false);
+    fn i_analyze_final(&mut self, confl: Clause) {
+        analyse_final(confl, false, self);
     }
     fn i_enqueue(&mut self, fact: Lit) -> bool {
         return enqueue(&fact, None, self);
