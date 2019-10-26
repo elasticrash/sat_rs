@@ -167,6 +167,34 @@ fn analyze_removeable(_p: Lit, min_level: u32, solver_state: &mut SolverState) -
                     solver_state.analyze_stack.pop();
                     for i in 1..c.clone().data.len() {
                         let p: Lit = c.clone().data[i];
+                        if solver_state.analyze_seen[var(&p) as usize] == Lbool::Undef0
+                            && solver_state.level[var(&p) as usize] != 0
+                        {
+                            match &solver_state.reason[var(&p) as usize] {
+                                Some(clause) => {
+                                    if ((1 << solver_state.level[var(&p) as usize] & 31)
+                                        & min_level)
+                                        != 0
+                                    {
+                                        solver_state.analyze_seen[var(&p) as usize] = Lbool::True;
+                                        solver_state.analyze_stack.push(p);
+                                        solver_state.analyze_toclear.push(p);
+                                    } else {
+                                        for j in top..solver_state.analyze_toclear.len() as i32 {
+                                            solver_state.analyze_seen[var(&solver_state
+                                                .analyze_toclear
+                                                [j as usize])
+                                                as usize] = Lbool::Undef0;
+                                            solver_state.analyze_toclear.truncate(
+                                                solver_state.analyze_toclear.len() - top as usize,
+                                            );
+                                            return false;
+                                        }
+                                    }
+                                }
+                                None => {}
+                            }
+                        }
                     }
                 }
                 None => {}

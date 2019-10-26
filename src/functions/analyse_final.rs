@@ -1,6 +1,6 @@
 use crate::models::clause::*;
-use crate::models::solverstate::*;
 use crate::models::lbool::*;
+use crate::models::solverstate::*;
 
 /*_________________________________________________________________________________________________
 |
@@ -15,7 +15,9 @@ use crate::models::lbool::*;
 
 pub fn analyse_final(_confl: Clause, _skip_first: bool, solver_state: &mut SolverState) {
     solver_state.conflict.clear();
-    if solver_state.root_level == 0 {return;}
+    if solver_state.root_level == 0 {
+        return;
+    }
 
-    let seen:Vec<Lbool> = Vec ::new();
+    let seen: Vec<Lbool> = Vec::new();
 }
