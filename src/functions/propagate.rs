@@ -16,7 +16,7 @@ use crate::models::clause::*;
 pub fn propagate(solver_state: &mut SolverState) {
     let confl: Clause;
 
-    while(solver_state.qhead < solver_state.trail.len()){
-        
+    while(solver_state.qhead < solver_state.trail.len() as i32){
+
     }
 }
