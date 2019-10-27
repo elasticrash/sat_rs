@@ -1,3 +1,6 @@
+use crate::models::solverstate::*;
+use crate::models::clause::*;
+
 /*_________________________________________________________________________________________________
 |
 |  propagate : [void]  .  [Clause*]
@@ -10,4 +13,10 @@
 |      * the propagation queue is empty, even if there was a conflict.
 |________________________________________________________________________________________________@*/
 
-pub fn propagate() {}
+pub fn propagate(solver_state: &mut SolverState) {
+    let confl: Clause;
+
+    while(solver_state.qhead < solver_state.trail.len()){
+        
+    }
+}
