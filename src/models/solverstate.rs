@@ -98,3 +98,12 @@ impl Internal for SolverState {
 }
 
 pub fn move_back(l1: Lit, l2: Lit) {}
+
+pub fn locked(c: Clause, solver_state: &mut SolverState) -> bool {
+    match &solver_state.reason[var(&c.data[0]) as usize] {
+        Some(x) => {
+            return c == *x;
+        }
+        _ => false,
+    }
+}

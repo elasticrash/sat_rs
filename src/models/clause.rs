@@ -1,4 +1,5 @@
 use crate::models::lit::Lit;
+use std::cmp::Ordering;
 
 #[derive(Clone)]
 pub struct Clause {
@@ -38,5 +39,18 @@ impl IClause for Clause {
     }
     fn get_data(&self) -> &Vec<Lit> {
         return &self.data;
+    }
+}
+
+impl PartialEq for Clause {
+    fn eq(&self, other: &Self) -> bool {
+        if self.activity == other.activity {
+            if self.data.len() == other.data.len() {
+                if self.is_learnt == other.is_learnt {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

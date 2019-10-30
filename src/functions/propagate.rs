@@ -72,7 +72,7 @@ pub fn propagate(solver_state: &mut SolverState) -> Option<Clause> {
                 }
             }
         }
-        ws.truncate((i-j) as usize);
+        ws.truncate((i - j) as usize);
     }
     return confl;
 }
