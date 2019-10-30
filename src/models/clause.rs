@@ -1,5 +1,4 @@
 use crate::models::lit::Lit;
-use std::cmp::Ordering;
 
 #[derive(Clone)]
 pub struct Clause {

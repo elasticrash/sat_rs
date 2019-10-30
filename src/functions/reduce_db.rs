@@ -1,6 +1,5 @@
 use crate::functions::new_clause::*;
 use crate::models::clause::*;
-use crate::models::lit::*;
 use crate::models::solverstate::*;
 use std::cmp::Ordering;
 /*_________________________________________________________________________________________________

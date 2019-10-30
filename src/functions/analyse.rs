@@ -86,7 +86,7 @@ pub fn analyze(
             let mut min_level: u32 = 0;
             for y in (i as usize)..out_learnt.len() {
                 i = y as i32;
-                min_level |= (1 << (solver_state.level[var(&out_learnt[y]) as usize] & 31));
+                min_level |= 1 << (solver_state.level[var(&out_learnt[y]) as usize] & 31);
             }
             solver_state.analyze_toclear.clear();
             i = 1;

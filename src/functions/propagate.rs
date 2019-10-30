@@ -18,7 +18,7 @@ use crate::models::solverstate::*;
 pub fn propagate(solver_state: &mut SolverState) -> Option<Clause> {
     let mut confl: Option<Clause> = None;
 
-    while (solver_state.qhead < solver_state.trail.len() as i32) {
+    while solver_state.qhead < solver_state.trail.len() as i32 {
         solver_state.solver_stats.propagations += 1.0;
         solver_state.simp_db_props -= 1.0;
         let p: Lit = solver_state.trail[solver_state.qhead as usize];
@@ -55,7 +55,7 @@ pub fn propagate(solver_state: &mut SolverState) -> Option<Clause> {
                     }
                 }
 
-                if (!foundwatch) {
+                if !foundwatch {
                     if enqueue(&first, Some(c.clone()), solver_state) {
                         if solver_state.decision_level() == 0 {
                             solver_state.ok = false;

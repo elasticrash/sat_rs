@@ -97,7 +97,7 @@ impl Internal for SolverState {
     }
 }
 
-pub fn move_back(l1: Lit, l2: Lit) {}
+pub fn move_back(_l1: Lit, _l2: Lit) {}
 
 pub fn locked(c: Clause, solver_state: &mut SolverState) -> bool {
     match &solver_state.reason[var(&c.data[0]) as usize] {
