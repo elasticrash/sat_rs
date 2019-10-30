@@ -15,8 +15,8 @@ use crate::models::solverstate::*;
 |      * the propagation queue is empty, even if there was a conflict.
 |________________________________________________________________________________________________@*/
 
-pub fn propagate(solver_state: &mut SolverState): Clause {
-    let mut confl: Clause;
+pub fn propagate(solver_state: &mut SolverState) -> Option<Clause> {
+    let mut confl: Option<Clause> = None;
 
     while (solver_state.qhead < solver_state.trail.len() as i32) {
         solver_state.solver_stats.propagations += 1.0;
@@ -59,7 +59,7 @@ pub fn propagate(solver_state: &mut SolverState): Clause {
                     if enqueue(&first, Some(c.clone()), solver_state) {
                         if solver_state.decision_level() == 0 {
                             solver_state.ok = false;
-                            confl = c.clone();
+                            confl = Some(c.clone());
                             solver_state.qhead = solver_state.trail.len() as i32;
 
                             while i < end {
@@ -72,7 +72,7 @@ pub fn propagate(solver_state: &mut SolverState): Clause {
                 }
             }
         }
-        ws.truncate(i-j);
+        ws.truncate((i-j) as usize);
     }
     return confl;
 }
