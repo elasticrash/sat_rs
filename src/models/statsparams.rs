@@ -19,9 +19,9 @@ pub struct MOO {
 
 #[derive(Copy, Clone)]
 pub struct SearchParams {
-    var_decay: f64,
-    clause_decay: f64,
-    random_var_freq: f64,
+    pub var_decay: f64,
+    pub clause_decay: f64,
+    pub random_var_freq: f64,
 }
 
 pub trait ISearchParams {

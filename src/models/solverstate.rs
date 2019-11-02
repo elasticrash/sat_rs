@@ -43,7 +43,7 @@ pub struct SolverState {
     pub moo: MOO,
     // SOLVING
     pub progress_estimate: f64,
-    pub mode: Vec<Lbool>,
+    pub model: Vec<Lbool>,
     pub conflict: Vec<Lit>,
 }
 
