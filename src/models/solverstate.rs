@@ -56,8 +56,14 @@ pub trait Internal {
     fn i_new_clause(self, ps: &mut Vec<Lit>);
     fn cla_bump_activity(&mut self, c: Clause);
     fn remove(c: Clause);
-    fn locked(c: Clause) -> bool;
+    fn locked(&mut self, c: Clause) -> bool;
     fn decision_level(&mut self) -> i32;
+}
+
+pub trait SemiInternal {
+    fn n_assigns(self) -> usize;
+    fn n_clauses(self) -> usize;
+    fn n_learnts(self) -> usize;
 }
 
 impl Internal for SolverState {
@@ -89,21 +95,29 @@ impl Internal for SolverState {
     }
     fn cla_bump_activity(&mut self, c: Clause) {}
     fn remove(_c: Clause) {}
-    fn locked(_c: Clause) -> bool {
-        return true;
+    fn locked(&mut self, _c: Clause) -> bool {
+        match &self.reason[var(&_c.data[0]) as usize] {
+            Some(x) => {
+                return _c == *x;
+            }
+            _ => false,
+        }
     }
     fn decision_level(&mut self) -> i32 {
         return 5;
     }
 }
 
-pub fn move_back(_l1: Lit, _l2: Lit) {}
-
-pub fn locked(c: Clause, solver_state: &mut SolverState) -> bool {
-    match &solver_state.reason[var(&c.data[0]) as usize] {
-        Some(x) => {
-            return c == *x;
-        }
-        _ => false,
+impl SemiInternal for SolverState {
+    fn n_assigns(self) -> usize {
+        return self.trail.len();
+    }
+    fn n_clauses(self) -> usize {
+        return self.clauses.len();
+    }
+    fn n_learnts(self) -> usize {
+        return self.clauses.len();
     }
 }
+
+pub fn move_back(_l1: Lit, _l2: Lit) {}

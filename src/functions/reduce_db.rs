@@ -27,7 +27,7 @@ fn reduce_db(solver_state: &mut SolverState) {
 
     for y in 0..solver_state.learnts.len() / 2 {
         if solver_state.learnts[y].data.len() > 2
-            && !locked(solver_state.learnts[y].clone(), solver_state)
+            && !solver_state.locked(solver_state.learnts[y].clone())
         {
             remove(solver_state.learnts[y].clone(), false, solver_state);
         } else {
@@ -38,7 +38,7 @@ fn reduce_db(solver_state: &mut SolverState) {
 
     for y in i..solver_state.learnts.len() as i32 {
         if solver_state.learnts[y as usize].data.len() > 2
-            && !locked(solver_state.learnts[y as usize].clone(), solver_state)
+            && !solver_state.locked(solver_state.learnts[y as usize].clone())
             && solver_state.learnts[y as usize].activity < extra_lim
         {
             remove(
