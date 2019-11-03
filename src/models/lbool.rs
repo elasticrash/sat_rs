@@ -42,7 +42,7 @@ pub fn is_undefined(value: Lbool) -> bool {
     return value != Lbool::True && value != Lbool::False;
 }
 
-pub fn value_by_var(x: i32, y: SolverState) -> Lbool {
+pub fn value_by_var(x: i32, y: &SolverState) -> Lbool {
     return y.assigns[x as usize];
 }
 

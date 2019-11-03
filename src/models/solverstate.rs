@@ -3,11 +3,11 @@ use crate::functions::enqueue::enqueue;
 use crate::functions::new_clause::new_clause;
 use crate::functions::search::var_rescale_activity;
 
-use crate::models::clause::Clause;
-use crate::models::lbool::Lbool;
+use crate::models::clause::*;
+use crate::models::lbool::*;
 use crate::models::lit::*;
 use crate::models::statsparams::*;
-use crate::models::varorder::VarOrder;
+use crate::models::varorder::*;
 
 #[derive(Clone)]
 pub struct SolverState {
@@ -50,14 +50,22 @@ pub struct SolverState {
 pub trait Internal {
     fn i_analyze_final(&mut self, confl: Clause);
     fn i_enqueue(&mut self, fact: Lit) -> bool;
-    fn var_bump_activity(&self, p: Lit);
-    fn var_decay_activity(self);
-    fn cla_decay_activity(self);
+    fn var_bump_activity(&mut self, p: Lit);
+    fn var_decay_activity(&mut self);
+    fn cla_decay_activity(&mut self);
     fn i_new_clause(self, ps: &mut Vec<Lit>);
     fn cla_bump_activity(&mut self, c: Clause);
     fn remove(c: Clause);
     fn locked(&mut self, c: Clause) -> bool;
     fn decision_level(&mut self) -> i32;
+}
+
+pub trait NewVar {
+    fn n_vars(&mut self) -> i32;
+    fn add_unit(p: Lit);
+    fn add_binary(p: Lit, q: Lit);
+    fn add_ternary(p: Lit, q: Lit, r: Lit);
+    fn add_clause(ps: Vec<Lit>);
 }
 
 pub trait SemiInternal {
@@ -73,21 +81,21 @@ impl Internal for SolverState {
     fn i_enqueue(&mut self, fact: Lit) -> bool {
         return enqueue(&fact, None, self);
     }
-    fn var_bump_activity(&self, p: Lit) {
+    fn var_bump_activity(&mut self, p: Lit) {
         if self.var_decay < 0.0 {
             return;
         }
         let index = var(&p) as f64 + self.var_inc;
         if self.activity[index as usize] > 1e100 {
-            var_rescale_activity();
+            var_rescale_activity(self);
         }
     }
-    fn var_decay_activity(mut self) {
+    fn var_decay_activity(&mut self) {
         if self.var_decay >= 0.0 {
             self.var_inc *= self.var_decay;
         }
     }
-    fn cla_decay_activity(mut self) {
+    fn cla_decay_activity(&mut self) {
         self.cla_inc *= self.cla_decay;
     }
     fn i_new_clause(mut self, ps: &mut Vec<Lit>) {
@@ -118,6 +126,16 @@ impl SemiInternal for SolverState {
     fn n_learnts(self) -> usize {
         return self.clauses.len();
     }
+}
+
+impl NewVar for SolverState {
+    fn n_vars(&mut self) -> i32 {
+        return self.assigns.len() as i32;
+    }
+    fn add_unit(p: Lit) {}
+    fn add_binary(p: Lit, q: Lit) {}
+    fn add_ternary(p: Lit, q: Lit, r: Lit) {}
+    fn add_clause(ps: Vec<Lit>) {}
 }
 
 pub fn move_back(_l1: Lit, _l2: Lit) {}

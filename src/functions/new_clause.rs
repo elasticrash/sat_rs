@@ -154,7 +154,7 @@ fn new_clause_pr(
     } else if ps.len() == 1 {
         if _theory_clause {
             solver_state.level_to_backtrack = 0;
-            cancel_util(0, solver_state);
+            cancel_until(0, solver_state);
         }
 
         let c: Clause = Clause::new(_learnt || _theory_clause, &ps);
@@ -251,7 +251,7 @@ pub fn assume(p: Lit, solver_state: &mut SolverState) -> bool {
     return solver_state.i_enqueue(p);
 }
 
-pub fn cancel_util(level: i32, solver_state: &mut SolverState) {
+pub fn cancel_until(level: i32, solver_state: &mut SolverState) {
     if solver_state.decision_level() > level {
         for y in (solver_state.trail_lim[level as usize])..(solver_state.trail.len() as i32) {
             let x = var(&solver_state.trail[y as usize]) as usize;

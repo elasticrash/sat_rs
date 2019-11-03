@@ -11,7 +11,7 @@ use std::cmp::Ordering;
 |    clauses are clauses that are reason to some assignment. Binary clauses are never removed.
 |________________________________________________________________________________________________@*/
 
-fn reduce_db(solver_state: &mut SolverState) {
+pub fn reduce_db(solver_state: &mut SolverState) {
     let mut i: i32 = 0;
     let mut j: i32 = 0;
 

@@ -1,12 +1,30 @@
 mod functions;
 mod models;
-use models::lit::*;
+use std::env;
 
-fn main() {}
+fn main() {
+    // let args: Vec<String> = env::args().collect();
 
-fn solver() {
-    let _lit_undefined: Lit = Lit::new(VAR_UNDEFINED, true);
-    // let solver = SolverState{
+    let mut expect: bool = false;
+    let mut expect_res: bool = false;
 
-    // }
+    let mut pos: usize = 1;
+
+    /*if &args[pos] == "-s" {
+        expect = true;
+        expect_res = true;
+        pos += 1;
+    }
+
+    if &args[pos] == "-u" {
+        expect = true;
+        expect_res = false;
+        pos += 1;
+    }*/
+}
+
+fn ReadWord() {
+    let sb_array: Vec<String> = Vec::new();
+
+    while true {}
 }
