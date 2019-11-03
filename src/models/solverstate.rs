@@ -40,11 +40,97 @@ pub struct SolverState {
     // DLPP(T)
     pub level_to_backtrack: i32,
     pub solver_stats: SolverStats,
-    pub moo: MOO,
     // SOLVING
     pub progress_estimate: f64,
     pub model: Vec<Lbool>,
     pub conflict: Vec<Lit>,
+    //MOO
+    pub default_parms: SearchParams,
+    pub expensive_ccmin: bool,
+    pub verbosity: i32,
+}
+
+pub trait NewState {
+    fn new() -> Self;
+}
+
+impl NewState for SolverState {
+    fn new() -> Self {
+        let mut solver = Self {
+            clauses: Vec::new(),
+            learnts: Vec::new(),
+            activity: Vec::new(),
+            watches: Vec::new(),
+            assigns: Vec::new(),
+            trail_pos: Vec::new(),
+            trail: Vec::new(),
+            trail_lim: Vec::new(),
+            reason: Vec::new(),
+            level: Vec::new(),
+            analyze_seen: Vec::new(),
+            analyze_stack: Vec::new(),
+            analyze_toclear: Vec::new(),
+            add_unit_tmp: Vec::new(),
+            add_binary_tmp: Vec::new(),
+            add_ternary_tmp: Vec::new(),
+            model: Vec::new(),
+            conflict: Vec::new(),
+            solver_stats: SolverStats::new(),
+            ok: true,
+            cla_inc: 1.0,
+            cla_decay: 1.0,
+            var_inc: 1.0,
+            var_decay: 1.0,
+            order: VarOrder::new(Vec::new(), Vec::new()),
+            qhead: 0,
+            simp_db_assigns: 0,
+            simp_db_props: 0.0,
+            default_parms: SearchParams {
+                var_decay: 0.95,
+                clause_decay: 0.999,
+                random_var_freq: 0.02,
+            },
+            expensive_ccmin: true,
+            verbosity: 0,
+            progress_estimate: 0.0,
+            root_level: 0,
+            level_to_backtrack: 0,
+        };
+
+        solver.add_unit_tmp.resize(2, Lit::new(-1, false));
+        solver.add_binary_tmp.resize(2, Lit::new(-1, false));
+        solver.add_ternary_tmp.resize(3, Lit::new(-1, false));
+        return solver;
+    }
+}
+
+#[derive(Copy, Clone)]
+pub struct SearchParams {
+    pub var_decay: f64,
+    pub clause_decay: f64,
+    pub random_var_freq: f64,
+}
+
+pub trait ISearchParams {
+    fn new(self, v: f64, c: f64, r: f64);
+    fn clone(self, other: SearchParams);
+    fn unit(self);
+}
+
+impl ISearchParams for SearchParams {
+    fn new(mut self, v: f64, c: f64, r: f64) {
+        self.var_decay = v;
+        self.clause_decay = c;
+        self.random_var_freq = r;
+    }
+    fn clone(mut self, other: SearchParams) {
+        self.var_decay = other.var_decay;
+        self.clause_decay = other.clause_decay;
+        self.random_var_freq = other.random_var_freq;
+    }
+    fn unit(self) {
+        self.new(1.0, 1.0, 0.0);
+    }
 }
 
 pub trait Internal {

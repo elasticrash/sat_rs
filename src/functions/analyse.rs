@@ -82,7 +82,7 @@ pub fn analyze(
         let mut i: i32 = 1;
         let mut j: i32;
 
-        if solver_state.moo.expensive_ccmin {
+        if solver_state.expensive_ccmin {
             let mut min_level: u32 = 0;
             for y in (i as usize)..out_learnt.len() {
                 i = y as i32;

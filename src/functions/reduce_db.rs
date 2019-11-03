@@ -26,6 +26,7 @@ pub fn reduce_db(solver_state: &mut SolverState) {
     });
 
     for y in 0..solver_state.learnts.len() / 2 {
+        i = y as i32;
         if solver_state.learnts[y].data.len() > 2
             && !solver_state.locked(solver_state.learnts[y].clone())
         {

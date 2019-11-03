@@ -117,7 +117,7 @@ pub fn var_rescale_activity(solver_state: &mut SolverState) {
 }
 
 pub fn cla_rescale_activity(solver_state: &mut SolverState) {
-      for y in 0..solver_state.learnts.len() {
+    for y in 0..solver_state.learnts.len() {
         solver_state.learnts[y as usize].activity *= 1e-20;
     }
     solver_state.cla_inc *= 1e-20;

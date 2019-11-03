@@ -1,12 +1,14 @@
+use crate::models::varorder::*;
+
 #[derive(Clone)]
 pub struct Heap {
-    pub comp: fn(i32, i32) -> bool,
+    pub comp: fn(&VarOrder, i32, i32) -> bool,
     pub heap: Vec<i32>,
     pub indices: Vec<i32>,
 }
 
 pub trait IHeap {
-    fn new(v: fn(i32, i32) -> bool) -> Self;
+    fn new(v: fn(&VarOrder, i32, i32) -> bool) -> Self;
     fn in_heap(&self, n: i32) -> bool;
     fn increase(&self, n: i32);
     fn insert(self, n: i32);
@@ -16,7 +18,7 @@ pub trait IHeap {
 }
 
 impl IHeap for Heap {
-    fn new(v: fn(i32, i32) -> bool) -> Self {
+    fn new(v: fn(&VarOrder, i32, i32) -> bool) -> Self {
         return Self {
             comp: v,
             heap: Vec::new(),

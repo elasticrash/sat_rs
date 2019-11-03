@@ -1,8 +1,6 @@
-use crate::models::heap::Heap;
-use crate::models::heap::IHeap;
+use crate::models::heap::*;
 use crate::models::lbool::{is_undefined, Lbool};
-use crate::models::lit::ILit;
-use crate::models::lit::Lit;
+use crate::models::lit::*;
 use crate::models::random::{drand, irand};
 
 #[derive(Clone)]
@@ -11,11 +9,10 @@ pub struct VarOrder {
     pub activity: Vec<f64>,
     pub heap: Heap,
     pub random_seed: f64,
-    pub lt: fn(x: i32, y: i32) -> bool,
 }
 
 pub trait IVarOrder {
-    fn new(self, ass: Vec<Lbool>, act: Vec<f64>);
+    fn new(ass: Vec<Lbool>, act: Vec<f64>) -> Self;
     fn lt(&self, x: i32, y: i32) -> bool;
     fn new_var(self);
     fn update(self, x: i32);
@@ -25,11 +22,13 @@ pub trait IVarOrder {
 }
 
 impl IVarOrder for VarOrder {
-    fn new(mut self, ass: Vec<Lbool>, act: Vec<f64>) {
-        self.assigns = ass;
-        self.activity = act;
-        self.heap = Heap::new(self.lt);
-        self.random_seed = 91648253.0;
+    fn new(ass: Vec<Lbool>, act: Vec<f64>) -> Self {
+        return Self {
+            assigns: ass,
+            activity: act,
+            heap: Heap::new(Self::lt),
+            random_seed: 91648253.0,
+        };
     }
     fn lt(&self, x: i32, y: i32) -> bool {
         return &self.activity[x as usize] > &self.activity[y as usize];
