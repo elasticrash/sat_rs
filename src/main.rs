@@ -10,8 +10,8 @@ use std::io::prelude::*;
 fn main() {
     // let args: Vec<String> = env::args().collect();
 
-    let mut expect: bool = false;
-    let mut expect_res: bool = false;
+    //let mut expect: bool = false;
+    //let mut expect_res: bool = false;
 
     //let mut pos: usize = 1;
 
@@ -63,11 +63,10 @@ fn main() {
 }
 
 fn read_word(chars: Vec<char>, from: i32) -> (String, String) {
-    let sb_array: Vec<String> = Vec::new();
     let mut sb = String::new();
     let mut fake = String::new();
     let mut i: i32 = from;
-    for y in from..chars.len() as i32 {
+    for _y in from..chars.len() as i32 {
         let mut ch = chars[i as usize];
 
         if ch == ' ' || ch == '\n' || ch == '\r' {
