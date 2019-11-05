@@ -242,6 +242,7 @@ pub fn new_var(solver_state: &mut SolverState) -> i32 {
     solver_state.level.push(-1);
     solver_state.trail_pos.push(-1);
     solver_state.activity.push(0.0);
+    solver_state.order.new_var();
     solver_state.analyze_seen.push(Lbool::Undef0);
 
     return index;
