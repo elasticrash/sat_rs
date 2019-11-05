@@ -151,7 +151,7 @@ pub trait NewVar {
     fn add_unit(p: Lit);
     fn add_binary(p: Lit, q: Lit);
     fn add_ternary(p: Lit, q: Lit, r: Lit);
-    fn add_clause(ps: Vec<Lit>);
+    fn add_clause(&mut self, ps: &mut Vec<Lit>);
 }
 
 pub trait SemiInternal {
@@ -218,10 +218,12 @@ impl NewVar for SolverState {
     fn n_vars(&mut self) -> i32 {
         return self.assigns.len() as i32;
     }
-    fn add_unit(p: Lit) {}
-    fn add_binary(p: Lit, q: Lit) {}
-    fn add_ternary(p: Lit, q: Lit, r: Lit) {}
-    fn add_clause(ps: Vec<Lit>) {}
+    fn add_unit(_p: Lit) {}
+    fn add_binary(_p: Lit, _q: Lit) {}
+    fn add_ternary(_p: Lit, _q: Lit, _r: Lit) {}
+    fn add_clause(&mut self, ps: &mut Vec<Lit>) {
+        new_clause(ps, false, self);
+    }
 }
 
 pub fn move_back(_l1: Lit, _l2: Lit) {}

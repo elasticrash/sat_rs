@@ -1,7 +1,7 @@
-fn reportf(a: String) {
+pub fn reportf(a: String) {
     print!("{:?}", a);
 }
 
-fn debug(a: String) {
+pub fn debug(a: String) {
     println!("{:?}", a);
 }

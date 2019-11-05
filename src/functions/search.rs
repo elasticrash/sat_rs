@@ -6,11 +6,9 @@ use crate::functions::propagate::*;
 use crate::functions::reduce_db::*;
 use crate::functions::simplify_db::*;
 use crate::functions::stats::*;
-use crate::models::clause::*;
 use crate::models::lbool::*;
 use crate::models::lit::*;
 use crate::models::solverstate::*;
-use crate::models::statsparams::*;
 use crate::models::varorder::*;
 use std::cmp::max;
 
@@ -45,7 +43,7 @@ pub fn search(
     solver_state.cla_decay = 1.0 / parms.clause_decay;
     solver_state.model.clear();
 
-    while true {
+    loop {
         match propagate(solver_state) {
             Some(_c) => {
                 solver_state.solver_stats.conflicts += 1.0;
@@ -106,7 +104,6 @@ pub fn search(
             }
         }
     }
-    return Lbool::False;
 }
 
 pub fn var_rescale_activity(solver_state: &mut SolverState) {

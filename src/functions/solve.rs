@@ -1,3 +1,5 @@
+use crate::models::solverstate::*;
+
 /*_________________________________________________________________________________________________
 |
 |  solve : (assumps : const vec<Lit>&)  .  [bool]
@@ -12,4 +14,4 @@
 |    not contain both 'x' and '~x' for any variable 'x'.
 |________________________________________________________________________________________________@*/
 
-pub fn solve() {}
+pub fn solve(solver_state: &mut SolverState) {}

@@ -1,21 +1,24 @@
 mod functions;
 mod models;
 use crate::functions::new_clause::*;
+use crate::functions::solve::*;
+use crate::functions::stats::*;
 use crate::models::lit::*;
+use crate::models::logger::*;
 use crate::models::solverstate::*;
 use std::env;
 use std::fs::File;
 use std::io::prelude::*;
 
 fn main() {
-    // let args: Vec<String> = env::args().collect();
+    let args: Vec<String> = env::args().collect();
 
-    //let mut expect: bool = false;
-    //let mut expect_res: bool = false;
+    let mut expect: bool = false;
+    let mut expect_res: bool = false;
 
-    //let mut pos: usize = 1;
+    let mut pos: usize = 1;
 
-    /*if &args[pos] == "-s" {
+    if &args[pos] == "-s" {
         expect = true;
         expect_res = true;
         pos += 1;
@@ -25,7 +28,7 @@ fn main() {
         expect = true;
         expect_res = false;
         pos += 1;
-    }*/
+    }
     let mut file = File::open("./input.txt").unwrap();
     let mut buffer = String::new();
 
@@ -58,7 +61,38 @@ fn main() {
             while var >= s.n_vars() {
                 new_var(&mut s);
             }
+            let solver_lit;
+            if parsed_lit > 0 {
+                solver_lit = Lit::simple(var);
+            } else {
+                solver_lit = !Lit::simple(var);
+            }
+
+            lits.push(solver_lit);
         }
+    }
+
+    s.add_clause(&mut lits);
+
+    if expect {
+        s.verbosity = 0;
+        solve(&mut s);
+        if s.ok == expect_res {
+            reportf(".".to_string());
+        } else {
+            reportf(format!("\nproblem: {0}\n", args[pos]));
+        }
+    } else {
+        s.verbosity = 1;
+        solve(&mut s);
+        let mut result: String = String::new();
+        if s.ok {
+            result.push_str("SATISFIABLE\n");
+        } else {
+            result.push_str("UNSATISFIABLE\n");
+        }
+        reportf(result);
+        print_stats(s.solver_stats);
     }
 }
 

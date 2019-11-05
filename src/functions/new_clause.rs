@@ -269,4 +269,4 @@ pub fn cancel_until(level: i32, solver_state: &mut SolverState) {
         solver_state.qhead = solver_state.trail.len() as i32;
     }
 }
-pub fn new_clause_callback(c: Clause) {}
+pub fn new_clause_callback(_c: Clause) {}

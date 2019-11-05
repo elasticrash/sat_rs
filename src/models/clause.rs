@@ -17,7 +17,7 @@ pub trait IClause {
 }
 
 impl IClause for Clause {
-    fn new(learnt: bool, ps: &Vec<Lit>) -> Self {
+    fn new(_learnt: bool, _ps: &Vec<Lit>) -> Self {
         return Self {
             data: Vec::new(),
             is_learnt: true,
