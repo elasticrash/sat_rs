@@ -56,7 +56,7 @@ pub fn search(
                     return L_FALSE;
                 }
                 let mut learnt_clause: Vec<Lit> = Vec::new();
-                let mut backtrack_level: i32 = analyze(Some(_c), &mut learnt_clause, solver_state);
+                let backtrack_level: i32 = analyze(Some(_c), &mut learnt_clause, solver_state);
                 cancel_until(max(backtrack_level, solver_state.root_level), solver_state);
                 new_clause(&mut learnt_clause, true, solver_state);
                 if learnt_clause.len() == 1 {
@@ -89,7 +89,7 @@ pub fn search(
                 solver_state.solver_stats.decisions += 1.0;
                 let next: Lit = solver_state.order.select(parms.random_var_freq);
 
-                if (next == Lit::new(VAR_UNDEFINED, true)) {
+                if next == Lit::new(VAR_UNDEFINED, true) {
                     if model_found() {
                         continue;
                     }

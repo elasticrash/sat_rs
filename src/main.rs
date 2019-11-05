@@ -5,7 +5,7 @@ use crate::models::lit::*;
 use crate::models::solverstate::*;
 use std::env;
 use std::fs::File;
-use std::io::{self, prelude::*, BufReader};
+use std::io::prelude::*;
 
 fn main() {
     // let args: Vec<String> = env::args().collect();
@@ -13,7 +13,7 @@ fn main() {
     let mut expect: bool = false;
     let mut expect_res: bool = false;
 
-    let mut pos: usize = 1;
+    //let mut pos: usize = 1;
 
     /*if &args[pos] == "-s" {
         expect = true;
