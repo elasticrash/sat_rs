@@ -40,7 +40,7 @@ fn main() {
     let mut w: (String, String);
     lits.clear();
     while {
-        w = ReadWord(all_chars.clone(), until);
+        w = read_word(all_chars.clone(), until);
         until += w.0.clone().len() as i32;
         until += w.1.clone().len() as i32;
         w.0.len() != 0 && w.1.len() != 0
@@ -62,7 +62,7 @@ fn main() {
     }
 }
 
-fn ReadWord(chars: Vec<char>, from: i32) -> (String, String) {
+fn read_word(chars: Vec<char>, from: i32) -> (String, String) {
     let sb_array: Vec<String> = Vec::new();
     let mut sb = String::new();
     let mut fake = String::new();
