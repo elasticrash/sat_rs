@@ -16,19 +16,19 @@ fn main() {
     let mut expect: bool = false;
     let mut expect_res: bool = false;
 
-    let mut pos: usize = 1;
+    // let mut pos: usize = 1;
 
-    if &args[pos] == "-s" {
-        expect = true;
-        expect_res = true;
-        pos += 1;
-    }
+    // if &args[pos] == "-s" {
+    //     expect = true;
+    //     expect_res = true;
+    //     pos += 1;
+    // }
 
-    if &args[pos] == "-u" {
-        expect = true;
-        expect_res = false;
-        pos += 1;
-    }
+    // if &args[pos] == "-u" {
+    //     expect = true;
+    //     expect_res = false;
+    //     pos += 1;
+    // }
     let mut file = File::open("./input.txt").unwrap();
     let mut buffer = String::new();
 
@@ -49,8 +49,6 @@ fn main() {
         w.0.len() != 0 && w.1.len() != 0
     } {
         let word = w.0;
-        println!("word > {}", word);
-
         if word == "%" {
             break;
         }
@@ -80,16 +78,16 @@ fn main() {
         if s.ok == expect_res {
             reportf(".".to_string());
         } else {
-            reportf(format!("\nproblem: {0}\n", args[pos]));
+            reportf("problem:".to_string());
         }
     } else {
         s.verbosity = 1;
         solve(&mut s);
         let mut result: String = String::new();
         if s.ok {
-            result.push_str("SATISFIABLE\n");
+            result.push_str("SATISFIABLE");
         } else {
-            result.push_str("UNSATISFIABLE\n");
+            result.push_str("UNSATISFIABLE");
         }
         reportf(result);
         print_stats(s.solver_stats);

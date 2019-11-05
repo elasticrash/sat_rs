@@ -1,5 +1,5 @@
 pub fn reportf(a: String) {
-    print!("{:?}", a);
+    println!("{:?}", a);
 }
 
 pub fn debug(a: String) {
