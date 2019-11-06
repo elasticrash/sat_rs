@@ -74,7 +74,7 @@ fn main() {
 
     if expect {
         s.verbosity = 0;
-        solve(&mut s);
+        solve_no_assumptions(&mut s);
         if s.ok == expect_res {
             reportf(".".to_string());
         } else {
@@ -82,7 +82,7 @@ fn main() {
         }
     } else {
         s.verbosity = 1;
-        solve(&mut s);
+        solve_no_assumptions(&mut s);
         let mut result: String = String::new();
         if s.ok {
             result.push_str("SATISFIABLE");
