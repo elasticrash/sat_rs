@@ -132,7 +132,7 @@ fn new_clause_pr(
             let mut _i: usize = 0;
             let mut _j: usize = 0;
 
-            for y in 0..unqs.len() {
+            for _y in 0..unqs.len() {
                 if solver_state.level[var(&unqs[_i]) as usize] != 0
                     || value_by_lit(unqs[_i], &solver_state) != Lbool::False
                 {
@@ -190,7 +190,7 @@ fn new_clause_pr(
                     move_back(c.clone().data[0], c.clone().data[1]);
                 }
 
-                solver_state.cla_bump_activity(c.clone());
+                solver_state.cla_bump_activity(&mut c.clone());
                 solver_state.learnts.push(c.clone());
                 solver_state.solver_stats.learnts_literals += c.clone().size() as f64;
             }

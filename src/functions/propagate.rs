@@ -26,7 +26,7 @@ pub fn propagate(solver_state: &mut SolverState) -> Option<Clause> {
         let mut ws: Vec<Clause> = solver_state.watches[index(p.clone()) as usize].clone();
         let mut i: i32 = 0;
         let mut j: i32 = 0;
-        let mut end = i + ws.len() as i32;
+        let end = i + ws.len() as i32;
         while i != end {
             let mut c: Clause = ws[i as usize].clone();
 

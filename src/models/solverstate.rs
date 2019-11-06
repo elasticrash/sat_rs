@@ -1,7 +1,7 @@
-use crate::functions::analyse_final::analyse_final;
-use crate::functions::enqueue::enqueue;
-use crate::functions::new_clause::new_clause;
-use crate::functions::search::var_rescale_activity;
+use crate::functions::analyse_final::*;
+use crate::functions::enqueue::*;
+use crate::functions::new_clause::*;
+use crate::functions::search::*;
 
 use crate::models::clause::*;
 use crate::models::lbool::*;
@@ -140,7 +140,7 @@ pub trait Internal {
     fn var_decay_activity(&mut self);
     fn cla_decay_activity(&mut self);
     fn i_new_clause(self, ps: &mut Vec<Lit>);
-    fn cla_bump_activity(&mut self, c: Clause);
+    fn cla_bump_activity(&mut self, c: &mut Clause);
     fn remove(c: Clause);
     fn locked(&mut self, c: Clause) -> bool;
     fn decision_level(&mut self) -> i32;
@@ -187,7 +187,12 @@ impl Internal for SolverState {
     fn i_new_clause(mut self, ps: &mut Vec<Lit>) {
         new_clause(ps, false, &mut self);
     }
-    fn cla_bump_activity(&mut self, c: Clause) {}
+    fn cla_bump_activity(&mut self, c: &mut Clause) {
+        c.activity += self.cla_inc;
+        if c.activity > 1e20 {
+            cla_rescale_activity(self);
+        }
+    }
     fn remove(_c: Clause) {}
     fn locked(&mut self, _c: Clause) -> bool {
         match &self.reason[var(&_c.data[0]) as usize] {

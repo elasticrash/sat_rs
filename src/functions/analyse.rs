@@ -24,7 +24,7 @@ use std::cmp::max;
 
 pub fn analyze(
     mut confl: Option<Clause>,
-    mut out_learnt: &mut Vec<Lit>,
+    out_learnt: &mut Vec<Lit>,
     solver_state: &mut SolverState,
 ) -> i32 {
     let mut out_btlevel: i32 = 0;
@@ -40,7 +40,7 @@ pub fn analyze(
             let c: Clause = confl.clone().unwrap();
 
             if c.is_learnt {
-                solver_state.cla_bump_activity(c.clone());
+                solver_state.cla_bump_activity(&mut c.clone());
             }
 
             let mut start: usize = 1;
@@ -171,7 +171,8 @@ fn analyze_removeable(_p: Lit, min_level: u32, solver_state: &mut SolverState) -
                             && solver_state.level[var(&p) as usize] != 0
                         {
                             match &solver_state.reason[var(&p) as usize] {
-                                Some(clause) => {
+                                None => {}
+                                _ => {
                                     if ((1 << solver_state.level[var(&p) as usize] & 31)
                                         & min_level)
                                         != 0
@@ -192,7 +193,6 @@ fn analyze_removeable(_p: Lit, min_level: u32, solver_state: &mut SolverState) -
                                         }
                                     }
                                 }
-                                None => {}
                             }
                         }
                     }

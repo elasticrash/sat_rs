@@ -11,7 +11,8 @@ use std::fs::File;
 use std::io::prelude::*;
 
 fn main() {
-    let args: Vec<String> = env::args().collect();
+    debug("=========================================".to_string());
+    let _args: Vec<String> = env::args().collect();
 
     let mut expect: bool = false;
     let mut expect_res: bool = false;
