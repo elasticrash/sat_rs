@@ -1,5 +1,6 @@
 pub mod clause;
 pub mod heap;
+pub mod input_arguments;
 pub mod lbool;
 pub mod lit;
 pub mod logger;

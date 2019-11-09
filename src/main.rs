@@ -3,6 +3,7 @@ mod models;
 use crate::functions::new_clause::*;
 use crate::functions::solve::*;
 use crate::functions::stats::*;
+use crate::models::input_arguments::*;
 use crate::models::lit::*;
 use crate::models::logger::*;
 use crate::models::solverstate::*;
@@ -14,22 +15,8 @@ fn main() {
     debug("=========================================".to_string());
     let _args: Vec<String> = env::args().collect();
 
-    let expect: bool = false;
-    let expect_res: bool = false;
+    let arguments: InputArguments = read_input_arguments(_args);
 
-    // let mut pos: usize = 1;
-
-    // if &args[pos] == "-s" {
-    //     expect = true;
-    //     expect_res = true;
-    //     pos += 1;
-    // }
-
-    // if &args[pos] == "-u" {
-    //     expect = true;
-    //     expect_res = false;
-    //     pos += 1;
-    // }
     let mut file = File::open("./input.txt").unwrap();
     let mut buffer = String::new();
 
@@ -73,7 +60,7 @@ fn main() {
 
     s.add_clause(&mut lits);
 
-    if expect {
+    if arguments.verbosity == 0 {
         s.verbosity = 0;
         solve_no_assumptions(&mut s);
         if s.ok == expect_res {
@@ -126,4 +113,50 @@ fn read_word(chars: Vec<char>, from: i32) -> (String, String) {
         i += 1;
     }
     return (sb, fake);
+}
+
+fn read_input_arguments(_args: Vec<String>) -> InputArguments {
+    let mut pos: usize = 1;
+
+    let mut arguments = InputArguments {
+        pre: "".to_string(),
+        grow: 1,
+        polarity_mode: "true".to_string(),
+        decay: 0,
+        rnd_freq: 0,
+        verbosity: 1,
+    };
+
+    if _args.len() > 1 {
+        if &_args[pos] == "-pre" {
+            pos += 1;
+            arguments.pre = _args[pos + 1].clone();
+        }
+
+        if &_args[pos] == "-grow" {
+            pos += 1;
+            arguments.grow = _args[pos + 1].clone().parse::<i32>().unwrap();
+        }
+
+        if &_args[pos] == "-polarity_mode" {
+            pos += 1;
+            arguments.polarity_mode = _args[pos + 1].clone();
+        }
+
+        if &_args[pos] == "-decay" {
+            pos += 1;
+            arguments.decay = _args[pos + 1].clone().parse::<i32>().unwrap();
+        }
+
+        if &_args[pos] == "-rnd_freq" {
+            pos += 1;
+            arguments.rnd_freq = _args[pos + 1].clone().parse::<i32>().unwrap();
+        }
+
+        if &_args[pos] == "-verbosity" {
+            pos += 1;
+            arguments.verbosity = _args[pos + 1].clone().parse::<i16>().unwrap();
+        }
+    }
+    return arguments;
 }
