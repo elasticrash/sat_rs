@@ -63,11 +63,6 @@ fn main() {
     if arguments.verbosity == 0 {
         s.verbosity = 0;
         solve_no_assumptions(&mut s);
-        if s.ok == expect_res {
-            reportf(".".to_string());
-        } else {
-            reportf("problem:".to_string());
-        }
     } else {
         s.verbosity = 1;
         solve_no_assumptions(&mut s);
