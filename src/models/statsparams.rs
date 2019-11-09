@@ -1,5 +1,8 @@
+use crate::models::timemem::*;
+
 #[derive(Copy, Clone)]
 pub struct SolverStats {
+    pub start_time: u64,
     pub starts: f64,
     pub decisions: f64,
     pub propagations: f64,
@@ -17,6 +20,7 @@ pub trait ISolverStats {
 impl ISolverStats for SolverStats {
     fn new() -> Self {
         return Self {
+            start_time: cpu_time(),
             starts: 0.0,
             decisions: 0.0,
             propagations: 0.0,

@@ -110,7 +110,7 @@ fn new_clause_pr(
         return;
     };
 
-    let mut ps: Vec<Lit> = Vec::new();
+    let ps: Vec<Lit>;
 
     if !_learnt {
         let qs = basic_clause_simplification(_ps.to_vec(), _copy);
@@ -204,8 +204,14 @@ fn new_clause_pr(
 
 pub fn remove(c: Clause, just_dealloc: bool, solver_state: &mut SolverState) {
     if !just_dealloc {
-        solver_state.watches[index(!c.clone().data[0]) as usize].push(c.clone());
-        solver_state.watches[index(!c.clone().data[1]) as usize].push(c.clone());
+        remove_watch(
+            &mut solver_state.watches[index(!c.clone().data[0]) as usize],
+            c.clone(),
+        );
+        remove_watch(
+            &mut solver_state.watches[index(!c.clone().data[1]) as usize],
+            c.clone(),
+        );
     }
 
     if c.is_learnt {
@@ -226,8 +232,13 @@ pub fn remove_watch(ws: &mut Vec<Clause>, elem: Clause) -> bool {
     if ws.len() == 0 {
         return false;
     }
-    for y in 0..ws.len() - 1 {
-        ws[y] = ws[y + 1].clone();
+    let mut j: usize = 0;
+    while ws[j] != elem {
+        j += 1;
+    }
+    for _y in j..ws.len() - 1 {
+        ws[j] = ws[j + 1].clone();
+        j += 1;
     }
     ws.pop();
     return true;

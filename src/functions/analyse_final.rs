@@ -21,17 +21,18 @@ pub fn analyse_final(_confl: Clause, _skip_first: bool, solver_state: &mut Solve
     }
 
     let mut seen: Vec<Lbool> = solver_state.analyze_seen.clone();
-    let mut istart: i32 = 0;
+    let mut istart: i32;
     if _skip_first {
         istart = 1
     } else {
         istart = 0
     };
-    for y in istart.._confl.data.len() as i32 {
-        let x: usize = var(&_confl.data[y as usize]) as usize;
+    for _y in istart.._confl.data.len() as i32 {
+        let x: usize = var(&_confl.data[istart as usize]) as usize;
         if solver_state.level[x] > 0 {
             seen[x] = Lbool::True;
         }
+        istart += 1;
     }
 
     let mut end: i32 = solver_state.trail_lim[solver_state.root_level as usize];

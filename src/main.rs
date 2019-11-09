@@ -14,8 +14,8 @@ fn main() {
     debug("=========================================".to_string());
     let _args: Vec<String> = env::args().collect();
 
-    let mut expect: bool = false;
-    let mut expect_res: bool = false;
+    let expect: bool = false;
+    let expect_res: bool = false;
 
     // let mut pos: usize = 1;
 

@@ -7,6 +7,7 @@ pub fn progress_estimate() -> f64 {
 }
 
 pub fn print_stats(stats: SolverStats) {
+    let cpu_time = cpu_time() - stats.start_time;
     reportf(format!("restarts              : {0}", stats.starts));
     reportf(format!("conflicts             : {0}", stats.conflicts,));
     reportf(format!("decisions             : {0}", stats.decisions,));
@@ -19,4 +20,5 @@ pub fn print_stats(stats: SolverStats) {
     if mem_used() != 0 {
         reportf(format!("Memory used           : {0} MB", mem_used()));
     }
+    reportf(format!("CPU time              : {0} s", cpu_time));
 }

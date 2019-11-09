@@ -33,7 +33,7 @@ pub fn analyze(
     let mut p: Lit = Lit::new(VAR_UNDEFINED, true);
 
     out_learnt.push(Lit::new(VAR_UNDEFINED, true)); // (leave room for the asserting literal)
-    let index: i32 = (solver_state.trail.len() - 1) as i32;
+    let mut index: i32 = (solver_state.trail.len() - 1) as i32;
 
     while {
         {
@@ -62,13 +62,9 @@ pub fn analyze(
                     }
                 }
             }
-            let mut n_index: usize = 0;
-            while {
-                n_index = (index - 1) as usize;
-                seen[var(&solver_state.trail[n_index]) as usize] == Lbool::Undef0
-            } {
-                n_index += 1;
-                p = solver_state.trail[n_index];
+            while { seen[var(&solver_state.trail[index as usize]) as usize] == Lbool::Undef0 } {
+                index -= 1;
+                p = solver_state.trail[(index + 1) as usize];
                 confl = solver_state.reason[var(&p) as usize].clone();
                 seen[var(&p) as usize] = Lbool::Undef0;
                 path_c -= 1;
@@ -79,29 +75,29 @@ pub fn analyze(
     out_learnt[0] = !p;
 
     {
-        let mut i: i32 = 1;
-        let mut j: i32;
+        let mut i: usize = 1;
+        let mut j: usize;
 
         if solver_state.expensive_ccmin {
             let mut min_level: u32 = 0;
             for y in (i as usize)..out_learnt.len() {
-                i = y as i32;
-                min_level |= 1 << (solver_state.level[var(&out_learnt[y]) as usize] & 31);
+                i = y;
+                min_level |= 1 << (solver_state.level[var(&out_learnt[i]) as usize] & 31);
             }
             solver_state.analyze_toclear.clear();
             i = 1;
             j = 1;
             for y in (i as usize)..out_learnt.len() {
                 match solver_state.reason[var(&out_learnt[y]) as usize] {
-                    Some(ref p) => {
+                    None => {
+                        j += 1;
+                        out_learnt[j as usize] = out_learnt[y];
+                    }
+                    _ => {
                         if !analyze_removeable(out_learnt[y], min_level, solver_state) {
                             j += 1;
                             out_learnt[j as usize] = out_learnt[y];
                         }
-                    }
-                    None => {
-                        j += 1;
-                        out_learnt[j as usize] = out_learnt[y];
                     }
                 }
             }
