@@ -223,12 +223,16 @@ impl NewVar for SolverState {
     fn n_vars(&mut self) -> i32 {
         return self.assigns.len() as i32;
     }
+    // TODO
     fn add_unit(_p: Lit) {}
+    // TODO
     fn add_binary(_p: Lit, _q: Lit) {}
+    // TODO
     fn add_ternary(_p: Lit, _q: Lit, _r: Lit) {}
     fn add_clause(&mut self, ps: &mut Vec<Lit>) {
         new_clause(ps, false, self);
     }
 }
 
+// TODO
 pub fn move_back(_l1: Lit, _l2: Lit) {}
