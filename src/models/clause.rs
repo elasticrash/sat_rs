@@ -10,7 +10,7 @@ pub struct Clause {
 pub trait IClause {
     fn new(learnt: bool, ps: &Vec<Lit>) -> Self;
     fn size(&self) -> i32;
-    fn learnt() -> bool;
+    fn learnt(&self) -> bool;
     fn get_by_index(&self) -> Lit;
     fn to_string() -> String;
     fn get_data(&self) -> &Vec<Lit>;
@@ -25,14 +25,16 @@ impl IClause for Clause {
         };
     }
     fn size(&self) -> i32 {
-        return 0;
+        return self.data.len() as i32;
     }
-    fn learnt() -> bool {
-        return true;
+    fn learnt(&self) -> bool {
+        return self.is_learnt;
     }
+    // TODO
     fn get_by_index(&self) -> Lit {
         return self.data[0];
     }
+    // TODO
     fn to_string() -> String {
         return String::new();
     }
