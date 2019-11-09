@@ -1,4 +1,4 @@
 Rust Port of MiniSAT2
 Work in progress, there are so much missing
 
-I am definately taking the wrong approach of port as much as you can blindly and then try to piece them together but I am having fun and learning rust at the same time
+I am definately taking the wrong approach of porting as much as you can blindly and then try to piece them together but I am having fun and learning rust at the same time
