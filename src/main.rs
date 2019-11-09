@@ -112,7 +112,7 @@ fn read_word(chars: Vec<char>, from: i32) -> (String, String) {
 
 fn read_input_arguments(_args: Vec<String>) -> InputArguments {
     let mut pos: usize = 1;
-
+    println!("{:?}", _args);
     let mut arguments = InputArguments {
         pre: "".to_string(),
         grow: 1,
@@ -123,34 +123,39 @@ fn read_input_arguments(_args: Vec<String>) -> InputArguments {
     };
 
     if _args.len() > 1 {
-        if &_args[pos] == "-pre" {
+        if _args[pos].starts_with("-pre") {
+            let arg: Vec<&str> = _args[pos].split('=').collect();
+            arguments.pre = String::from(arg[1]);
             pos += 1;
-            arguments.pre = _args[pos + 1].clone();
         }
 
-        if &_args[pos] == "-grow" {
+        if _args[pos].starts_with("-grow") {
+            let arg: Vec<&str> = _args[pos].split('=').collect();
+            arguments.grow = String::from(arg[1]).parse::<i32>().unwrap();
             pos += 1;
-            arguments.grow = _args[pos + 1].clone().parse::<i32>().unwrap();
         }
 
-        if &_args[pos] == "-polarity_mode" {
+        if _args[pos].starts_with("-polarity_mode") {
+            let arg: Vec<&str> = _args[pos].split('=').collect();
+            arguments.polarity_mode = String::from(arg[1]);
             pos += 1;
-            arguments.polarity_mode = _args[pos + 1].clone();
         }
 
-        if &_args[pos] == "-decay" {
+        if _args[pos].starts_with("-decay") {
+            let arg: Vec<&str> = _args[pos].split('=').collect();
+            arguments.decay = String::from(arg[1]).parse::<i32>().unwrap();
             pos += 1;
-            arguments.decay = _args[pos + 1].clone().parse::<i32>().unwrap();
         }
 
-        if &_args[pos] == "-rnd_freq" {
+        if _args[pos].starts_with("-rnd_freq") {
+            let arg: Vec<&str> = _args[pos].split('=').collect();
+            arguments.rnd_freq =  String::from(arg[1]).parse::<i32>().unwrap();
             pos += 1;
-            arguments.rnd_freq = _args[pos + 1].clone().parse::<i32>().unwrap();
         }
 
-        if &_args[pos] == "-verbosity" {
-            pos += 1;
-            arguments.verbosity = _args[pos + 1].clone().parse::<i16>().unwrap();
+        if _args[pos].starts_with("-verbosity") {
+            let arg: Vec<&str> = _args[pos].split('=').collect();
+            arguments.verbosity = String::from(arg[1]).parse::<i16>().unwrap();
         }
     }
     return arguments;
