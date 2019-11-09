@@ -111,7 +111,6 @@ fn read_word(chars: Vec<char>, from: i32) -> (String, String) {
 }
 
 fn read_input_arguments(_args: Vec<String>) -> InputArguments {
-    let mut pos: usize = 1;
     println!("{:?}", _args);
     let mut arguments = InputArguments {
         pre: "".to_string(),
@@ -122,35 +121,30 @@ fn read_input_arguments(_args: Vec<String>) -> InputArguments {
         verbosity: 1,
     };
 
-    if _args.len() > 1 {
+    for pos in 1.._args.len() {
         if _args[pos].starts_with("-pre") {
             let arg: Vec<&str> = _args[pos].split('=').collect();
             arguments.pre = String::from(arg[1]);
-            pos += 1;
         }
 
         if _args[pos].starts_with("-grow") {
             let arg: Vec<&str> = _args[pos].split('=').collect();
             arguments.grow = String::from(arg[1]).parse::<i32>().unwrap();
-            pos += 1;
         }
 
         if _args[pos].starts_with("-polarity_mode") {
             let arg: Vec<&str> = _args[pos].split('=').collect();
             arguments.polarity_mode = String::from(arg[1]);
-            pos += 1;
         }
 
         if _args[pos].starts_with("-decay") {
             let arg: Vec<&str> = _args[pos].split('=').collect();
             arguments.decay = String::from(arg[1]).parse::<i32>().unwrap();
-            pos += 1;
         }
 
         if _args[pos].starts_with("-rnd_freq") {
             let arg: Vec<&str> = _args[pos].split('=').collect();
             arguments.rnd_freq =  String::from(arg[1]).parse::<i32>().unwrap();
-            pos += 1;
         }
 
         if _args[pos].starts_with("-verbosity") {
