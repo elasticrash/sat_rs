@@ -11,8 +11,8 @@ pub trait IClause {
     fn new(learnt: bool, ps: &Vec<Lit>) -> Self;
     fn size(&self) -> i32;
     fn learnt(&self) -> bool;
-    fn get_by_index(&self) -> Lit;
-    fn to_string() -> String;
+    fn get_by_index(&self, i: usize) -> Lit;
+    fn to_string(&self) -> String;
     fn get_data(&self) -> &Vec<Lit>;
 }
 
@@ -30,13 +30,18 @@ impl IClause for Clause {
     fn learnt(&self) -> bool {
         return self.is_learnt;
     }
-    // TODO
-    fn get_by_index(&self) -> Lit {
-        return self.data[0];
+    fn get_by_index(&self, i: usize) -> Lit {
+        return self.data[i];
     }
-    // TODO
-    fn to_string() -> String {
-        return String::new();
+    fn to_string(&self) -> String {
+        let mut sb = String::new();
+        sb.push('[');
+        for y in self.data.clone() {
+            sb.push_str(&y.x.to_string());
+            sb.push_str(&String::from(", ".to_string()));
+        }
+        sb.push(']');
+        return sb;
     }
     fn get_data(&self) -> &Vec<Lit> {
         return &self.data;

@@ -33,6 +33,7 @@ impl IVarOrder for VarOrder {
     fn lt(&self, x: i32, y: i32) -> bool {
         return &self.activity[x as usize] > &self.activity[y as usize];
     }
+    // TODO
     fn new_var(&mut self) {}
     fn update(self, x: i32) {
         if self.heap.in_heap(x) {

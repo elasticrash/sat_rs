@@ -9,10 +9,12 @@ pub struct Heap {
 
 pub trait IHeap {
     fn new(v: fn(&VarOrder, i32, i32) -> bool) -> Self;
+    fn set_bounds(n: i32);
     fn in_heap(&self, n: i32) -> bool;
     fn increase(&self, n: i32);
     fn insert(self, n: i32);
     fn percolate_up(i: i32);
+    fn percolate_down(i: i32);
     fn empty(&self) -> bool;
     fn getmin(&self) -> i32;
 }
@@ -25,6 +27,8 @@ impl IHeap for Heap {
             indices: Vec::new(),
         };
     }
+    // TODO
+    fn set_bounds(n: i32) {}
     fn in_heap(&self, n: i32) -> bool {
         return self.indices[n as usize] != 0;
     }
@@ -36,10 +40,14 @@ impl IHeap for Heap {
         self.heap.push(n);
         <Heap as IHeap>::percolate_up(self.indices[n as usize]);
     }
+    // TODO
     fn percolate_up(_i: i32) {}
+    // TODO
+    fn percolate_down(_i: i32) {}
     fn empty(&self) -> bool {
         return self.heap.len() == 1 as usize;
     }
+    // TODO
     fn getmin(&self) -> i32 {
         return 0;
     }
