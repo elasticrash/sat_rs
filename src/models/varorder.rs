@@ -15,8 +15,8 @@ pub trait IVarOrder {
     fn new(ass: Vec<Lbool>, act: Vec<f64>) -> Self;
     fn lt(&self, x: i32, y: i32) -> bool;
     fn new_var(&mut self);
-    fn update(self, x: i32);
-    fn undo(self, x: i32);
+    fn update(&mut self, x: i32);
+    fn undo(&mut self, x: i32);
     fn select_default(&self) -> Lit;
     fn select(&self, random_var_freq: f64) -> Lit;
 }
@@ -33,14 +33,16 @@ impl IVarOrder for VarOrder {
     fn lt(&self, x: i32, y: i32) -> bool {
         return &self.activity[x as usize] > &self.activity[y as usize];
     }
-    // TODO
-    fn new_var(&mut self) {}
-    fn update(self, x: i32) {
+    fn new_var(&mut self) {
+        self.heap.set_bounds(self.assigns.len() as i32);
+        self.heap.insert(self.assigns.len() as i32 - 1);
+    }
+    fn update(&mut self, x: i32) {
         if self.heap.in_heap(x) {
             self.heap.increase(x);
         }
     }
-    fn undo(self, x: i32) {
+    fn undo(&mut self, x: i32) {
         if self.heap.in_heap(x) {
             self.heap.insert(x);
         }

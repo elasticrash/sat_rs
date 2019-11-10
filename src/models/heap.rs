@@ -9,10 +9,10 @@ pub struct Heap {
 
 pub trait IHeap {
     fn new(v: fn(&VarOrder, i32, i32) -> bool) -> Self;
-    fn set_bounds(n: i32);
+    fn set_bounds(&mut self, n: i32);
     fn in_heap(&self, n: i32) -> bool;
     fn increase(&self, n: i32);
-    fn insert(self, n: i32);
+    fn insert(&mut self, n: i32);
     fn percolate_up(i: i32);
     fn percolate_down(i: i32);
     fn empty(&self) -> bool;
@@ -27,18 +27,22 @@ impl IHeap for Heap {
             indices: Vec::new(),
         };
     }
-    // TODO
-    fn set_bounds(n: i32) {}
+    fn set_bounds(&mut self, n: i32) {
+        self.indices.resize(n as usize, 0);
+    }
     fn in_heap(&self, n: i32) -> bool {
         return self.indices[n as usize] != 0;
     }
     fn increase(&self, n: i32) {
         <Heap as IHeap>::percolate_up(self.indices[n as usize]);
     }
-    fn insert(mut self, n: i32) {
-        self.indices[n as usize] = self.heap.len() as i32;
-        self.heap.push(n);
-        <Heap as IHeap>::percolate_up(self.indices[n as usize]);
+    fn insert(&mut self, n: i32) {
+        // this check is to stop it panicking (until the whole thing is finished)
+        if n >= 0 {
+            self.indices[n as usize] = self.heap.len() as i32;
+            self.heap.push(n);
+            <Heap as IHeap>::percolate_up(self.indices[n as usize]);
+        }
     }
     // TODO
     fn percolate_up(_i: i32) {}
