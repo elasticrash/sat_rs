@@ -187,7 +187,7 @@ fn new_clause_pr(
                     c_clone.data[1] = ps[max_i as usize];
                     c_clone.data[max_i as usize] = ps[1];
                 } else {
-                    move_back(c.clone().data[0], c.clone().data[1]);
+                    move_back(c.clone().data[0], c.clone().data[1], solver_state);
                 }
 
                 solver_state.cla_bump_activity(&mut c.clone());

@@ -8,6 +8,7 @@ use crate::models::lbool::*;
 use crate::models::lit::*;
 use crate::models::statsparams::*;
 use crate::models::varorder::*;
+use std::cmp;
 
 #[derive(Clone)]
 pub struct SolverState {
@@ -148,9 +149,9 @@ pub trait Internal {
 
 pub trait NewVar {
     fn n_vars(&mut self) -> i32;
-    fn add_unit(p: Lit);
-    fn add_binary(p: Lit, q: Lit);
-    fn add_ternary(p: Lit, q: Lit, r: Lit);
+    fn add_unit(&mut self, p: Lit);
+    fn add_binary(&mut self, p: Lit, q: Lit);
+    fn add_ternary(&mut self, p: Lit, q: Lit, r: Lit);
     fn add_clause(&mut self, ps: &mut Vec<Lit>);
 }
 
@@ -223,16 +224,52 @@ impl NewVar for SolverState {
     fn n_vars(&mut self) -> i32 {
         return self.assigns.len() as i32;
     }
-    // TODO
-    fn add_unit(_p: Lit) {}
-    // TODO
-    fn add_binary(_p: Lit, _q: Lit) {}
-    // TODO
-    fn add_ternary(_p: Lit, _q: Lit, _r: Lit) {}
+    fn add_unit(&mut self, _p: Lit) {
+        self.add_unit_tmp[0] = _p;
+        self.add_clause(&mut self.add_unit_tmp.clone());
+    }
+    fn add_binary(&mut self, _p: Lit, _q: Lit) {
+        self.add_binary_tmp[0] = _p;
+        self.add_binary_tmp[1] = _q;
+        self.add_clause(&mut self.add_binary_tmp.clone());
+    }
+    fn add_ternary(&mut self, _p: Lit, _q: Lit, _r: Lit) {
+        self.add_ternary_tmp[0] = _p;
+        self.add_ternary_tmp[1] = _q;
+        self.add_ternary_tmp[1] = _r;
+        self.add_clause(&mut self.add_ternary_tmp.clone());
+    }
     fn add_clause(&mut self, ps: &mut Vec<Lit>) {
         new_clause(ps, false, self);
     }
 }
 
-// TODO
-pub fn move_back(_l1: Lit, _l2: Lit) {}
+pub fn move_back(_l1: Lit, _l2: Lit, solver_state: &mut SolverState) {
+    let mut lev1: i32 = solver_state.level[var(&_l1) as usize];
+    let mut lev2: i32 = solver_state.level[var(&_l2) as usize];
+    if lev1 == -1 {
+        lev1 = i32::max_value();
+    }
+    if lev2 == -1 {
+        lev2 = i32::max_value();
+    }
+
+    if lev1 < solver_state.level_to_backtrack || lev2 < solver_state.level_to_backtrack {
+        if value_by_lit(_l1, solver_state) == Lbool::True {
+            if value_by_lit(_l2, solver_state) == Lbool::True {
+            } else if lev1 <= lev2 || solver_state.level_to_backtrack <= lev2 {
+            } else {
+                solver_state.level_to_backtrack = lev2;
+            }
+        } else {
+            if value_by_lit(_l2, solver_state) == Lbool::True {
+                if lev2 <= lev1 || solver_state.level_to_backtrack <= lev1 {
+                } else {
+                    solver_state.level_to_backtrack = lev1;
+                }
+            } else {
+                solver_state.level_to_backtrack = cmp::min(lev1, lev2);
+            }
+        }
+    }
+}
