@@ -1,4 +1,3 @@
-use crate::models::lbool::*;
 use crate::models::varorder::*;
 
 #[derive(Clone)]
@@ -16,9 +15,9 @@ pub trait IHeap {
     fn increase(&mut self, n: i32);
     fn insert(&mut self, n: i32);
     fn percolate_up(&mut self, i: i32);
-    fn percolate_down(i: i32);
+    fn percolate_down(&mut self, mut i: i32);
     fn empty(&self) -> bool;
-    fn getmin(&self) -> i32;
+    fn getmin(&mut self) -> i32;
     fn left(n: i32) -> i32;
     fn right(n: i32) -> i32;
     fn parent(n: i32) -> i32;
@@ -50,10 +49,8 @@ impl IHeap for Heap {
             <Heap as IHeap>::percolate_up(self, self.indices[n as usize]);
         }
     }
-    // TODO
     fn percolate_up(&mut self, mut _i: i32) {
         let x = self.heap[_i as usize];
-        //comp(x, self.heap[<Heap as IHeap>::parent(_i) as usize])
         while <Heap as IHeap>::parent(_i) != 0
             && self.activities[x as usize]
                 > self.activities[self.heap[<Heap as IHeap>::parent(_i) as usize] as usize]
@@ -66,14 +63,44 @@ impl IHeap for Heap {
         self.heap[_i as usize] = x;
         self.indices[x as usize] = _i;
     }
-    // TODO
-    fn percolate_down(_i: i32) {}
+    fn percolate_down(&mut self, mut _i: i32) {
+        let x = self.heap[_i as usize];
+        while <Heap as IHeap>::left(_i) < self.heap.len() as i32 {
+            let child: i32;
+            if <Heap as IHeap>::right(_i) < self.heap.len() as i32
+                && self.activities[self.heap[<Heap as IHeap>::right(_i) as usize] as usize]
+                    > self.activities[self.heap[<Heap as IHeap>::left(_i) as usize] as usize]
+            {
+                child = <Heap as IHeap>::right(_i)
+            } else {
+                child = <Heap as IHeap>::left(_i);
+            }
+
+            if self.activities[child as usize] > self.activities[x as usize] {
+                break;
+            }
+
+            self.heap[_i as usize] = self.heap[child as usize];
+            self.indices[self.heap[_i as usize] as usize] = _i;
+            _i = child;
+        }
+
+        self.heap[_i as usize] = x;
+        self.indices[x as usize] = _i;
+    }
     fn empty(&self) -> bool {
         return self.heap.len() == 1 as usize;
     }
-    // TODO
-    fn getmin(&self) -> i32 {
-        return 0;
+    fn getmin(&mut self) -> i32 {
+        let r = self.heap[1];
+        self.heap[1] = *self.heap.last().unwrap();
+        self.indices[self.heap[1] as usize] = 1;
+        self.indices[r as usize] = 0;
+        self.heap.pop();
+        if (self.heap.len() > 1) {
+            <Heap as IHeap>::percolate_down(self, 1);
+        }
+        return r;
     }
     fn left(n: i32) -> i32 {
         return n + n;
