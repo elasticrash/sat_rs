@@ -15,7 +15,7 @@ pub trait IHeap {
     fn increase(&mut self, n: i32);
     fn insert(&mut self, n: i32);
     fn percolate_up(&mut self, i: i32);
-    fn percolate_down(&mut self, mut i: i32);
+    fn percolate_down(&mut self, i: i32);
     fn empty(&self) -> bool;
     fn getmin(&mut self) -> i32;
     fn left(n: i32) -> i32;
@@ -97,7 +97,7 @@ impl IHeap for Heap {
         self.indices[self.heap[1] as usize] = 1;
         self.indices[r as usize] = 0;
         self.heap.pop();
-        if (self.heap.len() > 1) {
+        if self.heap.len() > 1 {
             <Heap as IHeap>::percolate_down(self, 1);
         }
         return r;
