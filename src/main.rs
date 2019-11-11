@@ -144,7 +144,7 @@ fn read_input_arguments(_args: Vec<String>) -> InputArguments {
 
         if _args[pos].starts_with("-rnd_freq") {
             let arg: Vec<&str> = _args[pos].split('=').collect();
-            arguments.rnd_freq =  String::from(arg[1]).parse::<i32>().unwrap();
+            arguments.rnd_freq = String::from(arg[1]).parse::<i32>().unwrap();
         }
 
         if _args[pos].starts_with("-verbosity") {

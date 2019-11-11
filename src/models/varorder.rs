@@ -12,7 +12,7 @@ pub struct VarOrder {
 }
 
 pub trait IVarOrder {
-    fn new(ass: Vec<Lbool>, act: Vec<f64>) -> Self;
+    fn new(ass: Vec<Lbool>, act: &Vec<f64>) -> Self;
     fn lt(&self, x: i32, y: i32) -> bool;
     fn new_var(&mut self);
     fn update(&mut self, x: i32);
@@ -22,11 +22,11 @@ pub trait IVarOrder {
 }
 
 impl IVarOrder for VarOrder {
-    fn new(ass: Vec<Lbool>, act: Vec<f64>) -> Self {
+    fn new(ass: Vec<Lbool>, act: &Vec<f64>) -> Self {
         return Self {
             assigns: ass,
-            activity: act,
-            heap: Heap::new(Self::lt),
+            activity: act.to_vec(),
+            heap: Heap::new(Self::lt, &act),
             random_seed: 91648253.0,
         };
     }

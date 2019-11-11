@@ -57,7 +57,6 @@ pub trait NewState {
 
 impl NewState for SolverState {
     fn new() -> Self {
-
         let ass: Vec<Lbool> = Vec::new();
         let act: Vec<f64> = Vec::new();
 
@@ -86,7 +85,7 @@ impl NewState for SolverState {
             cla_decay: 1.0,
             var_inc: 1.0,
             var_decay: 1.0,
-            order: VarOrder::new(ass, act),
+            order: VarOrder::new(ass, &act),
             qhead: 0,
             simp_db_assigns: 0,
             simp_db_props: 0.0,
