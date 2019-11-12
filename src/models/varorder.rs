@@ -2,6 +2,7 @@ use crate::models::heap::*;
 use crate::models::lbool::{is_undefined, Lbool};
 use crate::models::lit::*;
 use crate::models::random::{drand, irand};
+use crate::models::logger::*;
 
 #[derive(Clone)]
 pub struct VarOrder {
@@ -51,6 +52,8 @@ impl IVarOrder for VarOrder {
         return <VarOrder as IVarOrder>::select(self, 0.0);
     }
     fn select(&mut self, random_var_freq: f64) -> Lit {
+        reportf("select".to_string());
+
         let random = drand(self.random_seed as f64);
         if random < random_var_freq as f64 && !self.heap.empty() {
             let next: i32 = irand(random, self.assigns.len() as i32);

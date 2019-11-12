@@ -1,4 +1,5 @@
 use crate::models::varorder::*;
+use crate::models::logger::*;
 
 #[derive(Clone)]
 pub struct Heap {
@@ -50,6 +51,8 @@ impl IHeap for Heap {
         }
     }
     fn percolate_up(&mut self, mut _i: i32) {
+        reportf("percolate_up".to_string());
+
         let x = self.heap[_i as usize];
         while <Heap as IHeap>::parent(_i) != 0
             && self.activities[x as usize]
@@ -64,6 +67,8 @@ impl IHeap for Heap {
         self.indices[x as usize] = _i;
     }
     fn percolate_down(&mut self, mut _i: i32) {
+        reportf("percolate_down".to_string());
+
         let x = self.heap[_i as usize];
         while <Heap as IHeap>::left(_i) < self.heap.len() as i32 {
             let child: i32;

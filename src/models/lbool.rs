@@ -14,7 +14,7 @@ pub enum Lbool {
 }
 
 impl PartialEq for Lbool {
-    fn eq(&self, other: &Self) -> bool {
+    fn eq(&self, other: &Lbool) -> bool {
         self == other
     }
 }
