@@ -23,6 +23,8 @@ use crate::models::solverstate::*;
 |________________________________________________________________________________________________@*/
 
 pub fn solve(assumptions: Vec<Lit>, solver_state: &mut SolverState) -> bool {
+    reportf("solve".to_string());
+
     simplify_db(solver_state);
     if !solver_state.ok {
         return false;
@@ -120,6 +122,7 @@ pub fn solve(assumptions: Vec<Lit>, solver_state: &mut SolverState) -> bool {
 }
 
 pub fn solve_no_assumptions(solver_state: &mut SolverState) {
+    reportf("solve_no_assumptions".to_string());
     let assumptions: Vec<Lit> = Vec::new();
     solve(assumptions, solver_state);
 }

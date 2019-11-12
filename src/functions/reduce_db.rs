@@ -1,7 +1,9 @@
 use crate::functions::new_clause::*;
 use crate::models::clause::*;
+use crate::models::logger::*;
 use crate::models::solverstate::*;
 use std::cmp::Ordering;
+
 /*_________________________________________________________________________________________________
 |
 |  reduceDB : ()  .  [void]
@@ -12,6 +14,8 @@ use std::cmp::Ordering;
 |________________________________________________________________________________________________@*/
 
 pub fn reduce_db(solver_state: &mut SolverState) {
+    reportf("reduce_db".to_string());
+
     let mut i: i32 = 0;
     let mut j: i32 = 0;
 

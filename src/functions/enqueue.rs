@@ -2,6 +2,7 @@ use crate::models::clause::*;
 use crate::models::lbool::*;
 use crate::models::lit::*;
 use crate::models::solverstate::*;
+use crate::models::logger::*;
 
 /*_________________________________________________________________________________________________
 |
@@ -21,6 +22,8 @@ use crate::models::solverstate::*;
 |________________________________________________________________________________________________@*/
 
 pub fn enqueue(_fact: &Lit, _from: Option<Clause>, solver_state: &mut SolverState) -> bool {
+    reportf("enqueue".to_string());
+
     if !is_undefined(value_by_lit(*_fact, solver_state)) {
         return value_by_lit(*_fact, solver_state) != L_FALSE;
     } else {
@@ -35,5 +38,7 @@ pub fn enqueue(_fact: &Lit, _from: Option<Clause>, solver_state: &mut SolverStat
 }
 
 pub fn internal_enqueue(_fact: &Lit, solver_state: &mut SolverState) -> bool {
+    reportf("internal_enqueue".to_string());
+
     return enqueue(&_fact, None, solver_state);
 }

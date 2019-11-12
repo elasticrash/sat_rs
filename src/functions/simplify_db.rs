@@ -2,6 +2,7 @@ use crate::functions::new_clause::*;
 use crate::functions::propagate::*;
 use crate::models::clause::*;
 use crate::models::lit::*;
+use crate::models::logger::*;
 use crate::models::solverstate::*;
 
 /*_________________________________________________________________________________________________
@@ -14,6 +15,8 @@ use crate::models::solverstate::*;
 |________________________________________________________________________________________________@*/
 
 pub fn simplify_db(solver_state: &mut SolverState) {
+    reportf("simplify_db".to_string());
+
     if !solver_state.ok {
         return;
     }

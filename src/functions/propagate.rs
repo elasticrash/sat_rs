@@ -2,7 +2,9 @@ use crate::functions::enqueue::*;
 use crate::models::clause::*;
 use crate::models::lbool::*;
 use crate::models::lit::*;
+use crate::models::logger::*;
 use crate::models::solverstate::*;
+
 /*_________________________________________________________________________________________________
 |
 |  propagate : [void]  .  [Clause*]
@@ -16,6 +18,8 @@ use crate::models::solverstate::*;
 |________________________________________________________________________________________________@*/
 
 pub fn propagate(solver_state: &mut SolverState) -> Option<Clause> {
+    reportf("propagate".to_string());
+
     let mut confl: Option<Clause> = None;
 
     while solver_state.qhead < solver_state.trail.len() as i32 {

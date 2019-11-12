@@ -2,9 +2,9 @@ use crate::functions::enqueue::*;
 use crate::models::clause::*;
 use crate::models::lbool::*;
 use crate::models::lit::*;
+use crate::models::logger::*;
 use crate::models::solverstate::*;
 use crate::models::varorder::*;
-use std::collections::HashMap;
 
 /*_________________________________________________________________________________________________
 |
@@ -25,29 +25,43 @@ use std::collections::HashMap;
 |    Activity heuristics are updated.
 |________________________________________________________________________________________________@*/
 
+#[derive(Clone)]
+struct Dict {
+    index: i32,
+    l: Lit,
+}
+
 pub fn basic_clause_simplification(_ps: Vec<Lit>, _copy: bool) -> Option<Vec<Lit>> {
+    reportf("basic_clause_simplification".to_string());
+
     let mut qs: Vec<Lit>;
 
     if _copy {
-        qs = Vec::new();
+        qs = _ps.to_vec();
     } else {
         qs = _ps;
     }
 
-    let mut dict: HashMap<i32, Lit> = HashMap::new();
+    let mut dict: Vec<Dict> = Vec::new();
+    for i in 0..qs.len() {
+        dict.push(Dict {
+            index: i as i32,
+            l: Lit::new(0, false),
+        });
+    }
     let ptr: i32 = 0;
 
     for i in 0..qs.len() {
         let l: Lit = qs[i];
         let v: i32 = var(&l);
-        let other = Some(dict.get(&v).unwrap());
-        if other != None {
-            if other.unwrap() == &l {
+        if v <= dict.len() as i32 {
+            let other = &dict[v as usize];
+            if other.l == l {
             } else {
                 return None;
             }
         } else {
-            dict.insert(v, l);
+            dict.push(Dict { index: v, l: l });
             qs.push(l);
         }
     }
@@ -57,6 +71,8 @@ pub fn basic_clause_simplification(_ps: Vec<Lit>, _copy: bool) -> Option<Vec<Lit
 }
 
 pub fn reorder_by_level(mut _ps: &mut Vec<Lit>, solver_state: &mut SolverState) {
+    reportf("reorder_by_level".to_string());
+
     let mut max: i32 = std::i32::MIN;
     let mut max_at: i32 = -1;
     let mut max2: i32 = std::i32::MIN;
@@ -96,6 +112,7 @@ pub fn reorder_by_level(mut _ps: &mut Vec<Lit>, solver_state: &mut SolverState) 
 }
 
 pub fn new_clause(_ps: &mut Vec<Lit>, _learnt: bool, solver_state: &mut SolverState) {
+    reportf("new_clause".to_string());
     new_clause_pr(_ps, _learnt, false, true, solver_state);
 }
 
@@ -106,6 +123,8 @@ fn new_clause_pr(
     _copy: bool,
     solver_state: &mut SolverState,
 ) {
+    reportf("new_clause_pr".to_string());
+
     if !solver_state.ok {
         return;
     };
@@ -203,6 +222,8 @@ fn new_clause_pr(
 }
 
 pub fn remove(c: Clause, just_dealloc: bool, solver_state: &mut SolverState) {
+    reportf("remove".to_string());
+
     if !just_dealloc {
         remove_watch(
             &mut solver_state.watches[index(!c.clone().data[0]) as usize],
@@ -221,6 +242,8 @@ pub fn remove(c: Clause, just_dealloc: bool, solver_state: &mut SolverState) {
     }
 }
 pub fn simplify(c: Clause, solver_state: &mut SolverState) -> bool {
+    reportf("simplify".to_string());
+
     for y in 0..c.size() {
         if value_by_lit(c.data[y as usize], &solver_state) == Lbool::True {
             return true;
@@ -229,6 +252,8 @@ pub fn simplify(c: Clause, solver_state: &mut SolverState) -> bool {
     return false;
 }
 pub fn remove_watch(ws: &mut Vec<Clause>, elem: Clause) -> bool {
+    reportf("remove_watch".to_string());
+
     if ws.len() == 0 {
         return false;
     }
@@ -244,6 +269,8 @@ pub fn remove_watch(ws: &mut Vec<Clause>, elem: Clause) -> bool {
     return true;
 }
 pub fn new_var(solver_state: &mut SolverState) -> i32 {
+    reportf("new_var".to_string());
+
     let index: i32;
     index = solver_state.assigns.len() as i32;
     solver_state.watches.push(Vec::new());
@@ -259,11 +286,15 @@ pub fn new_var(solver_state: &mut SolverState) -> i32 {
     return index;
 }
 pub fn assume(p: Lit, solver_state: &mut SolverState) -> bool {
+    reportf("assume".to_string());
+
     solver_state.trail_lim.push(solver_state.trail.len() as i32);
     return solver_state.i_enqueue(p);
 }
 
 pub fn cancel_until(level: i32, solver_state: &mut SolverState) {
+    reportf("cancel_until".to_string());
+
     if solver_state.decision_level() > level {
         for y in (solver_state.trail_lim[level as usize])..(solver_state.trail.len() as i32) {
             let x = var(&solver_state.trail[y as usize]) as usize;

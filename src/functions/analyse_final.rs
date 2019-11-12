@@ -2,6 +2,7 @@ use crate::models::clause::*;
 use crate::models::lbool::*;
 use crate::models::lit::*;
 use crate::models::solverstate::*;
+use crate::models::logger::*;
 
 /*_________________________________________________________________________________________________
 |
@@ -15,6 +16,7 @@ use crate::models::solverstate::*;
 |________________________________________________________________________________________________@*/
 
 pub fn analyse_final(_confl: Clause, _skip_first: bool, solver_state: &mut SolverState) {
+    reportf("analyse final".to_string());
     solver_state.conflict.clear();
     if solver_state.root_level == 0 {
         return;

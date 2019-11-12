@@ -21,7 +21,7 @@ fn main() {
     let mut buffer = String::new();
 
     let mut lits: Vec<Lit> = Vec::new();
-    let mut s: SolverState = SolverState::new();
+    let mut state: SolverState = SolverState::new();
 
     file.read_to_string(&mut buffer).unwrap();
 
@@ -44,8 +44,8 @@ fn main() {
 
         if parsed_lit != 0 {
             let var = parsed_lit.abs() - 1;
-            while var >= s.n_vars() {
-                new_var(&mut s);
+            while var >= state.n_vars() {
+                new_var(&mut state);
             }
             let solver_lit;
             if parsed_lit > 0 {
@@ -58,22 +58,22 @@ fn main() {
         }
     }
 
-    s.add_clause(&mut lits);
+    state.add_clause(&mut lits);
 
     if arguments.verbosity == 0 {
-        s.verbosity = 0;
-        solve_no_assumptions(&mut s);
+        state.verbosity = 0;
+        solve_no_assumptions(&mut state);
     } else {
-        s.verbosity = 1;
-        solve_no_assumptions(&mut s);
+        state.verbosity = 1;
+        solve_no_assumptions(&mut state);
         let mut result: String = String::new();
-        if s.ok {
+        if state.ok {
             result.push_str("SATISFIABLE");
         } else {
             result.push_str("UNSATISFIABLE");
         }
         reportf(result);
-        print_stats(s.solver_stats);
+        print_stats(state.solver_stats);
     }
 }
 

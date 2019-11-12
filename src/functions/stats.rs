@@ -7,6 +7,8 @@ pub fn progress_estimate() -> f64 {
 }
 
 pub fn print_stats(stats: SolverStats) {
+    reportf("print_stats".to_string());
+
     let cpu_time = cpu_time() - stats.start_time;
     reportf(format!("restarts              : {0}", stats.starts));
     reportf(format!("conflicts             : {0}", stats.conflicts,));

@@ -8,6 +8,7 @@ use crate::functions::simplify_db::*;
 use crate::functions::stats::*;
 use crate::models::lbool::*;
 use crate::models::lit::*;
+use crate::models::logger::*;
 use crate::models::solverstate::*;
 use crate::models::varorder::*;
 use std::cmp::max;
@@ -33,6 +34,8 @@ pub fn search(
     parms: SearchParams,
     solver_state: &mut SolverState,
 ) -> Lbool {
+    reportf("search".to_string());
+
     if !solver_state.ok {
         return Lbool::False;
     }
@@ -107,6 +110,8 @@ pub fn search(
 }
 
 pub fn var_rescale_activity(solver_state: &mut SolverState) {
+    reportf("var_rescale_activity".to_string());
+
     for y in 0..solver_state.clone().n_vars() {
         solver_state.activity[y as usize] *= 1e-100;
     }
@@ -114,6 +119,8 @@ pub fn var_rescale_activity(solver_state: &mut SolverState) {
 }
 
 pub fn cla_rescale_activity(solver_state: &mut SolverState) {
+    reportf("cla_rescale_activity".to_string());
+
     for y in 0..solver_state.learnts.len() {
         solver_state.learnts[y as usize].activity *= 1e-20;
     }

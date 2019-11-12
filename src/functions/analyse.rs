@@ -1,6 +1,7 @@
 use crate::models::clause::*;
 use crate::models::lbool::*;
 use crate::models::lit::*;
+use crate::models::logger::*;
 use crate::models::solverstate::*;
 use std::cmp::max;
 
@@ -27,6 +28,8 @@ pub fn analyze(
     out_learnt: &mut Vec<Lit>,
     solver_state: &mut SolverState,
 ) -> i32 {
+    reportf("analyse".to_string());
+
     let mut out_btlevel: i32 = 0;
     let mut seen: Vec<Lbool> = solver_state.analyze_seen.clone();
     let mut path_c: i32 = 0;
@@ -150,6 +153,8 @@ pub fn analyze(
 }
 
 fn analyze_removeable(_p: Lit, min_level: u32, solver_state: &mut SolverState) -> bool {
+    reportf("analyze removeable".to_string());
+
     solver_state.analyze_stack.clear();
     solver_state.analyze_stack.push(_p.clone());
     let top: i32 = solver_state.analyze_toclear.len() as i32;
