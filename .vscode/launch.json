@@ -9,7 +9,7 @@
             "type": "cppvsdbg",
             "request": "launch",
             "program": "${workspaceFolder}/target/debug/sat_rs.exe",
-            "args": ["-verbosity=0"],
+            "args": ["-verbosity=1"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],

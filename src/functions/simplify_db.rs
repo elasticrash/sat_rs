@@ -22,6 +22,7 @@ pub fn simplify_db(solver_state: &mut SolverState) {
     }
     match propagate(solver_state) {
         None => {
+            reportf("propagate match none".to_string());
             if solver_state.clone().n_assigns() == solver_state.simp_db_assigns as usize
                 || solver_state.simp_db_props > 0.0
             {
@@ -59,6 +60,7 @@ pub fn simplify_db(solver_state: &mut SolverState) {
                 + solver_state.solver_stats.learnts_literals;
         }
         _ => {
+            reportf("solver state false".to_string());
             solver_state.ok = false;
             return;
         }

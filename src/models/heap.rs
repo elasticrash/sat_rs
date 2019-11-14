@@ -1,5 +1,5 @@
-use crate::models::varorder::*;
 use crate::models::logger::*;
+use crate::models::varorder::*;
 
 #[derive(Clone)]
 pub struct Heap {
@@ -10,11 +10,11 @@ pub struct Heap {
 }
 
 pub trait IHeap {
-    fn new(v: fn(&VarOrder, i32, i32) -> bool, act: &Vec<f64>) -> Self;
+    fn new(v: fn(&VarOrder, i32, i32) -> bool) -> Self;
     fn set_bounds(&mut self, n: i32);
     fn in_heap(&self, n: i32) -> bool;
     fn increase(&mut self, n: i32);
-    fn insert(&mut self, n: i32);
+    fn insert(&mut self, n: i32, act: Vec<f64>);
     fn percolate_up(&mut self, i: i32);
     fn percolate_down(&mut self, i: i32);
     fn empty(&self) -> bool;
@@ -25,12 +25,12 @@ pub trait IHeap {
 }
 
 impl IHeap for Heap {
-    fn new(v: fn(&VarOrder, i32, i32) -> bool, act: &Vec<f64>) -> Self {
+    fn new(v: fn(&VarOrder, i32, i32) -> bool) -> Self {
         return Self {
             comp: Box::new(v),
             heap: Vec::new(),
             indices: Vec::new(),
-            activities: act.clone(),
+            activities: Vec::new(),
         };
     }
     fn set_bounds(&mut self, n: i32) {
@@ -42,7 +42,8 @@ impl IHeap for Heap {
     fn increase(&mut self, n: i32) {
         <Heap as IHeap>::percolate_up(self, self.indices[n as usize]);
     }
-    fn insert(&mut self, n: i32) {
+    fn insert(&mut self, n: i32, act: Vec<f64>) {
+        self.activities = act.clone();
         // this check is to stop it panicking (until the whole thing is finished)
         if n >= 0 {
             self.indices[n as usize] = self.heap.len() as i32;

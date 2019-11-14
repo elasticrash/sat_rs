@@ -1,8 +1,8 @@
 use crate::models::clause::*;
 use crate::models::lbool::*;
 use crate::models::lit::*;
-use crate::models::solverstate::*;
 use crate::models::logger::*;
+use crate::models::solverstate::*;
 
 /*_________________________________________________________________________________________________
 |

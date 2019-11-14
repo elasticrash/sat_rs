@@ -280,7 +280,7 @@ pub fn new_var(solver_state: &mut SolverState) -> i32 {
     solver_state.level.push(-1);
     solver_state.trail_pos.push(-1);
     solver_state.activity.push(0.0);
-    solver_state.order.new_var();
+    solver_state.order.new_var(solver_state.clone());
     solver_state.analyze_seen.push(Lbool::Undef0);
 
     return index;
@@ -300,7 +300,7 @@ pub fn cancel_until(level: i32, solver_state: &mut SolverState) {
             let x = var(&solver_state.trail[y as usize]) as usize;
             solver_state.assigns[x] = Lbool::Undef0;
             solver_state.reason[x] = None;
-            solver_state.order.clone().undo(x as i32); //revisit:: should no reason to clone here
+            solver_state.order.clone().undo(x as i32, solver_state.clone()); //revisit:: should no reason to clone here
         }
         solver_state.trail.truncate(
             (solver_state.trail.len() - solver_state.trail_lim[level as usize] as usize) as usize,

@@ -5,18 +5,12 @@ use std::ops::Not;
 pub static L_TRUE: Lbool = Lbool::True;
 pub static L_FALSE: Lbool = Lbool::False;
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub enum Lbool {
     True = 1,
     False = -2,
     Undef0 = 0,
     Undef1 = -1,
-}
-
-impl PartialEq for Lbool {
-    fn eq(&self, other: &Lbool) -> bool {
-        self == other
-    }
 }
 
 impl Not for Lbool {
