@@ -90,8 +90,8 @@ pub fn search(
                 solver_state.solver_stats.decisions += 1.0;
                 let next: Lit = solver_state.order.select(parms.random_var_freq);
 
-                if next == Lit::new(VAR_UNDEFINED, true) {
-                    if model_found() {
+                if next == Lit::new(VAR_UNDEFINED, false) {
+                    if model_found(solver_state) {
                         continue;
                     }
                     solver_state
@@ -104,6 +104,8 @@ pub fn search(
                     cancel_until(solver_state.root_level, solver_state);
                     return L_TRUE;
                 }
+
+                assume(next, solver_state);
             }
         }
     }

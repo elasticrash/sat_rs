@@ -296,11 +296,20 @@ pub fn cancel_until(level: i32, solver_state: &mut SolverState) {
     reportf("cancel_until".to_string());
 
     if solver_state.decision_level() > level {
-        for y in (solver_state.trail_lim[level as usize])..(solver_state.trail.len() as i32) {
-            let x = var(&solver_state.trail[y as usize]) as usize;
+        let mut c: i32 = (solver_state.trail.len() as i32 - 1) as i32;
+
+        loop {
+            let x = var(&solver_state.trail[c as usize]) as usize;
             solver_state.assigns[x] = Lbool::Undef0;
             solver_state.reason[x] = None;
-            solver_state.order.clone().undo(x as i32, solver_state.clone()); //revisit:: should no reason to clone here
+            solver_state
+                .order
+                .clone()
+                .undo(x as i32, solver_state.clone()); //revisit:: should no reason to clone here
+            c -= 1;
+            if c < solver_state.trail_lim[level as usize] {
+                break;
+            }
         }
         solver_state.trail.truncate(
             (solver_state.trail.len() - solver_state.trail_lim[level as usize] as usize) as usize,

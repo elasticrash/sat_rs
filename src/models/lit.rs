@@ -63,7 +63,10 @@ impl PartialEq for Lit {
 }
 
 pub fn sign(lit: &Lit) -> bool {
-    return (&lit.x & 1) != 0;
+    let t = &lit.x & 1;
+    let b = t != 0;
+
+    return b;
 }
 
 pub fn var(lit: &Lit) -> i32 {

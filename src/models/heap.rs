@@ -26,9 +26,11 @@ pub trait IHeap {
 
 impl IHeap for Heap {
     fn new(v: fn(&VarOrder, i32, i32) -> bool) -> Self {
+        let mut h = Vec::new();
+        h.push(-1);
         return Self {
             comp: Box::new(v),
-            heap: Vec::new(),
+            heap: h,
             indices: Vec::new(),
             activities: Vec::new(),
         };
@@ -44,12 +46,9 @@ impl IHeap for Heap {
     }
     fn insert(&mut self, n: i32, act: Vec<f64>) {
         self.activities = act.clone();
-        // this check is to stop it panicking (until the whole thing is finished)
-        if n >= 0 {
-            self.indices[n as usize] = self.heap.len() as i32;
-            self.heap.push(n);
-            <Heap as IHeap>::percolate_up(self, self.indices[n as usize]);
-        }
+        self.indices[n as usize] = self.heap.len() as i32;
+        self.heap.push(n);
+        <Heap as IHeap>::percolate_up(self, self.indices[n as usize]);
     }
     fn percolate_up(&mut self, mut _i: i32) {
         reportf("percolate_up".to_string());
@@ -82,7 +81,7 @@ impl IHeap for Heap {
                 child = <Heap as IHeap>::left(_i);
             }
 
-            if self.activities[child as usize] > self.activities[x as usize] {
+            if !(self.activities[child as usize] > self.activities[x as usize]) {
                 break;
             }
 
