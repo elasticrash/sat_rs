@@ -43,6 +43,7 @@ pub fn value_by_var(x: i32, y: &SolverState) -> Lbool {
 pub fn value_by_lit(x: Lit, y: &SolverState) -> Lbool {
     let v;
     if sign(&x) {
+        // this is wrong need fixing
         v = !y.assigns[var(&x) as usize];
     } else {
         v = y.assigns[var(&x) as usize];
