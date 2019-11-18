@@ -1,6 +1,7 @@
 use crate::models::logger::*;
 use crate::models::statsparams::*;
 use crate::models::timemem::*;
+use std::time::Duration;
 
 pub fn progress_estimate() -> f64 {
     return 0.0;
@@ -9,7 +10,7 @@ pub fn progress_estimate() -> f64 {
 pub fn print_stats(stats: SolverStats) {
     reportf("print_stats".to_string(), 0);
 
-    let cpu_time = cpu_time() - stats.start_time;
+    let duration: u64 = (stats.start_time.elapsed().subsec_nanos()/1000000) as u64;
     reportf(format!("restarts              : {0}", stats.starts), 2);
     reportf(format!("conflicts             : {0}", stats.conflicts,), 2);
     reportf(format!("decisions             : {0}", stats.decisions,), 2);
@@ -28,5 +29,5 @@ pub fn print_stats(stats: SolverStats) {
     if mem_used() != 0 {
         reportf(format!("Memory used           : {0} MB", mem_used()), 2);
     }
-    reportf(format!("CPU time              : {0} s", cpu_time), 2);
+    reportf(format!("CPU time              : {0} ms", duration), 2);
 }
