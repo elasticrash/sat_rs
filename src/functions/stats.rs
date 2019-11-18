@@ -10,7 +10,7 @@ pub fn progress_estimate() -> f64 {
 pub fn print_stats(stats: SolverStats) {
     reportf("print_stats".to_string(), 0);
 
-    let duration: u64 = (stats.start_time.elapsed().subsec_nanos()/1000000) as u64;
+    let duration: u64 = (stats.start_time.elapsed().subsec_nanos() / 1000000) as u64;
     reportf(format!("restarts              : {0}", stats.starts), 2);
     reportf(format!("conflicts             : {0}", stats.conflicts,), 2);
     reportf(format!("decisions             : {0}", stats.decisions,), 2);
@@ -26,8 +26,9 @@ pub fn print_stats(stats: SolverStats) {
         ),
         2,
     );
-    if mem_used() != 0 {
-        reportf(format!("Memory used           : {0} MB", mem_used()), 2);
-    }
+    reportf(
+        format!("Available Memory      : {0} / {1} MB", mem_used().free, mem_used().total),
+        2,
+    );
     reportf(format!("CPU time              : {0} ms", duration), 2);
 }
