@@ -72,7 +72,7 @@ fn main() {
         } else {
             result.push_str("UNSATISFIABLE");
         }
-        reportf(result);
+        reportf(result, 2);
         print_stats(state.solver_stats);
     }
 }

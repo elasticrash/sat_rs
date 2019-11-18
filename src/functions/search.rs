@@ -34,7 +34,7 @@ pub fn search(
     parms: SearchParams,
     solver_state: &mut SolverState,
 ) -> Lbool {
-    reportf("search".to_string());
+    reportf("search".to_string(), solver_state.verbosity);
 
     if !solver_state.ok {
         return Lbool::False;
@@ -112,7 +112,7 @@ pub fn search(
 }
 
 pub fn var_rescale_activity(solver_state: &mut SolverState) {
-    reportf("var_rescale_activity".to_string());
+    reportf("var_rescale_activity".to_string(), solver_state.verbosity);
 
     for y in 0..solver_state.clone().n_vars() {
         solver_state.activity[y as usize] *= 1e-100;
@@ -121,7 +121,7 @@ pub fn var_rescale_activity(solver_state: &mut SolverState) {
 }
 
 pub fn cla_rescale_activity(solver_state: &mut SolverState) {
-    reportf("cla_rescale_activity".to_string());
+    reportf("cla_rescale_activity".to_string(), solver_state.verbosity);
 
     for y in 0..solver_state.learnts.len() {
         solver_state.learnts[y as usize].activity *= 1e-20;

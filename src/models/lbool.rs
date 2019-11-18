@@ -1,5 +1,6 @@
 use crate::models::lit::*;
 use crate::models::solverstate::SolverState;
+use std::ops::BitAnd;
 use std::ops::Not;
 
 pub static L_TRUE: Lbool = Lbool::True;
@@ -24,6 +25,20 @@ impl Not for Lbool {
     }
 }
 
+impl BitAnd for Lbool {
+    type Output = Self;
+    fn bitand(self, rhs: Self) -> Self::Output {
+        let result = self as i8 & rhs as i8;
+        match result {
+            1 => Lbool::True,
+            -2 => Lbool::False,
+            0 => Lbool::Undef0,
+            -1 => Lbool::Undef1,
+            _ => Lbool::Undef1
+        }
+    }
+}
+
 pub fn to_bool(value: bool) -> Lbool {
     if value {
         return Lbool::True;
@@ -41,13 +56,10 @@ pub fn value_by_var(x: i32, y: &SolverState) -> Lbool {
 }
 
 pub fn value_by_lit(x: Lit, y: &SolverState) -> Lbool {
-    let v;
+    let mut assign = y.assigns[var(&x) as usize];
     if sign(&x) {
         // this is wrong need fixing
-        v = !y.assigns[var(&x) as usize];
-    } else {
-        v = y.assigns[var(&x) as usize];
+        assign = assign & assign;
     }
-
-    return v;
+    return assign;
 }

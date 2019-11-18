@@ -22,7 +22,7 @@ use crate::models::solverstate::*;
 |________________________________________________________________________________________________@*/
 
 pub fn enqueue(_fact: &Lit, _from: Option<Clause>, solver_state: &mut SolverState) -> bool {
-    reportf("enqueue".to_string());
+    reportf("enqueue".to_string(), solver_state.verbosity);
 
     if !is_undefined(value_by_lit(*_fact, solver_state)) {
         return value_by_lit(*_fact, solver_state) != L_FALSE;
@@ -38,7 +38,7 @@ pub fn enqueue(_fact: &Lit, _from: Option<Clause>, solver_state: &mut SolverStat
 }
 
 pub fn internal_enqueue(_fact: &Lit, solver_state: &mut SolverState) -> bool {
-    reportf("internal_enqueue".to_string());
+    reportf("internal_enqueue".to_string(), solver_state.verbosity);
 
     return enqueue(&_fact, None, solver_state);
 }

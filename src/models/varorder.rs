@@ -69,11 +69,9 @@ impl IVarOrder for VarOrder {
 
         while !self.heap.empty() {
             let next: i32 = self.heap.getmin();
-            println!("next {:?}", next);
 
             if is_undefined(self.assigns[next as usize]) {
                 let r =  !Lit::simple(next);
-                println!("lit {:?}", r.x);
                 return r;
             }
         }

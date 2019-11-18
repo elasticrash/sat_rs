@@ -28,7 +28,7 @@ pub fn analyze(
     out_learnt: &mut Vec<Lit>,
     solver_state: &mut SolverState,
 ) -> i32 {
-    reportf("analyse".to_string());
+    reportf("analyse".to_string(), solver_state.verbosity);
 
     let mut out_btlevel: i32 = 0;
     let mut seen: Vec<Lbool> = solver_state.analyze_seen.clone();
@@ -153,7 +153,7 @@ pub fn analyze(
 }
 
 fn analyze_removeable(_p: Lit, min_level: u32, solver_state: &mut SolverState) -> bool {
-    reportf("analyze removeable".to_string());
+    reportf("analyze removeable".to_string(), solver_state.verbosity);
 
     solver_state.analyze_stack.clear();
     solver_state.analyze_stack.push(_p.clone());

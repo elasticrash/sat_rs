@@ -51,7 +51,7 @@ impl IHeap for Heap {
         <Heap as IHeap>::percolate_up(self, self.indices[n as usize]);
     }
     fn percolate_up(&mut self, mut _i: i32) {
-        reportf("percolate_up".to_string());
+        reportf("percolate_up".to_string(), 0);
 
         let x = self.heap[_i as usize];
         while <Heap as IHeap>::parent(_i) != 0
@@ -67,7 +67,7 @@ impl IHeap for Heap {
         self.indices[x as usize] = _i;
     }
     fn percolate_down(&mut self, mut _i: i32) {
-        reportf("percolate_down".to_string());
+        reportf("percolate_down".to_string(), 0);
 
         let x = self.heap[_i as usize];
         while <Heap as IHeap>::left(_i) < self.heap.len() as i32 {

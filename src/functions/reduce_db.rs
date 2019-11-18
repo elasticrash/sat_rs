@@ -14,7 +14,7 @@ use std::cmp::Ordering;
 |________________________________________________________________________________________________@*/
 
 pub fn reduce_db(solver_state: &mut SolverState) {
-    reportf("reduce_db".to_string());
+    reportf("reduce_db".to_string(), solver_state.verbosity);
 
     let mut i: i32 = 0;
     let mut j: i32 = 0;

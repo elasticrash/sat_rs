@@ -1,4 +1,7 @@
 Rust Port of MiniSAT2
-Work in progress, there are so much missing
 
-I am definately taking the wrong approach of porting as much as you can blindly and then try to piece them together but I am having fun and learning rust at the same time
+I am definately taking the wrong approach of porting as much as you can blindly and then try to piece them together but I am having fun and learning rust at the same time.
+
+18/11/2019
+
+Got my first results, no idea yet if they are correct, there were a lot of wrong assumptions when I had to do bitwise operation on enums. Need time, to write tests.

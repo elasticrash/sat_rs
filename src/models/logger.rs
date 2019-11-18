@@ -1,5 +1,7 @@
-pub fn reportf(a: String) {
-    println!("{:?}", a);
+pub fn reportf(a: String, verbosity: i32) {
+    if verbosity > 1 {
+        println!("{:?}", a);
+    }
 }
 
 pub fn debug(a: String) {

@@ -32,7 +32,7 @@ struct Dict {
 }
 
 pub fn basic_clause_simplification(_ps: Vec<Lit>, _copy: bool) -> Option<Vec<Lit>> {
-    reportf("basic_clause_simplification".to_string());
+    reportf("basic_clause_simplification".to_string(), 0);
 
     let mut qs: Vec<Lit>;
 
@@ -71,7 +71,7 @@ pub fn basic_clause_simplification(_ps: Vec<Lit>, _copy: bool) -> Option<Vec<Lit
 }
 
 pub fn reorder_by_level(mut _ps: &mut Vec<Lit>, solver_state: &mut SolverState) {
-    reportf("reorder_by_level".to_string());
+    reportf("reorder_by_level".to_string(), solver_state.verbosity);
 
     let mut max: i32 = std::i32::MIN;
     let mut max_at: i32 = -1;
@@ -112,7 +112,7 @@ pub fn reorder_by_level(mut _ps: &mut Vec<Lit>, solver_state: &mut SolverState) 
 }
 
 pub fn new_clause(_ps: &mut Vec<Lit>, _learnt: bool, solver_state: &mut SolverState) {
-    reportf("new_clause".to_string());
+    reportf("new_clause".to_string(), solver_state.verbosity);
     new_clause_pr(_ps, _learnt, false, true, solver_state);
 }
 
@@ -123,7 +123,7 @@ fn new_clause_pr(
     _copy: bool,
     solver_state: &mut SolverState,
 ) {
-    reportf("new_clause_pr".to_string());
+    reportf("new_clause_pr".to_string(), solver_state.verbosity);
 
     if !solver_state.ok {
         return;
@@ -222,7 +222,7 @@ fn new_clause_pr(
 }
 
 pub fn remove(c: Clause, just_dealloc: bool, solver_state: &mut SolverState) {
-    reportf("remove".to_string());
+    reportf("remove".to_string(), solver_state.verbosity);
 
     if !just_dealloc {
         remove_watch(
@@ -242,7 +242,7 @@ pub fn remove(c: Clause, just_dealloc: bool, solver_state: &mut SolverState) {
     }
 }
 pub fn simplify(c: Clause, solver_state: &mut SolverState) -> bool {
-    reportf("simplify".to_string());
+    reportf("simplify".to_string(), solver_state.verbosity);
 
     for y in 0..c.size() {
         if value_by_lit(c.data[y as usize], &solver_state) == Lbool::True {
@@ -252,7 +252,7 @@ pub fn simplify(c: Clause, solver_state: &mut SolverState) -> bool {
     return false;
 }
 pub fn remove_watch(ws: &mut Vec<Clause>, elem: Clause) -> bool {
-    reportf("remove_watch".to_string());
+    reportf("remove_watch".to_string(), 0);
 
     if ws.len() == 0 {
         return false;
@@ -269,7 +269,7 @@ pub fn remove_watch(ws: &mut Vec<Clause>, elem: Clause) -> bool {
     return true;
 }
 pub fn new_var(solver_state: &mut SolverState) -> i32 {
-    reportf("new_var".to_string());
+    reportf("new_var".to_string(), solver_state.verbosity);
 
     let index: i32;
     index = solver_state.assigns.len() as i32;
@@ -286,14 +286,14 @@ pub fn new_var(solver_state: &mut SolverState) -> i32 {
     return index;
 }
 pub fn assume(p: Lit, solver_state: &mut SolverState) -> bool {
-    reportf("assume".to_string());
+    reportf("assume".to_string(), solver_state.verbosity);
 
     solver_state.trail_lim.push(solver_state.trail.len() as i32);
     return solver_state.i_enqueue(p);
 }
 
 pub fn cancel_until(level: i32, solver_state: &mut SolverState) {
-    reportf("cancel_until".to_string());
+    reportf("cancel_until".to_string(), solver_state.verbosity);
 
     if solver_state.decision_level() > level {
         let mut c: i32 = (solver_state.trail.len() as i32 - 1) as i32;

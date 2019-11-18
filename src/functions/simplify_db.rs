@@ -15,14 +15,14 @@ use crate::models::solverstate::*;
 |________________________________________________________________________________________________@*/
 
 pub fn simplify_db(solver_state: &mut SolverState) {
-    reportf("simplify_db".to_string());
+    reportf("simplify_db".to_string(), solver_state.verbosity);
 
     if !solver_state.ok {
         return;
     }
     match propagate(solver_state) {
         None => {
-            reportf("propagate match none".to_string());
+            reportf("propagate match none".to_string(), solver_state.verbosity);
             if solver_state.clone().n_assigns() == solver_state.simp_db_assigns as usize
                 || solver_state.simp_db_props > 0.0
             {
@@ -60,7 +60,7 @@ pub fn simplify_db(solver_state: &mut SolverState) {
                 + solver_state.solver_stats.learnts_literals;
         }
         _ => {
-            reportf("solver state false".to_string());
+            reportf("solver state false".to_string(), solver_state.verbosity);
             solver_state.ok = false;
             return;
         }

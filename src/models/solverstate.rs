@@ -250,7 +250,7 @@ impl NewVar for SolverState {
 }
 
 pub fn move_back(_l1: Lit, _l2: Lit, solver_state: &mut SolverState) {
-    reportf("move_back".to_string());
+    reportf("move_back".to_string(), solver_state.verbosity);
 
     let mut lev1: i32 = solver_state.level[var(&_l1) as usize];
     let mut lev2: i32 = solver_state.level[var(&_l2) as usize];

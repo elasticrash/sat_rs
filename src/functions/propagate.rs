@@ -18,7 +18,7 @@ use crate::models::solverstate::*;
 |________________________________________________________________________________________________@*/
 
 pub fn propagate(solver_state: &mut SolverState) -> Option<Clause> {
-    reportf("propagate".to_string());
+    reportf("propagate".to_string(), solver_state.verbosity);
 
     let mut confl: Option<Clause> = None;
 
