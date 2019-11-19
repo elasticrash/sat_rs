@@ -245,6 +245,7 @@ impl NewVar for SolverState {
         self.add_clause(&mut self.add_ternary_tmp.clone());
     }
     fn add_clause(&mut self, ps: &mut Vec<Lit>) {
+        reportf("add_clause".to_string(), self.verbosity);
         new_clause(ps, false, self);
     }
 }

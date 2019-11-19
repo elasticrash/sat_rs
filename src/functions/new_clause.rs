@@ -56,12 +56,20 @@ pub fn basic_clause_simplification(_ps: Vec<Lit>, _copy: bool) -> Option<Vec<Lit
     for i in 0..qs.len() {
         let l: Lit = qs[i];
         let v: i32 = var(&l);
-        if v < dict.len() as i32 && dict[v as usize].empty == false {
+        let mut has_value: bool = false;
+
+        if v < dict.len() as i32 {
+            if dict[v as usize].empty == false {
+                has_value = true;
+            }
+        }
+
+        if has_value {
             if dict[v as usize].l == l {
             } else {
                 return None;
             }
-        } else {
+        } else if v < dict.len() as i32 {
             dict[v as usize] = Dict {
                 index: v,
                 l: l,
@@ -172,6 +180,7 @@ fn new_clause_pr(
     } else {
         ps = _ps.to_vec();
     }
+    reportf("check ps length".to_string(), solver_state.verbosity);
 
     if ps.len() == 0 {
         solver_state.ok = false;
@@ -193,12 +202,11 @@ fn new_clause_pr(
             reorder_by_level(&mut ps.to_vec(), solver_state)
         }
 
-        let c: Clause = Clause::new(_learnt || _theory_clause, &ps);
-        let c_clone: &mut Clause = &mut c.clone();
-        //TODO this whole thing is a mess
+        let mut c: Clause = Clause::new(_learnt || _theory_clause, &ps);
+
         if !_learnt && !_theory_clause {
             solver_state.clauses.push(c.clone());
-            solver_state.solver_stats.clauses_literals += c_clone.size() as f64;
+            solver_state.solver_stats.clauses_literals += c.size() as f64;
         } else {
             if _learnt {
                 let mut max_i: i32 = 1;
@@ -209,24 +217,24 @@ fn new_clause_pr(
                         max_i = y as i32;
                     }
                 }
-                c_clone.data[1] = ps[max_i as usize];
-                c_clone.data[max_i as usize] = ps[1];
+                c.data[1] = ps[max_i as usize];
+                c.data[max_i as usize] = ps[1];
 
                 enqueue(&c.data[0], Some(c.clone()), solver_state);
             } else {
                 move_back(c.clone().data[0], c.clone().data[1], solver_state);
             }
 
-            solver_state.cla_bump_activity(&mut c_clone.clone());
-            solver_state.learnts.push(c_clone.clone());
-            solver_state.solver_stats.learnts_literals += c_clone.clone().size() as f64;
+            solver_state.cla_bump_activity(&mut c);
+            solver_state.learnts.push(c.clone());
+            solver_state.solver_stats.learnts_literals += c.clone().size() as f64;
         }
 
-        let watch_position_zero = index(!c_clone.clone().data[0]) as usize;
-        let watch_position_one = index(!c_clone.clone().data[1]) as usize;
+        let watch_position_zero = index(!c.clone().data[0]) as usize;
+        let watch_position_one = index(!c.clone().data[1]) as usize;
 
-        solver_state.watches[watch_position_zero].push(c_clone.clone());
-        solver_state.watches[watch_position_one].push(c_clone.clone());
+        solver_state.watches[watch_position_zero].push(c.clone());
+        solver_state.watches[watch_position_one].push(c.clone());
     }
 }
 
