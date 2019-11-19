@@ -29,7 +29,6 @@ use crate::models::varorder::*;
 struct Dict {
     index: i32,
     l: Lit,
-    empty: bool,
 }
 
 pub fn basic_clause_simplification(_ps: Vec<Lit>, _copy: bool) -> Option<Vec<Lit>> {
@@ -44,13 +43,6 @@ pub fn basic_clause_simplification(_ps: Vec<Lit>, _copy: bool) -> Option<Vec<Lit
     }
 
     let mut dict: Vec<Dict> = Vec::new();
-    for i in 0..qs.len() {
-        dict.push(Dict {
-            index: i as i32,
-            l: Lit::new(0, false),
-            empty: true,
-        });
-    }
     let mut ptr: i32 = 0;
 
     for i in 0..qs.len() {
@@ -58,25 +50,18 @@ pub fn basic_clause_simplification(_ps: Vec<Lit>, _copy: bool) -> Option<Vec<Lit
         let v: i32 = var(&l);
         let mut has_value: bool = false;
 
-        if v < dict.len() as i32 {
-            if dict[v as usize].empty == false {
-                has_value = true;
+        match dict.iter().find(|&x| x.index == v) {
+            Some(d) => {
+                if d.l == l {
+                } else {
+                    return None;
+                }
             }
-        }
-
-        if has_value {
-            if dict[v as usize].l == l {
-            } else {
-                return None;
+            None => {
+                dict.push(Dict { index: v, l: l });
+                qs[ptr as usize] = l;
+                ptr += 1;
             }
-        } else if v < dict.len() as i32 {
-            dict[v as usize] = Dict {
-                index: v,
-                l: l,
-                empty: false,
-            };
-            qs[ptr as usize] = l;
-            ptr += 1;
         }
     }
     qs.truncate(ptr as usize);
@@ -180,7 +165,11 @@ fn new_clause_pr(
     } else {
         ps = _ps.to_vec();
     }
-    reportf("check ps length".to_string(), solver_state.verbosity);
+
+    reportf(
+        "check ps length ".to_string() + &ps.len().to_string(),
+        solver_state.verbosity,
+    );
 
     if ps.len() == 0 {
         solver_state.ok = false;
