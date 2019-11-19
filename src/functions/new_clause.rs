@@ -29,6 +29,7 @@ use crate::models::varorder::*;
 struct Dict {
     index: i32,
     l: Lit,
+    empty: bool,
 }
 
 pub fn basic_clause_simplification(_ps: Vec<Lit>, _copy: bool) -> Option<Vec<Lit>> {
@@ -47,22 +48,27 @@ pub fn basic_clause_simplification(_ps: Vec<Lit>, _copy: bool) -> Option<Vec<Lit
         dict.push(Dict {
             index: i as i32,
             l: Lit::new(0, false),
+            empty: true,
         });
     }
-    let ptr: i32 = 0;
+    let mut ptr: i32 = 0;
 
     for i in 0..qs.len() {
         let l: Lit = qs[i];
         let v: i32 = var(&l);
-        if v <= dict.len() as i32 {
-            let other = &dict[v as usize];
-            if other.l == l {
+        if v < dict.len() as i32 && dict[v as usize].empty == false {
+            if dict[v as usize].l == l {
             } else {
                 return None;
             }
         } else {
-            dict.push(Dict { index: v, l: l });
-            qs.push(l);
+            dict[v as usize] = Dict {
+                index: v,
+                l: l,
+                empty: false,
+            };
+            qs[ptr as usize] = l;
+            ptr += 1;
         }
     }
     qs.truncate(ptr as usize);
@@ -155,13 +161,12 @@ fn new_clause_pr(
                 if solver_state.level[var(&unqs[_i]) as usize] != 0
                     || value_by_lit(unqs[_i], &solver_state) != Lbool::False
                 {
-                    _j += 1;
                     unqs[_j] = unqs[_i];
+                    _j += 1;
                 }
-                unqs.truncate(_i - _j);
-
                 _i += 1;
             }
+            unqs.truncate(unqs.len() - (_i - _j) as usize);
         }
         ps = unqs;
     } else {
@@ -182,42 +187,46 @@ fn new_clause_pr(
         let ps_clone: &mut Vec<Lit> = &mut ps.to_vec();
         if !internal_enqueue(&ps_clone[0], solver_state) {
             solver_state.ok = false;
-        } else {
-            if _theory_clause {
-                reorder_by_level(ps_clone, solver_state)
-            }
-
-            let c: Clause = Clause::new(_learnt || _theory_clause, &ps);
-            let c_clone: &mut Clause = &mut c.clone();
-
-            if !_learnt && !_theory_clause {
-                solver_state.clauses.push(c.clone());
-                solver_state.solver_stats.clauses_literals += c_clone.size() as f64;
-            } else {
-                if _learnt {
-                    let mut max_i: i32 = 1;
-                    let mut max: i32 = solver_state.level[var(&ps[1]) as usize];
-                    for y in 2..ps.len() {
-                        if solver_state.level[var(&ps[y]) as usize] > max {
-                            max = solver_state.level[var(&ps[y]) as usize];
-                            max_i = y as i32;
-                        }
-                    }
-                    c_clone.data[1] = ps[max_i as usize];
-                    c_clone.data[max_i as usize] = ps[1];
-                } else {
-                    move_back(c.clone().data[0], c.clone().data[1], solver_state);
-                }
-
-                solver_state.cla_bump_activity(&mut c.clone());
-                solver_state.learnts.push(c.clone());
-                solver_state.solver_stats.learnts_literals += c.clone().size() as f64;
-            }
-
-            solver_state.watches[index(!c.clone().data[0]) as usize].push(c.clone());
-            solver_state.watches[index(!c.clone().data[1]) as usize].push(c.clone());
-            new_clause_callback(c);
         }
+    } else {
+        if _theory_clause {
+            reorder_by_level(&mut ps.to_vec(), solver_state)
+        }
+
+        let c: Clause = Clause::new(_learnt || _theory_clause, &ps);
+        let c_clone: &mut Clause = &mut c.clone();
+        //TODO this whole thing is a mess
+        if !_learnt && !_theory_clause {
+            solver_state.clauses.push(c.clone());
+            solver_state.solver_stats.clauses_literals += c_clone.size() as f64;
+        } else {
+            if _learnt {
+                let mut max_i: i32 = 1;
+                let mut max: i32 = solver_state.level[var(&ps[1]) as usize];
+                for y in 2..ps.len() {
+                    if solver_state.level[var(&ps[y]) as usize] > max {
+                        max = solver_state.level[var(&ps[y]) as usize];
+                        max_i = y as i32;
+                    }
+                }
+                c_clone.data[1] = ps[max_i as usize];
+                c_clone.data[max_i as usize] = ps[1];
+
+                enqueue(&c.data[0], Some(c.clone()), solver_state);
+            } else {
+                move_back(c.clone().data[0], c.clone().data[1], solver_state);
+            }
+
+            solver_state.cla_bump_activity(&mut c_clone.clone());
+            solver_state.learnts.push(c_clone.clone());
+            solver_state.solver_stats.learnts_literals += c_clone.clone().size() as f64;
+        }
+
+        let watch_position_zero = index(!c_clone.clone().data[0]) as usize;
+        let watch_position_one = index(!c_clone.clone().data[1]) as usize;
+
+        solver_state.watches[watch_position_zero].push(c_clone.clone());
+        solver_state.watches[watch_position_one].push(c_clone.clone());
     }
 }
 
@@ -311,12 +320,10 @@ pub fn cancel_until(level: i32, solver_state: &mut SolverState) {
                 break;
             }
         }
-        solver_state.trail.truncate(
-            (solver_state.trail.len() - solver_state.trail_lim[level as usize] as usize) as usize,
-        );
         solver_state
-            .trail_lim
-            .truncate(solver_state.trail_lim.len() - level as usize);
+            .trail
+            .truncate(solver_state.trail_lim[level as usize] as usize);
+        solver_state.trail_lim.truncate(level as usize);
         solver_state.qhead = solver_state.trail.len() as i32;
     }
 }

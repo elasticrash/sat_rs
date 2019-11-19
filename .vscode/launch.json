@@ -24,7 +24,7 @@
             "request": "launch",
             "program": "${workspaceFolder}/target/debug/sat_rs.exe",
             "args": [
-                "-verbosity=1"
+                "-verbosity=2"
             ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

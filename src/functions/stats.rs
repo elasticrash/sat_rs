@@ -27,7 +27,11 @@ pub fn print_stats(stats: SolverStats) {
         2,
     );
     reportf(
-        format!("Available Memory      : {0} / {1} MB", mem_used().free, mem_used().total),
+        format!(
+            "Available Memory      : {0} / {1} MB",
+            mem_used().free,
+            mem_used().total
+        ),
         2,
     );
     reportf(format!("CPU time              : {0} ms", duration), 2);

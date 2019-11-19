@@ -145,7 +145,7 @@ pub fn analyze(
         }
 
         solver_state.solver_stats.max_literals += out_learnt.len() as f64;
-        out_learnt.truncate((i - j) as usize);
+        out_learnt.truncate(out_learnt.len() - (i - j) as usize);
         solver_state.solver_stats.tot_literals += out_learnt.len() as f64;
     }
 
@@ -187,9 +187,7 @@ fn analyze_removeable(_p: Lit, min_level: u32, solver_state: &mut SolverState) -
                                                 .analyze_toclear
                                                 [j as usize])
                                                 as usize] = Lbool::Undef0;
-                                            solver_state.analyze_toclear.truncate(
-                                                solver_state.analyze_toclear.len() - top as usize,
-                                            );
+                                            solver_state.analyze_toclear.truncate(top as usize);
                                             return false;
                                         }
                                     }

@@ -34,7 +34,7 @@ impl BitAnd for Lbool {
             -2 => Lbool::False,
             0 => Lbool::Undef0,
             -1 => Lbool::Undef1,
-            _ => Lbool::Undef1
+            _ => Lbool::Undef1,
         }
     }
 }

@@ -16,12 +16,12 @@ fn main() {
     let _args: Vec<String> = env::args().collect();
 
     let arguments: InputArguments = read_input_arguments(_args);
-
     let mut file = File::open("./input.txt").unwrap();
     let mut buffer = String::new();
 
     let mut lits: Vec<Lit> = Vec::new();
     let mut state: SolverState = SolverState::new();
+    state.verbosity = arguments.verbosity as i32;
 
     file.read_to_string(&mut buffer).unwrap();
 
@@ -29,7 +29,6 @@ fn main() {
 
     let mut until: i32 = 0;
     let mut w: (String, String);
-    lits.clear();
     while {
         w = read_word(all_chars.clone(), until);
         until += w.0.clone().len() as i32;
@@ -56,15 +55,15 @@ fn main() {
 
             lits.push(solver_lit);
         }
+        if parsed_lit == 0 {
+            state.add_clause(&mut lits);
+            lits.clear();
+        }
     }
 
-    state.add_clause(&mut lits);
-
-    if arguments.verbosity == 0 {
-        state.verbosity = 0;
+    if state.verbosity == 0 {
         solve_no_assumptions(&mut state);
     } else {
-        state.verbosity = 1;
         solve_no_assumptions(&mut state);
         let mut result: String = String::new();
         if state.ok {

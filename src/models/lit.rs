@@ -41,6 +41,9 @@ impl ILit for Lit {
     }
 }
 
+// using the Not operator as a bitwise operator
+// might need changing in the future as it is
+// slightly confusing
 impl Not for Lit {
     type Output = Lit;
     fn not(self) -> Lit {

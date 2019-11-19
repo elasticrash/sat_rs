@@ -56,5 +56,7 @@ pub fn reduce_db(solver_state: &mut SolverState) {
             j += 1;
         }
     }
-    solver_state.learnts.truncate((i - j) as usize)
+    solver_state
+        .learnts
+        .truncate(solver_state.learnts.len() - (i - j) as usize)
 }

@@ -40,7 +40,8 @@ impl IVarOrder for VarOrder {
         self.activity = solver_state.activity.clone();
 
         self.heap.set_bounds(self.assigns.len() as i32);
-        self.heap.insert(self.assigns.len() as i32 - 1, self.activity.clone());
+        self.heap
+            .insert(self.assigns.len() as i32 - 1, self.activity.clone());
     }
     fn update(&mut self, x: i32) {
         if self.heap.in_heap(x) {
@@ -71,7 +72,7 @@ impl IVarOrder for VarOrder {
             let next: i32 = self.heap.getmin();
 
             if is_undefined(self.assigns[next as usize]) {
-                let r =  !Lit::simple(next);
+                let r = !Lit::simple(next);
                 return r;
             }
         }

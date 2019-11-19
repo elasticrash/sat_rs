@@ -5,3 +5,7 @@ I am definately taking the wrong approach of porting as much as you can blindly 
 18/11/2019
 
 Got my first results, no idea yet if they are correct, there were a lot of wrong assumptions when I had to do bitwise operation on enums. Need time, to write tests.
+
+19/11/2019
+
+The results where completely wrong, it turned out I was reading the clauses incorrectly from the cnf files. This is now fixed. But the solver gives incorrects results.
