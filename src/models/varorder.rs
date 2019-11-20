@@ -1,7 +1,6 @@
 use crate::models::heap::*;
 use crate::models::lbool::{is_undefined, Lbool};
 use crate::models::lit::*;
-use crate::models::logger::*;
 use crate::models::random::{drand, irand};
 use crate::models::solverstate::*;
 

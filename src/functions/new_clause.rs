@@ -48,7 +48,6 @@ pub fn basic_clause_simplification(_ps: Vec<Lit>, _copy: bool) -> Option<Vec<Lit
     for i in 0..qs.len() {
         let l: Lit = qs[i];
         let v: i32 = var(&l);
-        let mut has_value: bool = false;
 
         match dict.iter().find(|&x| x.index == v) {
             Some(d) => {

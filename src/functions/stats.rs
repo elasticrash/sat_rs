@@ -1,7 +1,6 @@
 use crate::models::logger::*;
 use crate::models::statsparams::*;
 use crate::models::timemem::*;
-use std::time::Duration;
 
 pub fn progress_estimate() -> f64 {
     return 0.0;

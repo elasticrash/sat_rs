@@ -27,7 +27,7 @@ impl Not for Lbool {
 
 impl BitAnd for Lbool {
     type Output = Self;
-    fn bitand(self, rhs: Self) -> Self::Output {
+    fn bitand(self, _rhs: Self) -> Self::Output {
         let result = !(self as i8);
         match result {
             1 => Lbool::True,

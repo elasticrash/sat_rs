@@ -36,7 +36,7 @@ pub fn simplify_db(solver_state: &mut SolverState) {
             }
 
             for t in 0..2 {
-                let mut clause_size = 0;
+                let clause_size: usize;
                 if t != 0 {
                     clause_size = solver_state.learnts.len();
                 } else {
