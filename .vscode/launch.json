@@ -22,6 +22,7 @@
             "name": "Rust",
             "type": "cppvsdbg",
             "request": "launch",
+            "preLaunchTask": "cargo_build",
             "program": "${workspaceFolder}/target/debug/sat_rs.exe",
             "args": [
                 "-verbosity=2"

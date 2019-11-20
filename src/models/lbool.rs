@@ -1,7 +1,5 @@
 use crate::models::lit::*;
 use crate::models::solverstate::SolverState;
-use std::ops::BitAnd;
-use std::ops::Not;
 
 pub static L_TRUE: Lbool = Lbool::True;
 pub static L_FALSE: Lbool = Lbool::False;
@@ -12,31 +10,6 @@ pub enum Lbool {
     False = -2,
     Undef0 = 0,
     Undef1 = -1,
-}
-
-impl Not for Lbool {
-    type Output = Lbool;
-    fn not(self) -> Lbool {
-        if self == Lbool::True {
-            return Lbool::False;
-        } else {
-            return Lbool::True;
-        }
-    }
-}
-
-impl BitAnd for Lbool {
-    type Output = Self;
-    fn bitand(self, _rhs: Self) -> Self::Output {
-        let result = !(self as i8);
-        match result {
-            1 => Lbool::True,
-            -2 => Lbool::False,
-            0 => Lbool::Undef0,
-            -1 => Lbool::Undef1,
-            _ => Lbool::Undef1,
-        }
-    }
 }
 
 pub fn to_bool(value: bool) -> Lbool {
@@ -58,8 +31,19 @@ pub fn value_by_var(x: i32, y: &SolverState) -> Lbool {
 pub fn value_by_lit(x: Lit, solver_state: &SolverState) -> Lbool {
     let mut assign = solver_state.assigns[var(&x) as usize];
     if sign(&x) {
-        // using the bitwise and to do bitwise NOT
-        assign = assign & assign;
+        assign = bit_not(assign);
     }
     return assign;
+}
+
+// bitwise not for lbool
+fn bit_not(lb: Lbool) -> Lbool {
+    let result = !(lb as i8);
+    return match result {
+        1 => Lbool::True,
+        -2 => Lbool::False,
+        0 => Lbool::Undef0,
+        -1 => Lbool::Undef1,
+        _ => Lbool::Undef1,
+    };
 }
