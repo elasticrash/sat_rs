@@ -247,16 +247,25 @@ pub fn remove(c: Clause, just_dealloc: bool, solver_state: &mut SolverState) {
         solver_state.solver_stats.clauses_literals -= c.size() as f64;
     }
 }
-pub fn simplify(c: Clause, solver_state: &mut SolverState) -> bool {
+pub fn simplify(k: i32, t: i32, solver_state: &mut SolverState) -> bool {
     reportf("simplify".to_string(), solver_state.verbosity);
 
+    let c;
+    if t != 0 {
+        c = &solver_state.learnts[k as usize];
+    } else {
+        c = &solver_state.clauses[k as usize];
+    }
+
     for y in 0..c.size() {
-        if value_by_lit(c.data[y as usize], &solver_state) == Lbool::True {
+        let f = value_by_lit(c.data[y as usize], &solver_state);
+        if f == Lbool::True {
             return true;
         }
     }
     return false;
 }
+
 pub fn remove_watch(ws: &mut Vec<Clause>, elem: Clause) -> bool {
     reportf("remove_watch".to_string(), 0);
 

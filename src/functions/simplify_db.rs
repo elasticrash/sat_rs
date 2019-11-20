@@ -36,6 +36,13 @@ pub fn simplify_db(solver_state: &mut SolverState) {
             }
 
             for t in 0..2 {
+                let mut clause_size = 0;
+                if t != 0 {
+                    clause_size = solver_state.learnts.len();
+                } else {
+                    clause_size = solver_state.clauses.len();
+                }
+
                 let mut cs: Vec<Clause>;
                 if t != 0 {
                     cs = solver_state.learnts.clone();
@@ -44,15 +51,22 @@ pub fn simplify_db(solver_state: &mut SolverState) {
                 }
 
                 let mut j: i32 = 0;
-                for k in 0..cs.len() {
-                    if solver_state.locked(cs[k].clone()) && simplify(cs[k].clone(), solver_state) {
+                for k in 0..clause_size {
+                    let a = !solver_state.locked(k as i32, t);
+                    let b = simplify(k as i32, t, solver_state);
+
+                    if a && b {
                         remove(cs[k].clone(), false, solver_state);
                     } else {
                         cs[j as usize] = cs[k].clone();
                         j += 1;
                     }
                 }
-                cs.truncate(cs.len() - j as usize);
+                if t != 0 {
+                    solver_state.learnts.truncate(clause_size - j as usize)
+                } else {
+                    solver_state.clauses.truncate(clause_size - j as usize)
+                }
             }
 
             solver_state.simp_db_assigns = solver_state.clone().n_assigns() as i32;

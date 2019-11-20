@@ -28,7 +28,7 @@ impl Not for Lbool {
 impl BitAnd for Lbool {
     type Output = Self;
     fn bitand(self, rhs: Self) -> Self::Output {
-        let result = self as i8 & rhs as i8;
+        let result = !(self as i8);
         match result {
             1 => Lbool::True,
             -2 => Lbool::False,
@@ -55,10 +55,10 @@ pub fn value_by_var(x: i32, y: &SolverState) -> Lbool {
     return y.assigns[x as usize];
 }
 
-pub fn value_by_lit(x: Lit, y: &SolverState) -> Lbool {
-    let mut assign = y.assigns[var(&x) as usize];
+pub fn value_by_lit(x: Lit, solver_state: &SolverState) -> Lbool {
+    let mut assign = solver_state.assigns[var(&x) as usize];
     if sign(&x) {
-        // this is wrong need fixing
+        // using the bitwise and to do bitwise NOT
         assign = assign & assign;
     }
     return assign;

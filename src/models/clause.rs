@@ -53,7 +53,19 @@ impl PartialEq for Clause {
         if self.activity == other.activity {
             if self.data.len() == other.data.len() {
                 if self.is_learnt == other.is_learnt {
-                    return true;
+                    let mut f: String = String::new();
+                    for y in self.data.clone() {
+                        f.push_str(&y.x.to_string())
+                    }
+
+                    let mut s: String = String::new();
+                    for y in other.data.clone() {
+                        s.push_str(&y.x.to_string())
+                    }
+
+                    if f == s {
+                        return true;
+                    }
                 }
             }
         }

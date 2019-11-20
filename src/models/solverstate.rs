@@ -148,7 +148,7 @@ pub trait Internal {
     fn i_new_clause(self, ps: &mut Vec<Lit>);
     fn cla_bump_activity(&mut self, c: &mut Clause);
     fn remove(c: Clause);
-    fn locked(&mut self, c: Clause) -> bool;
+    fn locked(&mut self, y: i32, t: i32) -> bool;
     fn decision_level(&mut self) -> i32;
 }
 
@@ -200,16 +200,22 @@ impl Internal for SolverState {
         }
     }
     fn remove(_c: Clause) {}
-    fn locked(&mut self, _c: Clause) -> bool {
+    fn locked(&mut self, y: i32, t: i32) -> bool {
+        let _c;
+        if t != 0 {
+            _c = &self.learnts[y as usize];
+        } else {
+            _c = &self.clauses[y as usize];
+        }
         match &self.reason[var(&_c.data[0]) as usize] {
             Some(x) => {
-                return _c == *x;
+                return _c == x;
             }
             _ => false,
         }
     }
     fn decision_level(&mut self) -> i32 {
-        return 5;
+        return self.trail_lim.len() as i32;
     }
 }
 
