@@ -38,6 +38,8 @@ pub fn solve(assumptions: Vec<Lit>, solver_state: &mut SolverState) -> bool {
     solver_state.root_level = assumptions.len() as i32;
     for y in 0..assumptions.len() {
         let p: Lit = assumptions[y];
+        assert!(var(&p) < solver_state.n_vars());
+
         if !assume(p, solver_state) {
             match &solver_state.reason[var(&p) as usize] {
                 Some(r) => {
@@ -57,6 +59,7 @@ pub fn solve(assumptions: Vec<Lit>, solver_state: &mut SolverState) -> bool {
             match propagate(solver_state) {
                 Some(confl) => {
                     analyse_final(confl.clone(), false, solver_state);
+                    assert!(solver_state.conflict.len() > 0);
                     cancel_until(0, solver_state);
                     return false;
                 }
@@ -64,6 +67,7 @@ pub fn solve(assumptions: Vec<Lit>, solver_state: &mut SolverState) -> bool {
             }
         }
     }
+    assert!(solver_state.root_level == solver_state.decision_level());
 
     if solver_state.verbosity >= 1 {
         reportf(

@@ -55,6 +55,7 @@ pub fn analyse_final(_confl: Clause, _skip_first: bool, solver_state: &mut Solve
                     }
                 }
                 None => {
+                    assert!(solver_state.level[x] > 0);
                     solver_state.conflict.push(!solver_state.trail[y as usize]);
                 }
             }

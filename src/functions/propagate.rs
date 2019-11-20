@@ -42,21 +42,23 @@ pub fn propagate(solver_state: &mut SolverState) -> Option<Clause> {
                 c.data[1] = false_lit;
             }
 
+            assert!(c.data[1] == false_lit);
+
             let first: Lit = c.data[0].clone();
             let val: Lbool = value_by_lit(first, solver_state);
             if val == L_TRUE {
                 ws[j as usize] = c;
                 j += 1;
             } else {
+                let mut foundwatch: bool = false;
                 for k in 2..c.data.len() {
-                    let mut foundwatch: bool = false;
                     if value_by_lit(c.data[k], solver_state) != L_FALSE {
                         c.data[1] = c.data[k];
                         c.data[k] = false_lit;
 
                         solver_state.watches[index(!c.data[1]) as usize].push(c.clone());
                         foundwatch = true;
-
+                    } else {
                         if !foundwatch {
                             ws[j as usize] = c.clone();
                             j += 1;
@@ -71,6 +73,22 @@ pub fn propagate(solver_state: &mut SolverState) -> Option<Clause> {
                                         i += 1;
                                     }
                                 }
+                            }
+                        }
+                    }
+                }
+                if !foundwatch {
+                    ws[j as usize] = c.clone();
+                    j += 1;
+                    if !enqueue(&first, Some(c.clone()), solver_state) {
+                        if solver_state.decision_level() == 0 {
+                            solver_state.ok = false;
+                            confl = Some(c.clone());
+                            solver_state.qhead = solver_state.trail.len() as i32;
+                            while i < end {
+                                ws[j as usize] = ws[i as usize].clone();
+                                j += 1;
+                                i += 1;
                             }
                         }
                     }

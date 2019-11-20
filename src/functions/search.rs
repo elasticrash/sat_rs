@@ -39,6 +39,7 @@ pub fn search(
     if !solver_state.ok {
         return Lbool::False;
     }
+    assert!(solver_state.root_level == solver_state.decision_level());
 
     solver_state.solver_stats.starts += 1.0;
     let mut conflict_c: i32 = 0;
@@ -105,7 +106,7 @@ pub fn search(
                     return L_TRUE;
                 }
 
-                assume(next, solver_state);
+                assert!(assume(next, solver_state));
             }
         }
     }

@@ -20,6 +20,9 @@ pub fn simplify_db(solver_state: &mut SolverState) {
     if !solver_state.ok {
         return;
     }
+
+    assert!(solver_state.decision_level() == 0);
+
     match propagate(solver_state) {
         None => {
             reportf("propagate match none".to_string(), solver_state.verbosity);

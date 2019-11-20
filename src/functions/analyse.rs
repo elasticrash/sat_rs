@@ -40,6 +40,7 @@ pub fn analyze(
 
     while {
         {
+            assert!(confl != None);
             let c: Clause = confl.clone().unwrap();
 
             if c.is_learnt {
@@ -154,12 +155,15 @@ pub fn analyze(
 
 fn analyze_removeable(_p: Lit, min_level: u32, solver_state: &mut SolverState) -> bool {
     reportf("analyze removeable".to_string(), solver_state.verbosity);
+    assert!(solver_state.reason[var(&_p) as usize] != None);
 
     solver_state.analyze_stack.clear();
     solver_state.analyze_stack.push(_p.clone());
     let top: i32 = solver_state.analyze_toclear.len() as i32;
 
     while solver_state.analyze_stack.len() > 0 {
+        let p_ = &solver_state.analyze_stack.last();
+        assert!(solver_state.reason[var(&p_.unwrap()) as usize] != None);
         let c: Clause;
         if solver_state.analyze_stack.last() == None {
             match &solver_state.reason[var(&_p) as usize] {

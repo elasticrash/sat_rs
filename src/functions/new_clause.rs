@@ -129,7 +129,11 @@ fn new_clause_pr(
 
     let ps: Vec<Lit>;
 
+    assert!(!(_learnt && _theory_clause));
+
     if !_learnt {
+        assert!(_theory_clause || solver_state.decision_level() == 0);
+
         let qs = basic_clause_simplification(_ps.to_vec(), _copy);
 
         if qs == None {
@@ -208,7 +212,7 @@ fn new_clause_pr(
                 c.data[1] = ps[max_i as usize];
                 c.data[max_i as usize] = ps[1];
 
-                enqueue(&c.data[0], Some(c.clone()), solver_state);
+                assert!(enqueue(&c.data[0], Some(c.clone()), solver_state));
             } else {
                 move_back(c.clone().data[0], c.clone().data[1], solver_state);
             }
@@ -248,6 +252,7 @@ pub fn remove(c: Clause, just_dealloc: bool, solver_state: &mut SolverState) {
 }
 pub fn simplify(k: i32, t: i32, solver_state: &mut SolverState) -> bool {
     reportf("simplify".to_string(), solver_state.verbosity);
+    assert!(solver_state.decision_level() == 0);
 
     let c;
     if t != 0 {
@@ -273,6 +278,7 @@ pub fn remove_watch(ws: &mut Vec<Clause>, elem: Clause) -> bool {
     }
     let mut j: usize = 0;
     while ws[j] != elem {
+        assert!(j < ws.len() - 1);
         j += 1;
     }
     for _y in j..ws.len() - 1 {
