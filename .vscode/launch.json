@@ -10,7 +10,7 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/MiniSAT.cs/bin/Debug/netcoreapp3.0/MiniSAT.cs.dll",
+            "program": "${workspaceFolder}/MiniSAT.cs/bin/Debug/netcoreapp2.0/MiniSAT.cs.dll",
             "args": [
                 "input.txt"
             ],

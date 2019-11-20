@@ -67,22 +67,22 @@ pub fn solve(assumptions: Vec<Lit>, solver_state: &mut SolverState) -> bool {
 
     if solver_state.verbosity >= 1 {
         reportf(
-            "==================================[MINISAT]==================================="
+            "==================================[MINISAT]======================================="
                 .to_string(),
             2,
         );
         reportf(
-            "| Conflicts |     ORIGINAL     |              LEARNT              | Progress |"
+            "| Conflicts |       ORIGINAL        |              LEARNT              | Progress |"
                 .to_string(),
             2,
         );
         reportf(
-            "|           | Clauses Literals |   Limit Clauses Literals  Lit/Cl |          |"
+            "|           | Clauses      Literals |   Limit Clauses Literals  Lit/Cl |          |"
                 .to_string(),
             2,
         );
         reportf(
-            "=============================================================================="
+            "=================================================================================="
                 .to_string(),
             2,
         );
@@ -92,15 +92,15 @@ pub fn solve(assumptions: Vec<Lit>, solver_state: &mut SolverState) -> bool {
         if solver_state.verbosity >= 1 {
             reportf(
                 format!(
-                    "|      {0}    |     {1}       {2}    |   {3}      {4}       {5}         {6}   |   {7} %%   |",
+                    "|      {0}    |     {1}        {2}    |   {3}      {4}       {5}       {6}   |   {7} %%   |",
                     solver_state.solver_stats.conflicts,
                     solver_state.clone().n_clauses(),
                     solver_state.solver_stats.clauses_literals,
-                    nof_learnts,
+                    nof_learnts.floor(),
                     solver_state.clone().n_learnts(),
                     solver_state.solver_stats.learnts_literals,
-                    solver_state.solver_stats.learnts_literals
-                        / solver_state.clone().n_learnts() as f64,
+                    (solver_state.solver_stats.learnts_literals
+                        / solver_state.clone().n_learnts() as f64).floor(),
                     solver_state.progress_estimate * 100.0
                 ),
                 2,
@@ -120,7 +120,7 @@ pub fn solve(assumptions: Vec<Lit>, solver_state: &mut SolverState) -> bool {
 
     if solver_state.verbosity >= 1 {
         reportf(
-            "=============================================================================="
+            "=================================================================================="
                 .to_string(),
             2,
         );

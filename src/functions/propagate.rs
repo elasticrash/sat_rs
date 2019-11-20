@@ -36,6 +36,7 @@ pub fn propagate(solver_state: &mut SolverState) -> Option<Clause> {
 
             i += 1;
             let false_lit: Lit = !p;
+
             if c.data[0] == false_lit {
                 c.data[0] = c.data[1];
                 c.data[1] = false_lit;
@@ -43,33 +44,33 @@ pub fn propagate(solver_state: &mut SolverState) -> Option<Clause> {
 
             let first: Lit = c.data[0].clone();
             let val: Lbool = value_by_lit(first, solver_state);
-            let mut foundwatch: bool = false;
             if val == L_TRUE {
                 ws[j as usize] = c;
                 j += 1;
             } else {
                 for k in 2..c.data.len() {
+                    let mut foundwatch: bool = false;
                     if value_by_lit(c.data[k], solver_state) != L_FALSE {
                         c.data[1] = c.data[k];
                         c.data[k] = false_lit;
 
                         solver_state.watches[index(!c.data[1]) as usize].push(c.clone());
                         foundwatch = true;
-                        break;
-                    }
-                }
 
-                if !foundwatch {
-                    if enqueue(&first, Some(c.clone()), solver_state) {
-                        if solver_state.decision_level() == 0 {
-                            solver_state.ok = false;
-                            confl = Some(c.clone());
-                            solver_state.qhead = solver_state.trail.len() as i32;
-
-                            while i < end {
-                                ws[j as usize] = ws[i as usize].clone();
-                                j += 1;
-                                i += 1;
+                        if !foundwatch {
+                            ws[j as usize] = c.clone();
+                            j += 1;
+                            if enqueue(&first, Some(c.clone()), solver_state) {
+                                if solver_state.decision_level() == 0 {
+                                    solver_state.ok = false;
+                                    confl = Some(c.clone());
+                                    solver_state.qhead = solver_state.trail.len() as i32;
+                                    while i < end {
+                                        ws[j as usize] = ws[i as usize].clone();
+                                        j += 1;
+                                        i += 1;
+                                    }
+                                }
                             }
                         }
                     }
