@@ -7,7 +7,7 @@ use crate::models::solverstate::*;
 
 /*_________________________________________________________________________________________________
 |
-|  simplifyDB : [void]  .  [bool]
+|  simplifyDB
 |
 |  Description:
 |    Simplify the clause database according to the current top-level assigment. Currently, the only
@@ -16,13 +16,11 @@ use crate::models::solverstate::*;
 
 pub fn simplify_db(solver_state: &mut SolverState) {
     reportf("simplify_db".to_string(), solver_state.verbosity);
-
     if !solver_state.ok {
         return;
     }
 
     assert!(solver_state.decision_level() == 0);
-
     match propagate(solver_state) {
         None => {
             reportf("propagate match none".to_string(), solver_state.verbosity);

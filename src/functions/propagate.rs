@@ -7,7 +7,7 @@ use crate::models::solverstate::*;
 
 /*_________________________________________________________________________________________________
 |
-|  propagate : [void]  .  [Clause*]
+|  propagate
 |
 |  Description:
 |    Propagates all enqueued facts. If a conflict arises, the conflicting clause is returned,
@@ -62,7 +62,7 @@ pub fn propagate(solver_state: &mut SolverState) -> Option<Clause> {
                         if !foundwatch {
                             ws[j as usize] = c.clone();
                             j += 1;
-                            if enqueue(&first, Some(c.clone()), solver_state) {
+                            if !enqueue(&first, Some(c.clone()), solver_state) {
                                 if solver_state.decision_level() == 0 {
                                     solver_state.ok = false;
                                     confl = Some(c.clone());

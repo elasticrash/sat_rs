@@ -7,7 +7,7 @@ use std::cmp::max;
 
 /*_________________________________________________________________________________________________
 |
-|  analyze : (confl : Clause*) (out_learnt : vec<Lit>&) (out_btlevel : int&)  .  [void]
+|  analyze 
 |
 |  Description:
 |    Analyze conflict and produce a reason clause.

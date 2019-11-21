@@ -8,7 +8,7 @@ use crate::models::varorder::*;
 
 /*_________________________________________________________________________________________________
 |
-|  newClause : (ps : const vec<Lit>&) (learnt : bool)  .  [void]
+|  newClause
 |
 |  Description:
 |    Allocate and add a new clause to the SAT solvers clause database. If a conflict is detected,
@@ -110,7 +110,6 @@ pub fn reorder_by_level(mut _ps: &mut Vec<Lit>, solver_state: &mut SolverState) 
 }
 
 pub fn new_clause(_ps: &mut Vec<Lit>, _learnt: bool, solver_state: &mut SolverState) {
-    reportf("new_clause".to_string(), solver_state.verbosity);
     new_clause_pr(_ps, _learnt, false, true, solver_state);
 }
 
@@ -121,7 +120,7 @@ fn new_clause_pr(
     _copy: bool,
     solver_state: &mut SolverState,
 ) {
-    reportf("new_clause_pr".to_string(), solver_state.verbosity);
+    reportf("new_clause".to_string(), solver_state.verbosity);
 
     if !solver_state.ok {
         return;
@@ -168,11 +167,6 @@ fn new_clause_pr(
     } else {
         ps = _ps.to_vec();
     }
-
-    reportf(
-        "check ps length ".to_string() + &ps.len().to_string(),
-        solver_state.verbosity,
-    );
 
     if ps.len() == 0 {
         solver_state.ok = false;

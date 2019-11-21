@@ -6,7 +6,7 @@ use std::cmp::Ordering;
 
 /*_________________________________________________________________________________________________
 |
-|  reduceDB : ()  .  [void]
+|  reduceDB
 |
 |  Description:
 |    Remove half of the learnt clauses, minus the clauses locked by the current assignment. Locked

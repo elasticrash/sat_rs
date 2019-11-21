@@ -10,7 +10,7 @@ use crate::models::solverstate::*;
 
 /*_________________________________________________________________________________________________
 |
-|  solve : (assumps : const vec<Lit>&)  .  [bool]
+|  solve
 |
 |  Description:
 |    Top-level solve. If using assumptions (non-empty 'assumps' vector), you must call

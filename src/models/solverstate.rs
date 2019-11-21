@@ -147,7 +147,6 @@ pub trait Internal {
     fn cla_decay_activity(&mut self);
     fn i_new_clause(self, ps: &mut Vec<Lit>);
     fn cla_bump_activity(&mut self, c: &mut Clause);
-    fn remove(c: Clause);
     fn locked(&mut self, y: i32, t: i32) -> bool;
     fn decision_level(&mut self) -> i32;
 }
@@ -199,7 +198,6 @@ impl Internal for SolverState {
             cla_rescale_activity(self);
         }
     }
-    fn remove(_c: Clause) {}
     fn locked(&mut self, y: i32, t: i32) -> bool {
         let _c;
         if t != 0 {

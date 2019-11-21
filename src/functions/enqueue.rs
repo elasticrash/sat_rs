@@ -6,7 +6,7 @@ use crate::models::solverstate::*;
 
 /*_________________________________________________________________________________________________
 |
-|  enqueue : (p : Lit) (from : Clause*)  .  [bool]
+|  enqueue 
 |
 |  Description:
 |    Puts a new fact on the propagation queue as well as immediately updating the variable's value.

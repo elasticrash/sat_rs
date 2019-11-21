@@ -15,7 +15,7 @@ use std::cmp::max;
 
 /*_________________________________________________________________________________________________
 |
-|  search : (nof_conflicts : int) (nof_learnts : int) (parms : const SearchParams&)  .  [lbool]
+|  search
 |
 |  Description:
 |    Search for a model the specified number of conflicts, keeping the number of learnt clauses
