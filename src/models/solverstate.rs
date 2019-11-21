@@ -225,7 +225,7 @@ impl SemiInternal for SolverState {
         return self.clauses.len();
     }
     fn n_learnts(self) -> usize {
-        return self.clauses.len();
+        return self.learnts.len();
     }
 }
 

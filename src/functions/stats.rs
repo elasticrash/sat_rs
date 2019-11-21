@@ -11,10 +11,28 @@ pub fn print_stats(stats: SolverStats) {
 
     let duration: u64 = (stats.start_time.elapsed().subsec_nanos() / 1000000) as u64;
     reportf(format!("restarts              : {0}", stats.starts), 2);
-    reportf(format!("conflicts             : {0}", stats.conflicts,), 2);
-    reportf(format!("decisions             : {0}", stats.decisions,), 2);
     reportf(
-        format!("propagations          : {0}", stats.propagations,),
+        format!(
+            "conflicts             : {0}    ({1}/ms)",
+            stats.conflicts,
+            (stats.conflicts / duration as f64)
+        ),
+        2,
+    );
+    reportf(
+        format!(
+            "decisions             : {0}    ({1}/ms)",
+            stats.decisions,
+            (stats.decisions / duration as f64)
+        ),
+        2,
+    );
+    reportf(
+        format!(
+            "propagations          : {0}    ({1}/ms)",
+            stats.propagations,
+            (stats.propagations / duration as f64)
+        ),
         2,
     );
     reportf(
