@@ -14,11 +14,11 @@ pub struct VarOrder {
 
 pub trait IVarOrder {
     fn new(ass: Vec<Lbool>, act: Vec<f64>) -> Self;
-    fn lt(&self, x: i32, y: i32) -> bool;
     fn new_var(&mut self, solver_state: SolverState);
     fn update(&mut self, x: i32);
     fn undo(&mut self, x: i32, solver_state: SolverState);
     fn select(&mut self, random_var_freq: f64, solver_state: SolverState) -> Lit;
+    fn sync(&mut self, solver_state: SolverState);
 }
 
 impl IVarOrder for VarOrder {
@@ -26,16 +26,13 @@ impl IVarOrder for VarOrder {
         return Self {
             assigns: ass,
             activity: act,
-            heap: Heap::new(Self::lt),
+            heap: Heap::new(),
             random_seed: 91648253.0,
         };
     }
-    fn lt(&self, x: i32, y: i32) -> bool {
-        return &self.activity[x as usize] > &self.activity[y as usize];
-    }
+
     fn new_var(&mut self, solver_state: SolverState) {
-        self.assigns = solver_state.assigns.clone();
-        self.activity = solver_state.activity.clone();
+        <VarOrder as IVarOrder>::sync(self, solver_state);
 
         self.heap.set_bounds(self.assigns.len() as i32);
         self.heap
@@ -47,20 +44,16 @@ impl IVarOrder for VarOrder {
         }
     }
     fn undo(&mut self, x: i32, solver_state: SolverState) {
-        self.assigns = solver_state.assigns.clone();
-        self.activity = solver_state.activity.clone();
+        <VarOrder as IVarOrder>::sync(self, solver_state);
 
         if self.heap.in_heap(x) {
             self.heap.insert(x, self.activity.clone());
         }
     }
     fn select(&mut self, random_var_freq: f64, solver_state: SolverState) -> Lit {
-        let random = drand(self.random_seed as f64);
-        
-        // might need to find better solution with assigns and activities
-        self.assigns = solver_state.assigns.clone();
-        self.activity = solver_state.activity.clone();
+        <VarOrder as IVarOrder>::sync(self, solver_state.clone());
 
+        let random = drand(self.random_seed as f64);
         if random < random_var_freq as f64 && !self.heap.empty() {
             let next: i32 = irand(random, self.assigns.len() as i32);
             if is_undefined(self.assigns[next as usize]) {
@@ -69,7 +62,7 @@ impl IVarOrder for VarOrder {
         }
 
         while !self.heap.empty() {
-            let next: i32 = self.heap.getmin();
+            let next: i32 = self.heap.getmin(solver_state.activity.to_vec());
 
             if is_undefined(self.assigns[next as usize]) {
                 let r = !Lit::simple(next);
@@ -78,5 +71,9 @@ impl IVarOrder for VarOrder {
         }
 
         return Lit::new(-1, false);
+    }
+    fn sync(&mut self, solver_state: SolverState) {
+        self.assigns = solver_state.assigns.clone();
+        self.activity = solver_state.activity.clone();
     }
 }

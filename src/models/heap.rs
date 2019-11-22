@@ -1,16 +1,15 @@
 use crate::models::logger::*;
-use crate::models::varorder::*;
+use crate::models::solverstate::*;
 
 #[derive(Clone)]
 pub struct Heap {
-    pub comp: Box<fn(&VarOrder, i32, i32) -> bool>,
     pub heap: Vec<i32>,
     pub indices: Vec<i32>,
     pub activities: Vec<f64>,
 }
 
 pub trait IHeap {
-    fn new(v: fn(&VarOrder, i32, i32) -> bool) -> Self;
+    fn new() -> Self;
     fn set_bounds(&mut self, n: i32);
     fn in_heap(&self, n: i32) -> bool;
     fn increase(&mut self, n: i32);
@@ -18,18 +17,17 @@ pub trait IHeap {
     fn percolate_up(&mut self, i: i32);
     fn percolate_down(&mut self, i: i32);
     fn empty(&self) -> bool;
-    fn getmin(&mut self) -> i32;
+    fn getmin(&mut self, act: Vec<f64>) -> i32;
     fn left(n: i32) -> i32;
     fn right(n: i32) -> i32;
     fn parent(n: i32) -> i32;
 }
 
 impl IHeap for Heap {
-    fn new(v: fn(&VarOrder, i32, i32) -> bool) -> Self {
+    fn new() -> Self {
         let mut h = Vec::new();
         h.push(-1);
         return Self {
-            comp: Box::new(v),
             heap: h,
             indices: Vec::new(),
             activities: Vec::new(),
@@ -96,7 +94,8 @@ impl IHeap for Heap {
     fn empty(&self) -> bool {
         return self.heap.len() == 1 as usize;
     }
-    fn getmin(&mut self) -> i32 {
+    fn getmin(&mut self, act: Vec<f64>) -> i32 {
+        self.activities = act.to_vec();
         let r = self.heap[1];
         self.heap[1] = *self.heap.last().unwrap();
         self.indices[self.heap[1] as usize] = 1;
