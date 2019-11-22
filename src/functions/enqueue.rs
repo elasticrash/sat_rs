@@ -6,7 +6,7 @@ use crate::models::solverstate::*;
 
 /*_________________________________________________________________________________________________
 |
-|  enqueue 
+|  enqueue
 |
 |  Description:
 |    Puts a new fact on the propagation queue as well as immediately updating the variable's value.
@@ -32,11 +32,8 @@ pub fn enqueue(_fact: &Lit, _from: Option<Clause>, solver_state: &mut SolverStat
         solver_state.level[x] = solver_state.decision_level();
         solver_state.trail_pos[x] = solver_state.trail.len() as i32;
         solver_state.trail.push(*_fact);
-
         match _from {
-            Some(s) => {
-                solver_state.reason[x] = Some(s)
-            },
+            Some(s) => solver_state.reason[x] = Some(s),
             _ => solver_state.reason[x] = None,
         }
 

@@ -58,23 +58,25 @@ pub fn propagate(solver_state: &mut SolverState) -> Option<Clause> {
 
                         solver_state.watches[index(!c.data[1]) as usize].push(c.clone());
                         foundwatch = true;
+                        break;
                     } else {
-                        if !foundwatch {
-                            ws[j as usize] = c.clone();
-                            j += 1;
-                            if !enqueue(&first, Some(c.clone()), solver_state) {
-                                if solver_state.decision_level() == 0 {
-                                    solver_state.ok = false;
-                                    confl = Some(c.clone());
-                                    solver_state.qhead = solver_state.trail.len() as i32;
-                                    while i < end {
-                                        ws[j as usize] = ws[i as usize].clone();
-                                        j += 1;
-                                        i += 1;
-                                    }
+                    }
+                    if !foundwatch {
+                        ws[j as usize] = c.clone();
+                        j += 1;
+                        if !enqueue(&first, Some(c.clone()), solver_state) {
+                            if solver_state.decision_level() == 0 {
+                                solver_state.ok = false;
+                                confl = Some(c.clone());
+                                solver_state.qhead = solver_state.trail.len() as i32;
+                                while i < end {
+                                    ws[j as usize] = ws[i as usize].clone();
+                                    j += 1;
+                                    i += 1;
                                 }
                             }
                         }
+                        foundwatch = true;
                     }
                 }
                 if !foundwatch {

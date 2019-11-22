@@ -18,8 +18,7 @@ pub trait IVarOrder {
     fn new_var(&mut self, solver_state: SolverState);
     fn update(&mut self, x: i32);
     fn undo(&mut self, x: i32, solver_state: SolverState);
-    fn select_default(&mut self) -> Lit;
-    fn select(&mut self, random_var_freq: f64) -> Lit;
+    fn select(&mut self, random_var_freq: f64, solver_state: SolverState) -> Lit;
 }
 
 impl IVarOrder for VarOrder {
@@ -55,11 +54,13 @@ impl IVarOrder for VarOrder {
             self.heap.insert(x, self.activity.clone());
         }
     }
-    fn select_default(&mut self) -> Lit {
-        return <VarOrder as IVarOrder>::select(self, 0.0);
-    }
-    fn select(&mut self, random_var_freq: f64) -> Lit {
+    fn select(&mut self, random_var_freq: f64, solver_state: SolverState) -> Lit {
         let random = drand(self.random_seed as f64);
+        
+        // might need to find better solution with assigns and activities
+        self.assigns = solver_state.assigns.clone();
+        self.activity = solver_state.activity.clone();
+
         if random < random_var_freq as f64 && !self.heap.empty() {
             let next: i32 = irand(random, self.assigns.len() as i32);
             if is_undefined(self.assigns[next as usize]) {

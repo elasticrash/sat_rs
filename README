@@ -9,3 +9,7 @@ Got my first results, no idea yet if they are correct, there were a lot of wrong
 19/11/2019
 
 The results where completely wrong, it turned out I was reading the clauses incorrectly from the cnf files. This is now fixed. But the solver gives incorrects results.
+
+22/11/2019
+
+Some simple problems seem to be working fine, more complicated ones give still the wrong results
