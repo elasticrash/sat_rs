@@ -176,10 +176,11 @@ impl Internal for SolverState {
         if self.var_decay < 0.0 {
             return;
         }
-        let index = var(&p) as f64 + self.var_inc;
-        if self.activity[index as usize] > 1e100 {
+        let index = var(&p) as f64;
+        if self.activity[index as usize] + self.var_inc > 1e100 {
             var_rescale_activity(self);
         }
+        self.order.update(var(&p));
     }
     fn var_decay_activity(&mut self) {
         if self.var_decay >= 0.0 {

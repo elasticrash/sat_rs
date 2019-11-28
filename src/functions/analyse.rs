@@ -51,7 +51,9 @@ pub fn analyze(
             if p.x == VAR_UNDEFINED {
                 start = 0;
             }
-            for j in start..c.clone().data.len() {
+            let mut j: usize = start;
+
+            for _y in start..c.clone().data.len() {
                 let q: Lit = c.data[j];
                 if seen[var(&q) as usize] == Lbool::Undef0
                     && solver_state.level[var(&q) as usize] > 0
@@ -65,14 +67,14 @@ pub fn analyze(
                         out_btlevel = max(out_btlevel, solver_state.level[var(&q) as usize])
                     }
                 }
+                j += 1;
             }
-            while { seen[var(&solver_state.trail[index as usize]) as usize] == Lbool::Undef0 } {
-                index -= 1;
-                p = solver_state.trail[(index + 1) as usize];
-                confl = solver_state.reason[var(&p) as usize].clone();
-                seen[var(&p) as usize] = Lbool::Undef0;
-                path_c -= 1;
-            }
+            while { seen[var(&solver_state.trail[index as usize]) as usize] == Lbool::Undef0 } {}
+            index -= 1;
+            p = solver_state.trail[(index + 1) as usize];
+            confl = solver_state.reason[var(&p) as usize].clone();
+            seen[var(&p) as usize] = Lbool::Undef0;
+            path_c -= 1;
         }
         path_c > 0
     } {}
@@ -80,38 +82,41 @@ pub fn analyze(
 
     {
         let mut i: usize = 1;
-        let mut j: usize;
+        let mut j: usize = 0;
 
         if solver_state.expensive_ccmin {
             let mut min_level: u32 = 0;
-            for y in (i as usize)..out_learnt.len() {
-                i = y;
-                min_level |= 1 << (solver_state.level[var(&out_learnt[i]) as usize] & 31);
+            for _y in 1..out_learnt.len() {
+                let v = var(&out_learnt[i]);
+                let l = solver_state.level[v as usize];
+                min_level |= 1 << (l & 31);
+                i += 1;
             }
             solver_state.analyze_toclear.clear();
             i = 1;
             j = 1;
-            for y in (i as usize)..out_learnt.len() {
-                match solver_state.reason[var(&out_learnt[y]) as usize] {
+            for _y in 1..out_learnt.len() {
+                match solver_state.reason[var(&out_learnt[i]) as usize] {
                     None => {
+                        out_learnt[j as usize] = out_learnt[i];
                         j += 1;
-                        out_learnt[j as usize] = out_learnt[y];
                     }
                     _ => {
-                        if !analyze_removeable(out_learnt[y], min_level, solver_state) {
+                        if !analyze_removeable(out_learnt[i], min_level, solver_state) {
+                            out_learnt[j as usize] = out_learnt[i];
                             j += 1;
-                            out_learnt[j as usize] = out_learnt[y];
                         }
                     }
                 }
+                i += 1;
             }
         } else {
             solver_state.analyze_toclear.clear();
             i = 1;
             j = 1;
             let mut keep: bool = false;
-            for y in (i as usize)..out_learnt.len() {
-                match solver_state.reason[var(&out_learnt[y]) as usize] {
+            for _y in 1..out_learnt.len() {
+                match solver_state.reason[var(&out_learnt[i]) as usize] {
                     Some(ref p) => {
                         let c: Clause = p.clone();
                         for k in 1..c.data.len() {
@@ -119,20 +124,21 @@ pub fn analyze(
                                 && solver_state.level[var(&c.data[k]) as usize] != 0
                             {
                                 j += 1;
-                                out_learnt[j as usize] = out_learnt[y];
+                                out_learnt[j as usize] = out_learnt[i];
                                 keep = true;
                                 break;
                             }
                         }
                     }
                     None => {
-                        out_learnt[j as usize] = out_learnt[y];
+                        out_learnt[j as usize] = out_learnt[i];
                     }
                 }
 
                 if !keep {
-                    solver_state.analyze_toclear.push(out_learnt[y]);
+                    solver_state.analyze_toclear.push(out_learnt[i]);
                 }
+                i += 1;
             }
         }
         {

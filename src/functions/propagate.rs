@@ -28,6 +28,7 @@ pub fn propagate(solver_state: &mut SolverState) -> Option<Clause> {
         let p: Lit = solver_state.trail[solver_state.qhead as usize];
         solver_state.qhead += 1;
         let mut ws: Vec<Clause> = solver_state.watches[index(p.clone()) as usize].clone();
+        //log p
         let mut i: i32 = 0;
         let mut j: i32 = 0;
         let end = i + ws.len() as i32;
