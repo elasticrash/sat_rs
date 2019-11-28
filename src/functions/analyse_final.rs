@@ -6,7 +6,7 @@ use crate::models::solverstate::*;
 
 /*_________________________________________________________________________________________________
 |
-|  analyzeFinal 
+|  analyzeFinal
 |
 |  Description:
 |    Specialized analysis procedure to express the final conflict in terms of assumptions.

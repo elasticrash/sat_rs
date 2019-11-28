@@ -89,7 +89,9 @@ pub fn search(
                 }
 
                 solver_state.solver_stats.decisions += 1.0;
-                let next: Lit = solver_state.order.select(parms.random_var_freq, solver_state.clone());
+                let next: Lit = solver_state
+                    .order
+                    .select(parms.random_var_freq, solver_state.clone());
 
                 if next == Lit::new(VAR_UNDEFINED, false) {
                     if model_found(solver_state) {

@@ -7,7 +7,7 @@ use std::cmp::max;
 
 /*_________________________________________________________________________________________________
 |
-|  analyze 
+|  analyze
 |
 |  Description:
 |    Analyze conflict and produce a reason clause.
