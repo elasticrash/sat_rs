@@ -64,9 +64,13 @@ pub fn simplify_db(solver_state: &mut SolverState) {
                     }
                 }
                 if t != 0 {
-                    solver_state.learnts.truncate(clause_size - j as usize)
+                    solver_state
+                        .learnts
+                        .truncate(solver_state.learnts.len() - (clause_size - j as usize))
                 } else {
-                    solver_state.clauses.truncate(clause_size - j as usize)
+                    solver_state
+                        .clauses
+                        .truncate(solver_state.clauses.len() - (clause_size - j as usize))
                 }
             }
 
