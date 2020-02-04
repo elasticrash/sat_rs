@@ -1,5 +1,4 @@
 use crate::models::logger::*;
-use crate::models::solverstate::*;
 
 #[derive(Clone)]
 pub struct Heap {
