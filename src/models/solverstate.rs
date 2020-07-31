@@ -206,12 +206,10 @@ impl Internal for SolverState {
         } else {
             _c = &self.clauses[y as usize];
         }
-        match &self.reason[var(&_c.data[0]) as usize] {
-            Some(x) => {
-                return _c == x;
-            }
+        return match &self.reason[var(&_c.data[0]) as usize] {
+            Some(x) => _c == x,
             _ => false,
-        }
+        };
     }
     fn decision_level(&mut self) -> i32 {
         return self.trail_lim.len() as i32;

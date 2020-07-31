@@ -18,46 +18,36 @@ fn main() {
     let arguments: InputArguments = read_input_arguments(_args);
     let mut file = File::open("./input.txt").unwrap();
     let mut buffer = String::new();
-
-    let mut lits: Vec<Lit> = Vec::new();
     let mut state: SolverState = SolverState::new();
     state.verbosity = arguments.verbosity as i32;
 
     file.read_to_string(&mut buffer).unwrap();
 
-    let all_chars: Vec<char> = buffer.chars().collect();
-
-    let mut until: i32 = 0;
-    let mut w: (String, String);
-    while {
-        w = read_word(all_chars.clone(), until);
-        until += w.0.clone().len() as i32;
-        until += w.1.clone().len() as i32;
-        w.0.len() != 0 && w.1.len() != 0
-    } {
-        let word = w.0;
-        if word == "%" {
-            break;
-        }
-        let parsed_lit: i32 = word.parse::<i32>().unwrap();
-
-        if parsed_lit != 0 {
-            let var = parsed_lit.abs() - 1;
-            while var >= state.n_vars() {
-                new_var(&mut state);
+    let problem_lines = regex::Regex::new(r" 0|\n|\r").unwrap();
+    for part in problem_lines.split(&buffer) {
+        let mut lits: Vec<Lit> = Vec::new();
+        if part != "" && !part.starts_with('c') && !part.starts_with('p') {
+            let line_vars = regex::Regex::new(r" ").unwrap();
+            for var in line_vars.split(&part) {
+                if var != "" {
+                    let parsed_lit: i32 = var.parse::<i32>().unwrap();
+                    let zero_based_abs_var = parsed_lit.abs() - 1;
+                    while zero_based_abs_var >= state.n_vars() {
+                        new_var(&mut state);
+                    }
+                    let solver_lit;
+                    if parsed_lit > 0 {
+                        solver_lit = Lit::simple(zero_based_abs_var);
+                    } else {
+                        solver_lit = !Lit::simple(zero_based_abs_var);
+                    }
+                    lits.push(solver_lit);
+                }
             }
-            let solver_lit;
-            if parsed_lit > 0 {
-                solver_lit = Lit::simple(var);
-            } else {
-                solver_lit = !Lit::simple(var);
-            }
-
-            lits.push(solver_lit);
         }
-        if parsed_lit == 0 {
+        if lits.len() > 0 {
+            println!("{:?}", lits);
             state.add_clause(&mut lits);
-            lits.clear();
         }
     }
 
@@ -76,39 +66,6 @@ fn main() {
     }
 }
 
-fn read_word(chars: Vec<char>, from: i32) -> (String, String) {
-    let mut sb = String::new();
-    let mut fake = String::new();
-    let mut i: i32 = from;
-    for _y in from..chars.len() as i32 {
-        let mut ch = chars[i as usize];
-
-        if ch == ' ' || ch == '\n' || ch == '\r' {
-            fake.push_str(&ch.to_string());
-            if sb.len() > 0 {
-                break;
-            }
-        } else {
-            if ch == 'p' || ch == 'c' {
-                fake.push_str(&ch.to_string());
-                while ch != '\n' {
-                    i += 1;
-                    ch = chars[i as usize];
-                    fake.push_str(&ch.to_string());
-                }
-
-                if sb.len() > 0 {
-                    break;
-                }
-            } else {
-                sb.push_str(&ch.to_string());
-            }
-        }
-        i += 1;
-    }
-    return (sb, fake);
-}
-
 fn read_input_arguments(_args: Vec<String>) -> InputArguments {
     println!("{:?}", _args);
     let mut arguments = InputArguments {
@@ -120,35 +77,31 @@ fn read_input_arguments(_args: Vec<String>) -> InputArguments {
         verbosity: 1,
     };
 
-    for pos in 1.._args.len() {
-        if _args[pos].starts_with("-pre") {
-            let arg: Vec<&str> = _args[pos].split('=').collect();
-            arguments.pre = String::from(arg[1]);
+    for arg in _args {
+        let arg_value: Vec<&str> = arg.split('=').collect();
+
+        if arg.starts_with("-pre") {
+            arguments.pre = String::from(arg_value[1]);
         }
 
-        if _args[pos].starts_with("-grow") {
-            let arg: Vec<&str> = _args[pos].split('=').collect();
-            arguments.grow = String::from(arg[1]).parse::<i32>().unwrap();
+        if arg.starts_with("-grow") {
+            arguments.grow = String::from(arg_value[1]).parse::<i32>().unwrap();
         }
 
-        if _args[pos].starts_with("-polarity_mode") {
-            let arg: Vec<&str> = _args[pos].split('=').collect();
-            arguments.polarity_mode = String::from(arg[1]);
+        if arg.starts_with("-polarity_mode") {
+            arguments.polarity_mode = String::from(arg_value[1]);
         }
 
-        if _args[pos].starts_with("-decay") {
-            let arg: Vec<&str> = _args[pos].split('=').collect();
-            arguments.decay = String::from(arg[1]).parse::<i32>().unwrap();
+        if arg.starts_with("-decay") {
+            arguments.decay = String::from(arg_value[1]).parse::<i32>().unwrap();
         }
 
-        if _args[pos].starts_with("-rnd_freq") {
-            let arg: Vec<&str> = _args[pos].split('=').collect();
-            arguments.rnd_freq = String::from(arg[1]).parse::<i32>().unwrap();
+        if arg.starts_with("-rnd_freq") {
+            arguments.rnd_freq = String::from(arg_value[1]).parse::<i32>().unwrap();
         }
 
-        if _args[pos].starts_with("-verbosity") {
-            let arg: Vec<&str> = _args[pos].split('=').collect();
-            arguments.verbosity = String::from(arg[1]).parse::<i16>().unwrap();
+        if arg.starts_with("-verbosity") {
+            arguments.verbosity = String::from(arg_value[1]).parse::<i16>().unwrap();
         }
     }
     return arguments;

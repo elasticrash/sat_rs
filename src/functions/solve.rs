@@ -116,6 +116,7 @@ pub fn solve(assumptions: Vec<Lit>, solver_state: &mut SolverState) -> bool {
                 parms,
                 solver_state,
             );
+            println!("{:?}", status);
 
             nof_conflicts *= 1.5;
             nof_learnts *= 1.1;

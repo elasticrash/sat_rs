@@ -32,11 +32,7 @@ pub fn enqueue(_fact: &Lit, _from: Option<Clause>, solver_state: &mut SolverStat
         solver_state.level[x] = solver_state.decision_level();
         solver_state.trail_pos[x] = solver_state.trail.len() as i32;
         solver_state.trail.push(*_fact);
-
-        match _from {
-            Some(s) => solver_state.reason[x] = Some(s),
-            None => solver_state.reason[x] = None,
-        }
+        solver_state.reason[x] = _from;
 
         return true;
     }
