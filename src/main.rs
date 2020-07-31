@@ -46,7 +46,6 @@ fn main() {
             }
         }
         if lits.len() > 0 {
-            println!("{:?}", lits);
             state.add_clause(&mut lits);
         }
     }
