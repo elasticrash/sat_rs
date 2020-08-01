@@ -4,7 +4,7 @@ use crate::models::solverstate::SolverState;
 pub static L_TRUE: Lbool = Lbool::True;
 pub static L_FALSE: Lbool = Lbool::False;
 
-#[derive(Copy, Clone, PartialEq)]
+#[derive(Copy, Clone, PartialEq, Debug)]
 pub enum Lbool {
     True = 1,
     False = -2,

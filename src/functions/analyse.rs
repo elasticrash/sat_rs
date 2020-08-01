@@ -69,7 +69,7 @@ pub fn analyze(
                 }
                 j += 1;
             }
-            while { seen[var(&solver_state.trail[index as usize]) as usize] == Lbool::Undef0 } {}
+            while seen[var(&solver_state.trail[index as usize]) as usize] == Lbool::Undef0 {}
             index -= 1;
             p = solver_state.trail[(index + 1) as usize];
             confl = solver_state.reason[var(&p) as usize].clone();
