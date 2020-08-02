@@ -14,13 +14,18 @@ use std::cmp::Ordering;
 |________________________________________________________________________________________________@*/
 
 pub fn reduce_db(solver_state: &mut SolverState) {
-    reportf("reduce_db".to_string(), solver_state.verbosity);
+    reportf(
+        "reduce_db".to_string(),
+        file!(),
+        line!(),
+        solver_state.verbosity,
+    );
 
     let mut i: i32 = 0;
     let mut j: i32 = 0;
 
     let extra_lim: f64 = solver_state.cla_inc / solver_state.learnts.len() as f64;
-
+    
     solver_state.learnts.sort_by(|x, y| {
         if x.size() > 2 && (y.size() == 2 || x.activity < y.activity) {
             Ordering::Less
@@ -30,18 +35,20 @@ pub fn reduce_db(solver_state: &mut SolverState) {
     });
 
     for y in 0..solver_state.learnts.len() / 2 {
-        i = y as i32;
-        if solver_state.learnts[y].data.len() > 2 && !solver_state.locked(i, 1) {
+        if solver_state.learnts[y].data.len() > 2
+            && !solver_state.locked(&solver_state.learnts[y].clone())
+        {
             remove(solver_state.learnts[y].clone(), false, solver_state);
         } else {
-            solver_state.learnts[j as usize] = solver_state.learnts[i as usize].clone();
+            solver_state.learnts[j as usize] = solver_state.learnts[y as usize].clone();
             j += 1;
         }
+        i = y as i32;
     }
 
     for y in i..solver_state.learnts.len() as i32 {
         if solver_state.learnts[y as usize].data.len() > 2
-            && !solver_state.locked(y, 1)
+            && !solver_state.locked(&solver_state.learnts[y as usize].clone())
             && solver_state.learnts[y as usize].activity < extra_lim
         {
             remove(

@@ -28,8 +28,13 @@ pub fn analyze(
     out_learnt: &mut Vec<Lit>,
     solver_state: &mut SolverState,
 ) -> i32 {
-    reportf("analyse".to_string(), solver_state.verbosity);
-
+    reportf(
+        "analyse".to_string(),
+        file!(),
+        line!(),
+        solver_state.verbosity,
+    );
+    
     let mut out_btlevel: i32 = 0;
     let mut seen: Vec<Lbool> = solver_state.analyze_seen.clone();
     let mut path_c: i32 = 0;
@@ -160,7 +165,12 @@ pub fn analyze(
 }
 
 fn analyze_removeable(_p: Lit, min_level: u32, solver_state: &mut SolverState) -> bool {
-    reportf("analyze removeable".to_string(), solver_state.verbosity);
+    reportf(
+        "analyze removeable".to_string(),
+        file!(),
+        line!(),
+        solver_state.verbosity,
+    );
     assert!(solver_state.reason[var(&_p) as usize] != None);
 
     solver_state.analyze_stack.clear();
@@ -168,47 +178,45 @@ fn analyze_removeable(_p: Lit, min_level: u32, solver_state: &mut SolverState) -
     let top: i32 = solver_state.analyze_toclear.len() as i32;
 
     while solver_state.analyze_stack.len() > 0 {
-        let p_ = &solver_state.analyze_stack.last();
-        assert!(solver_state.reason[var(&p_.unwrap()) as usize] != None);
+        let p_last = &solver_state.analyze_stack.last();
+        assert!(solver_state.reason[var(&p_last.unwrap()) as usize] != None);
         let c: Clause;
-        if solver_state.analyze_stack.last() == None {
-            match &solver_state.reason[var(&_p) as usize] {
-                Some(clause) => {
-                    c = clause.clone();
-                    solver_state.analyze_stack.pop();
-                    for i in 1..c.clone().data.len() {
-                        let p: Lit = c.clone().data[i];
-                        if solver_state.analyze_seen[var(&p) as usize] == Lbool::Undef0
-                            && solver_state.level[var(&p) as usize] != 0
-                        {
-                            match &solver_state.reason[var(&p) as usize] {
-                                None => {}
-                                _ => {
-                                    if ((1 << solver_state.level[var(&p) as usize] & 31)
-                                        & min_level)
-                                        != 0
-                                    {
-                                        solver_state.analyze_seen[var(&p) as usize] = Lbool::True;
-                                        solver_state.analyze_stack.push(p);
-                                        solver_state.analyze_toclear.push(p);
-                                    } else {
-                                        for j in top..solver_state.analyze_toclear.len() as i32 {
-                                            solver_state.analyze_seen[var(&solver_state
-                                                .analyze_toclear
-                                                [j as usize])
-                                                as usize] = Lbool::Undef0;
-                                            solver_state.analyze_toclear.truncate(top as usize);
-                                            return false;
-                                        }
+        match &solver_state.reason[var(&p_last.unwrap()) as usize] {
+            Some(clause) => {
+                c = clause.clone();
+                solver_state.analyze_stack.pop();
+                for i in 1..c.clone().data.len() {
+                    let p: Lit = c.clone().data[i];
+                    if solver_state.analyze_seen[var(&p) as usize] == Lbool::Undef0
+                        && solver_state.level[var(&p) as usize] != 0
+                    {
+                        match &solver_state.reason[var(&p) as usize] {
+                            None => {}
+                            _ => {
+                                if ((1 << solver_state.level[var(&p) as usize] & 31) & min_level)
+                                    != 0
+                                {
+                                    solver_state.analyze_seen[var(&p) as usize] = Lbool::True;
+                                    solver_state.analyze_stack.push(p);
+                                    solver_state.analyze_toclear.push(p);
+                                } else {
+                                    for j in top..solver_state.analyze_toclear.len() as i32 {
+                                        solver_state.analyze_seen[var(
+                                            &solver_state.analyze_toclear[j as usize]
+                                        )
+                                            as usize] = Lbool::Undef0;
+                                        solver_state.analyze_toclear.truncate(top as usize);
+                                        return false;
                                     }
                                 }
                             }
                         }
                     }
                 }
-                None => {}
             }
+            None => {}
         }
     }
+    solver_state.analyze_toclear.push(_p);
     return true;
 }

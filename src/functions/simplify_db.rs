@@ -15,7 +15,12 @@ use crate::models::solverstate::*;
 |________________________________________________________________________________________________@*/
 
 pub fn simplify_db(solver_state: &mut SolverState) {
-    reportf("simplify_db".to_string(), solver_state.verbosity);
+    reportf(
+        "simplify_db".to_string(),
+        file!(),
+        line!(),
+        solver_state.verbosity,
+    );
     if !solver_state.ok {
         return;
     }
@@ -23,7 +28,12 @@ pub fn simplify_db(solver_state: &mut SolverState) {
     assert!(solver_state.decision_level() == 0);
     match propagate(solver_state) {
         None => {
-            reportf("propagate match none".to_string(), solver_state.verbosity);
+            reportf(
+                "propagate match none".to_string(),
+                file!(),
+                line!(),
+                solver_state.verbosity,
+            );
             if solver_state.clone().n_assigns() == solver_state.simp_db_assigns as usize
                 || solver_state.simp_db_props > 0.0
             {
@@ -53,8 +63,10 @@ pub fn simplify_db(solver_state: &mut SolverState) {
 
                 let mut j: i32 = 0;
                 for k in 0..clause_size {
-                    let a = !solver_state.locked(k as i32, t);
+                    let a = !solver_state.locked(&cs[k]);
                     let b = simplify(k as i32, t, solver_state);
+
+                    //println!("HELP {}-{}", a, b);
 
                     if a && b {
                         remove(cs[k].clone(), false, solver_state);
@@ -79,7 +91,12 @@ pub fn simplify_db(solver_state: &mut SolverState) {
                 + solver_state.solver_stats.learnts_literals;
         }
         _ => {
-            reportf("solver state false".to_string(), solver_state.verbosity);
+            reportf(
+                "solver state false".to_string(),
+                file!(),
+                line!(),
+                solver_state.verbosity,
+            );
             solver_state.ok = false;
             return;
         }

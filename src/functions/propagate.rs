@@ -18,27 +18,37 @@ use crate::models::solverstate::*;
 |________________________________________________________________________________________________@*/
 
 pub fn propagate(solver_state: &mut SolverState) -> Option<Clause> {
-    reportf("propagate".to_string(), solver_state.verbosity);
+    reportf(
+        "propagate".to_string(),
+        file!(),
+        line!(),
+        solver_state.verbosity,
+    );
 
     let mut confl: Option<Clause> = None;
 
     while solver_state.qhead < solver_state.trail.len() as i32 {
         solver_state.solver_stats.propagations += 1.0;
         solver_state.simp_db_props -= 1.0;
+
         let p: Lit = solver_state.trail[solver_state.qhead as usize];
         solver_state.qhead += 1;
         let mut ws: Vec<Clause> = solver_state.watches[index(p.clone()) as usize].clone();
+
         //log p
         let mut i: i32 = 0;
         let mut j: i32 = 0;
         let end = i + ws.len() as i32;
         while i != end {
             let mut c: Clause = ws[i as usize].clone();
+            //println!("{}:{:?}:{:?}", line!(), c, solver_state.trail.len());
 
             i += 1;
             let false_lit: Lit = !p;
 
             if c.data[0] == false_lit {
+                //println!("YES");
+
                 c.data[0] = c.data[1];
                 c.data[1] = false_lit;
             }
@@ -48,14 +58,18 @@ pub fn propagate(solver_state: &mut SolverState) -> Option<Clause> {
             let first: Lit = c.data[0].clone();
             let val: Lbool = value_by_lit(first, solver_state);
             if val == L_TRUE {
+                //println!("61");
+
                 ws[j as usize] = c;
                 j += 1;
             } else {
+                //println!("66");
                 let mut foundwatch: bool = false;
                 for k in 2..c.data.len() {
                     if value_by_lit(c.data[k], solver_state) != L_FALSE {
                         c.data[1] = c.data[k];
                         c.data[k] = false_lit;
+                        //println!("VL");
 
                         solver_state.watches[index(!c.data[1]) as usize].push(c.clone());
                         foundwatch = true;

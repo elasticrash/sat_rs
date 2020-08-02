@@ -34,7 +34,12 @@ pub fn search(
     parms: SearchParams,
     solver_state: &mut SolverState,
 ) -> Lbool {
-    reportf("search".to_string(), solver_state.verbosity);
+    reportf(
+        "search".to_string(),
+        file!(),
+        line!(),
+        solver_state.verbosity,
+    );
 
     if !solver_state.ok {
         return Lbool::False;
@@ -52,13 +57,16 @@ pub fn search(
             Some(_c) => {
                 solver_state.solver_stats.conflicts += 1.0;
                 conflict_c += 1;
+                let mut learnt_clause: Vec<Lit> = Vec::new();
 
                 if solver_state.decision_level() == solver_state.root_level {
                     analyse_final(_c, false, solver_state);
                     return L_FALSE;
                 }
-                let mut learnt_clause: Vec<Lit> = Vec::new();
-                let backtrack_level: i32 = analyze(Some(_c), &mut learnt_clause, solver_state);
+
+                let backtrack_level: i32 =
+                    analyze(Some(_c.clone()), &mut learnt_clause, solver_state);
+
                 cancel_until(max(backtrack_level, solver_state.root_level), solver_state);
                 new_clause(&mut learnt_clause, true, solver_state);
                 if learnt_clause.len() == 1 {
@@ -115,7 +123,12 @@ pub fn search(
 }
 
 pub fn var_rescale_activity(solver_state: &mut SolverState) {
-    reportf("var_rescale_activity".to_string(), solver_state.verbosity);
+    reportf(
+        "var_rescale_activity".to_string(),
+        file!(),
+        line!(),
+        solver_state.verbosity,
+    );
 
     for y in 0..solver_state.clone().n_vars() {
         solver_state.activity[y as usize] *= 1e-100;
@@ -124,7 +137,12 @@ pub fn var_rescale_activity(solver_state: &mut SolverState) {
 }
 
 pub fn cla_rescale_activity(solver_state: &mut SolverState) {
-    reportf("cla_rescale_activity".to_string(), solver_state.verbosity);
+    reportf(
+        "cla_rescale_activity".to_string(),
+        file!(),
+        line!(),
+        solver_state.verbosity,
+    );
 
     for y in 0..solver_state.learnts.len() {
         solver_state.learnts[y as usize].activity *= 1e-20;

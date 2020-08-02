@@ -12,7 +12,6 @@ use std::fs::File;
 use std::io::prelude::*;
 
 fn main() {
-    debug("=========================================".to_string());
     let _args: Vec<String> = env::args().collect();
 
     let arguments: InputArguments = read_input_arguments(_args);
@@ -60,7 +59,7 @@ fn main() {
         } else {
             result.push_str("UNSATISFIABLE");
         }
-        reportf(result, 2);
+        reportf(result, file!(), line!(), 2);
         print_stats(state.solver_stats);
     }
 }

@@ -110,7 +110,7 @@ impl NewState for SolverState {
     }
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 pub struct SearchParams {
     pub var_decay: f64,
     pub clause_decay: f64,
@@ -147,7 +147,7 @@ pub trait Internal {
     fn cla_decay_activity(&mut self);
     fn i_new_clause(self, ps: &mut Vec<Lit>);
     fn cla_bump_activity(&mut self, c: &mut Clause);
-    fn locked(&mut self, y: i32, t: i32) -> bool;
+    fn locked(&mut self, _c: &Clause) -> bool;
     fn decision_level(&mut self) -> i32;
 }
 
@@ -199,13 +199,7 @@ impl Internal for SolverState {
             cla_rescale_activity(self);
         }
     }
-    fn locked(&mut self, y: i32, t: i32) -> bool {
-        let _c;
-        if t != 0 {
-            _c = &self.learnts[y as usize];
-        } else {
-            _c = &self.clauses[y as usize];
-        }
+    fn locked(&mut self, _c: &Clause) -> bool {
         return match &self.reason[var(&_c.data[0]) as usize] {
             Some(x) => _c == x,
             _ => false,
@@ -248,13 +242,18 @@ impl NewVar for SolverState {
         self.add_clause(&mut self.add_ternary_tmp.clone());
     }
     fn add_clause(&mut self, ps: &mut Vec<Lit>) {
-        reportf("add_clause".to_string(), self.verbosity);
+        reportf("add_clause".to_string(), file!(), line!(), self.verbosity);
         new_clause(ps, false, self);
     }
 }
 
 pub fn move_back(_l1: Lit, _l2: Lit, solver_state: &mut SolverState) {
-    reportf("move_back".to_string(), solver_state.verbosity);
+    reportf(
+        "move_back".to_string(),
+        file!(),
+        line!(),
+        solver_state.verbosity,
+    );
 
     let mut lev1: i32 = solver_state.level[var(&_l1) as usize];
     let mut lev2: i32 = solver_state.level[var(&_l2) as usize];

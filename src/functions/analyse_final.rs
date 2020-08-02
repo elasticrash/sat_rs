@@ -16,7 +16,12 @@ use crate::models::solverstate::*;
 |________________________________________________________________________________________________@*/
 
 pub fn analyse_final(_confl: Clause, _skip_first: bool, solver_state: &mut SolverState) {
-    reportf("analyse final".to_string(), solver_state.verbosity);
+    reportf(
+        "analyse final".to_string(),
+        file!(),
+        line!(),
+        solver_state.verbosity,
+    );
     solver_state.conflict.clear();
     if solver_state.root_level == 0 {
         return;

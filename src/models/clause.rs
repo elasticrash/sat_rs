@@ -1,6 +1,6 @@
 use crate::models::lit::Lit;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Clause {
     pub data: Vec<Lit>,
     pub is_learnt: bool,
