@@ -91,7 +91,6 @@ pub fn propagate(solver_state: &mut SolverState) -> Option<Clause> {
                     }
                 }
             }
-            //end = i + ws.len() as i32;
         }
         ws.truncate(ws.len() - (i - j) as usize);
     }
