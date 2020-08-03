@@ -27,35 +27,36 @@ pub fn analyse_final(_confl: Clause, _skip_first: bool, solver_state: &mut Solve
         return;
     }
 
-    let mut seen: Vec<Lbool> = solver_state.analyze_seen.clone();
-    let mut istart: i32;
+    let istart: i32;
     if _skip_first {
         istart = 1
     } else {
         istart = 0
     };
     for _y in istart.._confl.data.len() as i32 {
-        let x: usize = var(&_confl.data[istart as usize]) as usize;
+        let x: usize = var(&_confl.data[_y as usize]) as usize;
         if solver_state.level[x] > 0 {
-            seen[x] = Lbool::True;
+            solver_state.analyze_seen[x] = Lbool::True;
         }
-        istart += 1;
     }
 
-    let mut end: i32 = solver_state.trail_lim[solver_state.root_level as usize];
+    let start: i32;
     if solver_state.root_level >= solver_state.trail_lim.len() as i32 {
-        end = (solver_state.trail.len() - 1) as i32;
+        start = (solver_state.trail.len() - 1) as i32;
+    } else {
+        start = solver_state.trail_lim[solver_state.root_level as usize];
     }
 
-    for y in (end..solver_state.trail_lim[0] + 1).rev() {
+    for y in (start..solver_state.trail_lim[0] + 1).rev() {
         let x: usize = var(&solver_state.trail[y as usize]) as usize;
 
-        if seen[x] != Lbool::True {
+        if solver_state.analyze_seen[x] != Lbool::Undef0 {
             match solver_state.reason[x].clone() {
                 Some(clause) => {
                     for j in 1..clause.data.len() {
                         if solver_state.level[var(&clause.data[j as usize]) as usize] > 0 {
-                            seen[var(&clause.data[j as usize]) as usize] = Lbool::True;
+                            solver_state.analyze_seen[var(&clause.data[j as usize]) as usize] =
+                                Lbool::True;
                         }
                     }
                 }
@@ -65,7 +66,7 @@ pub fn analyse_final(_confl: Clause, _skip_first: bool, solver_state: &mut Solve
                 }
             }
 
-            seen[x] = Lbool::Undef0;
+            solver_state.analyze_seen[x] = Lbool::Undef0;
         }
     }
 }

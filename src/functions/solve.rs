@@ -36,7 +36,7 @@ pub fn solve(assumptions: Vec<Lit>, solver_state: &mut SolverState) -> bool {
     };
 
     let parms: SearchParams = solver_state.default_parms;
-    println!("{:?}", parms);
+
     let mut nof_conflicts: f64 = 100.0;
     let mut nof_learnts: f64 = solver_state.clauses.len() as f64 / 3.0;
     let mut status: Lbool = Lbool::Undef0;
@@ -61,16 +61,14 @@ pub fn solve(assumptions: Vec<Lit>, solver_state: &mut SolverState) -> bool {
             cancel_until(0, solver_state);
             return false;
         }
-        {
-            match propagate(solver_state) {
-                Some(confl) => {
-                    analyse_final(confl.clone(), false, solver_state);
-                    assert!(solver_state.conflict.len() > 0);
-                    cancel_until(0, solver_state);
-                    return false;
-                }
-                None => {}
+        match propagate(solver_state) {
+            Some(confl) => {
+                analyse_final(confl.clone(), false, solver_state);
+                assert!(solver_state.conflict.len() > 0);
+                cancel_until(0, solver_state);
+                return false;
             }
+            None => {}
         }
     }
     assert!(solver_state.root_level == solver_state.decision_level());

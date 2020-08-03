@@ -41,14 +41,11 @@ pub fn propagate(solver_state: &mut SolverState) -> Option<Clause> {
         let end = i + ws.len() as i32;
         while i != end {
             let mut c: Clause = ws[i as usize].clone();
-            //println!("{}:{:?}:{:?}", line!(), c, solver_state.trail.len());
 
             i += 1;
             let false_lit: Lit = !p;
 
             if c.data[0] == false_lit {
-                //println!("YES");
-
                 c.data[0] = c.data[1];
                 c.data[1] = false_lit;
             }
@@ -84,6 +81,7 @@ pub fn propagate(solver_state: &mut SolverState) -> Option<Clause> {
                             solver_state.ok = false;
                         }
                         confl = Some(c.clone());
+
                         solver_state.qhead = solver_state.trail.len() as i32;
                         while i < end {
                             ws[j as usize] = ws[i as usize].clone();
@@ -93,6 +91,7 @@ pub fn propagate(solver_state: &mut SolverState) -> Option<Clause> {
                     }
                 }
             }
+            //end = i + ws.len() as i32;
         }
         ws.truncate(ws.len() - (i - j) as usize);
     }

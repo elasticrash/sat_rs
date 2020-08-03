@@ -21,7 +21,7 @@ use crate::models::solverstate::*;
 |    TRUE if fact was enqueued without conflict, FALSE otherwise.
 |________________________________________________________________________________________________@*/
 
-pub fn enqueue(_fact: &Lit, _from: Option<Clause>, solver_state: &mut SolverState) -> bool {
+pub fn enqueue(p: &Lit, from: Option<Clause>, solver_state: &mut SolverState) -> bool {
     reportf(
         "enqueue".to_string(),
         file!(),
@@ -29,15 +29,17 @@ pub fn enqueue(_fact: &Lit, _from: Option<Clause>, solver_state: &mut SolverStat
         solver_state.verbosity,
     );
 
-    if !is_undefined(value_by_lit(*_fact, solver_state)) {
-        return value_by_lit(*_fact, solver_state) != L_FALSE;
+    if !is_undefined(value_by_lit(*p, solver_state)) {
+        return value_by_lit(*p, solver_state) != L_FALSE;
     } else {
-        let x: usize = var(&_fact) as usize;
-        solver_state.assigns[x] = to_bool(!sign(_fact));
+        let x: usize = var(&p) as usize;
+        solver_state.assigns[x] = to_bool(!sign(p));
         solver_state.level[x] = solver_state.decision_level();
         solver_state.trail_pos[x] = solver_state.trail.len() as i32;
-        solver_state.trail.push(*_fact);
-        solver_state.reason[x] = _from;
+        solver_state.reason[x] = from;
+        solver_state.trail.push(*p);
+
+        println!("{}:{}:{:?}", line!(), file!(), p);
 
         return true;
     }
