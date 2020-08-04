@@ -12,6 +12,7 @@ pub struct Lit {
 pub trait ILit {
     fn new(v: i32, sign: bool) -> Self;
     fn simple(v: i32) -> Self;
+    fn empty() -> Self;
     fn to_string(lit: &Lit) -> String;
     fn get_hash_code(lit: &Lit) -> i32;
     fn equals(&self, lit: &Lit) -> bool;
@@ -25,6 +26,9 @@ impl ILit for Lit {
     }
     fn simple(v: i32) -> Self {
         Self { x: v + v }
+    }
+    fn empty() -> Self {
+        Self { x: 0 }
     }
     fn to_string(lit: &Lit) -> String {
         let temp_string = var(&lit).to_string();

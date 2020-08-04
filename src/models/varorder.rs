@@ -46,7 +46,7 @@ impl IVarOrder for VarOrder {
     fn undo(&mut self, x: i32, solver_state: SolverState) {
         <VarOrder as IVarOrder>::sync(self, solver_state);
 
-        if self.heap.in_heap(x) {
+        if !self.heap.in_heap(x) {
             self.heap.insert(x, self.activity.clone());
         }
     }

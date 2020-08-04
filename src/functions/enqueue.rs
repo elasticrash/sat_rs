@@ -38,9 +38,6 @@ pub fn enqueue(p: &Lit, from: Option<Clause>, solver_state: &mut SolverState) ->
         solver_state.trail_pos[x] = solver_state.trail.len() as i32;
         solver_state.reason[x] = from;
         solver_state.trail.push(*p);
-
-        println!("{}:{}:{:?}", line!(), file!(), p);
-
         return true;
     }
 }

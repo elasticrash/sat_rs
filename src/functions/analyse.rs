@@ -34,13 +34,12 @@ pub fn analyze(
         line!(),
         solver_state.verbosity,
     );
-    
     let mut out_btlevel: i32 = 0;
     let mut seen: Vec<Lbool> = solver_state.analyze_seen.clone();
     let mut path_c: i32 = 0;
     let mut p: Lit = Lit::new(VAR_UNDEFINED, true);
 
-    out_learnt.push(Lit::new(VAR_UNDEFINED, true)); // (leave room for the asserting literal)
+    out_learnt.push(Lit::empty()); // (leave room for the asserting literal)
     let mut index: i32 = (solver_state.trail.len() - 1) as i32;
 
     while {
@@ -52,14 +51,15 @@ pub fn analyze(
                 solver_state.cla_bump_activity(&mut c.clone());
             }
 
-            let mut start: usize = 1;
+            let mut start: usize;
             if p.x == VAR_UNDEFINED {
                 start = 0;
+            } else {
+                start = 1;
             }
-            let mut j: usize = start;
 
             for _y in start..c.clone().data.len() {
-                let q: Lit = c.data[j];
+                let q: Lit = c.data[start];
                 if seen[var(&q) as usize] == Lbool::Undef0
                     && solver_state.level[var(&q) as usize] > 0
                 {
@@ -72,10 +72,16 @@ pub fn analyze(
                         out_btlevel = max(out_btlevel, solver_state.level[var(&q) as usize])
                     }
                 }
-                j += 1;
+                start += 1;
             }
-            while seen[var(&solver_state.trail[index as usize]) as usize] == Lbool::Undef0 {}
-            index -= 1;
+            loop {
+                if seen[var(&solver_state.trail[index as usize]) as usize] == Lbool::Undef0 {
+                    index -= 1;
+                } else {
+                    index -= 1;
+                    break;
+                }
+            }
             p = solver_state.trail[(index + 1) as usize];
             confl = solver_state.reason[var(&p) as usize].clone();
             seen[var(&p) as usize] = Lbool::Undef0;
