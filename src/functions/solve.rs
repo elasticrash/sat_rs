@@ -49,7 +49,7 @@ pub fn solve(assumptions: Vec<Lit>, solver_state: &mut SolverState) -> bool {
         if !assume(p, solver_state) {
             match &solver_state.reason[var(&p) as usize] {
                 Some(r) => {
-                    analyse_final(r.clone(), true, solver_state);
+                    analyse_final(&(r.clone()), true, solver_state);
                     solver_state.conflict.push(!p);
                 }
                 None => {
@@ -63,7 +63,7 @@ pub fn solve(assumptions: Vec<Lit>, solver_state: &mut SolverState) -> bool {
         }
         match propagate(solver_state) {
             Some(confl) => {
-                analyse_final(confl.clone(), false, solver_state);
+                analyse_final(&confl, false, solver_state);
                 assert!(solver_state.conflict.len() > 0);
                 cancel_until(0, solver_state);
                 return false;
@@ -92,7 +92,7 @@ pub fn solve(assumptions: Vec<Lit>, solver_state: &mut SolverState) -> bool {
         //println!("{}:{}", file!(), line!());
         if solver_state.verbosity >= 1 {
             println!(
-                    "|      {0}    |     {1}        {2}    |   {3}      {4}       {5}       {6}   |   {7} %%   |",
+                    "|      {0}    |     {1}        {2}    |   {3}      {4}       {5}       {6}    |   {7} %%   |",
                     solver_state.solver_stats.conflicts,
                     solver_state.clone().n_clauses(),
                     solver_state.solver_stats.clauses_literals,

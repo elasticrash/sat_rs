@@ -36,7 +36,7 @@ impl IClause for Clause {
     fn to_string(&self) -> String {
         let mut sb = String::new();
         sb.push('[');
-        for y in self.data.clone() {
+        for y in &self.data {
             sb.push_str(&y.x.to_string());
             sb.push_str(&String::from(", ".to_string()));
         }
@@ -54,12 +54,12 @@ impl PartialEq for Clause {
             if self.data.len() == other.data.len() {
                 if self.is_learnt == other.is_learnt {
                     let mut f: String = String::new();
-                    for y in self.data.clone() {
+                    for y in &self.data {
                         f.push_str(&y.x.to_string())
                     }
 
                     let mut s: String = String::new();
-                    for y in other.data.clone() {
+                    for y in &other.data {
                         s.push_str(&y.x.to_string())
                     }
 

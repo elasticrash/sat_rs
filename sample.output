@@ -2,17 +2,16 @@
 | Conflicts |     ORIGINAL     |              LEARNT              | Progress |
 |           | Clauses Literals |   Limit Clauses Literals  Lit/Cl |          |
 ==============================================================================
-|         0 |     160      480 |      53       0        0     NaN | 0.000 %% |
-|       100 |     160      480 |      58      65      793    12.2 | 0.056 %% |
-|       250 |     160      480 |      64      47      343     7.3 | 0.030 %% |
-|       475 |     160      480 |      70      79      433     5.5 | 0.056 %% |
-|       813 |     156      468 |      77      66      294     4.5 | 1.696 %% |
+|         0 |     176      528 |      58       0        0     NaN | 0.000 %% |
+|       100 |     176      528 |      63      63      862    13.7 | 0.047 %% |
+|       250 |     176      528 |      70      73      832    11.4 | 0.046 %% |
+|       475 |     176      528 |      77      62      369     6.0 | 0.046 %% |
 ==============================================================================
 UNSATISFIABLE
-restarts              :            5
-conflicts             :          963   (11213.0 /sec)
-decisions             :         1175   (13681.5 /sec)
-propagations          :        16496   (192077.1 /sec)
-conflict literals     :         6210   (27.63 %% deleted)
-Memory used           : 0.60 MB
-CPU time              : 0.086 s
+restarts              :            4
+conflicts             :          659   (432.3 /sec)
+decisions             :         1001   (656.7 /sec)
+propagations          :        14934   (9797.4 /sec)
+conflict literals     :         6594   (12.08 %% deleted)
+Memory used           : 0.55 MB
+CPU time              : 1.524 s

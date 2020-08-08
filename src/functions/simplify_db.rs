@@ -42,8 +42,8 @@ pub fn simplify_db(solver_state: &mut SolverState) {
 
             for y in solver_state.simp_db_assigns..solver_state.clone().n_assigns() as i32 {
                 let _p: Lit = solver_state.trail[y as usize];
-                solver_state.watches[index(_p) as usize].clear();
-                solver_state.watches[index(!_p) as usize].clear();
+                solver_state.watches[_p.x as usize].clear();
+                solver_state.watches[!_p.x as usize].clear();
             }
 
             for t in 0..2 {

@@ -167,7 +167,7 @@ pub trait SemiInternal {
 
 impl Internal for SolverState {
     fn i_analyze_final(&mut self, confl: Clause) {
-        analyse_final(confl, false, self);
+        analyse_final(&confl, false, self);
     }
     fn i_enqueue(&mut self, fact: Lit) -> bool {
         return enqueue(&fact, None, self);

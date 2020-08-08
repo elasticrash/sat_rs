@@ -60,7 +60,7 @@ pub fn search(
                 let mut learnt_clause: Vec<Lit> = Vec::new();
 
                 if solver_state.decision_level() == solver_state.root_level {
-                    analyse_final(_c, false, solver_state);
+                    analyse_final(&_c, false, solver_state);
                     return L_FALSE;
                 }
 

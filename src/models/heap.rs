@@ -17,9 +17,6 @@ pub trait IHeap {
     fn percolate_down(&mut self, i: i32);
     fn empty(&self) -> bool;
     fn getmin(&mut self, act: Vec<f64>) -> i32;
-    fn left(n: i32) -> i32;
-    fn right(n: i32) -> i32;
-    fn parent(n: i32) -> i32;
 }
 
 impl IHeap for Heap {
@@ -51,13 +48,12 @@ impl IHeap for Heap {
         reportf("percolate_up".to_string(), file!(), line!(), 0);
 
         let x = self.heap[_i as usize];
-        while <Heap as IHeap>::parent(_i) != 0
-            && self.activities[x as usize]
-                > self.activities[self.heap[<Heap as IHeap>::parent(_i) as usize] as usize]
+        while (_i >> 1) != 0
+            && self.activities[x as usize] > self.activities[self.heap[(_i >> 1) as usize] as usize]
         {
-            self.heap[_i as usize] = self.heap[<Heap as IHeap>::parent(_i) as usize];
+            self.heap[_i as usize] = self.heap[(_i >> 1) as usize];
             self.indices[self.heap[_i as usize] as usize] = _i;
-            _i = <Heap as IHeap>::parent(_i);
+            _i = _i >> 1;
         }
 
         self.heap[_i as usize] = x;
@@ -67,15 +63,15 @@ impl IHeap for Heap {
         reportf("percolate_down".to_string(), file!(), line!(), 0);
 
         let x = self.heap[_i as usize];
-        while <Heap as IHeap>::left(_i) < self.heap.len() as i32 {
+        while _i + _i < self.heap.len() as i32 {
             let child: i32;
-            if <Heap as IHeap>::right(_i) < self.heap.len() as i32
-                && self.activities[self.heap[<Heap as IHeap>::right(_i) as usize] as usize]
-                    > self.activities[self.heap[<Heap as IHeap>::left(_i) as usize] as usize]
+            if (_i + _i + 1) < self.heap.len() as i32
+                && self.activities[self.heap[(_i + _i + 1) as usize] as usize]
+                    > self.activities[self.heap[(_i + _i) as usize] as usize]
             {
-                child = <Heap as IHeap>::right(_i)
+                child = _i + _i + 1;
             } else {
-                child = <Heap as IHeap>::left(_i);
+                child = _i + _i;
             }
 
             if !(self.activities[child as usize] > self.activities[x as usize]) {
@@ -104,14 +100,5 @@ impl IHeap for Heap {
             <Heap as IHeap>::percolate_down(self, 1);
         }
         return r;
-    }
-    fn left(n: i32) -> i32 {
-        return n + n;
-    }
-    fn right(n: i32) -> i32 {
-        return n + n + 1;
-    }
-    fn parent(n: i32) -> i32 {
-        return n >> 1;
     }
 }

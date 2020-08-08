@@ -15,7 +15,7 @@ use crate::models::solverstate::*;
 |    if conflict arose before search even started).
 |________________________________________________________________________________________________@*/
 
-pub fn analyse_final(_confl: Clause, _skip_first: bool, solver_state: &mut SolverState) {
+pub fn analyse_final(_confl: &Clause, _skip_first: bool, solver_state: &mut SolverState) {
     reportf(
         "analyse final".to_string(),
         file!(),
@@ -51,7 +51,7 @@ pub fn analyse_final(_confl: Clause, _skip_first: bool, solver_state: &mut Solve
         let x: usize = var(&solver_state.trail[y as usize]) as usize;
 
         if solver_state.analyze_seen[x] != Lbool::Undef0 {
-            match solver_state.reason[x].clone() {
+            match &solver_state.reason[x] {
                 Some(clause) => {
                     for j in 1..clause.data.len() {
                         if solver_state.level[var(&clause.data[j as usize]) as usize] > 0 {

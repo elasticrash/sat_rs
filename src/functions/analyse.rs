@@ -35,7 +35,6 @@ pub fn analyze(
         solver_state.verbosity,
     );
     let mut out_btlevel: i32 = 0;
-    let mut seen: Vec<Lbool> = solver_state.analyze_seen.clone();
     let mut path_c: i32 = 0;
     let mut p: Lit = Lit::new(VAR_UNDEFINED, true);
 
@@ -45,7 +44,7 @@ pub fn analyze(
     while {
         {
             assert!(confl != None);
-            let c: Clause = confl.clone().unwrap();
+            let c: &Clause = &confl.unwrap();
 
             if c.is_learnt {
                 solver_state.cla_bump_activity(&mut c.clone());
@@ -58,13 +57,13 @@ pub fn analyze(
                 start = 1;
             }
 
-            for _y in start..c.clone().data.len() {
+            for _y in start..c.data.len() {
                 let q: Lit = c.data[start];
-                if seen[var(&q) as usize] == Lbool::Undef0
+                if solver_state.analyze_seen[var(&q) as usize] == Lbool::Undef0
                     && solver_state.level[var(&q) as usize] > 0
                 {
                     solver_state.var_bump_activity(q);
-                    seen[var(&q) as usize] = Lbool::True;
+                    solver_state.analyze_seen[var(&q) as usize] = Lbool::True;
                     if solver_state.level[var(&q) as usize] == solver_state.decision_level() {
                         path_c += 1;
                     } else {
@@ -75,7 +74,9 @@ pub fn analyze(
                 start += 1;
             }
             loop {
-                if seen[var(&solver_state.trail[index as usize]) as usize] == Lbool::Undef0 {
+                if solver_state.analyze_seen[var(&solver_state.trail[index as usize]) as usize]
+                    == Lbool::Undef0
+                {
                     index -= 1;
                 } else {
                     index -= 1;
@@ -84,7 +85,7 @@ pub fn analyze(
             }
             p = solver_state.trail[(index + 1) as usize];
             confl = solver_state.reason[var(&p) as usize].clone();
-            seen[var(&p) as usize] = Lbool::Undef0;
+            solver_state.analyze_seen[var(&p) as usize] = Lbool::Undef0;
             path_c -= 1;
         }
         path_c > 0
@@ -129,9 +130,9 @@ pub fn analyze(
             for _y in 1..out_learnt.len() {
                 match solver_state.reason[var(&out_learnt[i]) as usize] {
                     Some(ref p) => {
-                        let c: Clause = p.clone();
+                        let c: &Clause = p;
                         for k in 1..c.data.len() {
-                            if seen[var(&c.data[k]) as usize] == Lbool::Undef0
+                            if solver_state.analyze_seen[var(&c.data[k]) as usize] == Lbool::Undef0
                                 && solver_state.level[var(&c.data[k]) as usize] != 0
                             {
                                 j += 1;
@@ -154,11 +155,12 @@ pub fn analyze(
         }
         {
             for y in 0..out_learnt.len() {
-                seen[var(&out_learnt[y]) as usize] = Lbool::Undef0;
+                solver_state.analyze_seen[var(&out_learnt[y]) as usize] = Lbool::Undef0;
             }
 
             for y in 0..solver_state.analyze_toclear.len() {
-                seen[var(&solver_state.analyze_toclear[y]) as usize] = Lbool::Undef0;
+                solver_state.analyze_seen[var(&solver_state.analyze_toclear[y]) as usize] =
+                    Lbool::Undef0;
             }
         }
 
@@ -186,13 +188,13 @@ fn analyze_removeable(_p: Lit, min_level: u32, solver_state: &mut SolverState) -
     while solver_state.analyze_stack.len() > 0 {
         let p_last = &solver_state.analyze_stack.last();
         assert!(solver_state.reason[var(&p_last.unwrap()) as usize] != None);
-        let c: Clause;
+        let c: &Clause;
         match &solver_state.reason[var(&p_last.unwrap()) as usize] {
             Some(clause) => {
-                c = clause.clone();
+                c = &clause;
                 solver_state.analyze_stack.pop();
-                for i in 1..c.clone().data.len() {
-                    let p: Lit = c.clone().data[i];
+                for i in 1..c.data.len() {
+                    let p: Lit = c.data[i];
                     if solver_state.analyze_seen[var(&p) as usize] == Lbool::Undef0
                         && solver_state.level[var(&p) as usize] != 0
                     {

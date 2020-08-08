@@ -190,10 +190,6 @@ fn new_clause_pr(
             solver_state.level_to_backtrack = 0;
             cancel_until(0, solver_state);
         }
-
-        let c: Clause = Clause::new(_learnt || _theory_clause, &ps);
-        new_clause_callback(c);
-
         let ps_clone: &mut Vec<Lit> = &mut ps.to_vec();
         if !internal_enqueue(&ps_clone[0], solver_state) {
             solver_state.ok = false;
@@ -231,8 +227,8 @@ fn new_clause_pr(
             solver_state.solver_stats.learnts_literals += c.clone().size() as f64;
         }
 
-        let watch_position_zero = index(!c.clone().data[0]) as usize;
-        let watch_position_one = index(!c.clone().data[1]) as usize;
+        let watch_position_zero = (!c.clone().data[0]).x as usize;
+        let watch_position_one = (!c.clone().data[1]).x as usize;
 
         solver_state.watches[watch_position_zero].push(c.clone());
         solver_state.watches[watch_position_one].push(c.clone());
@@ -249,11 +245,11 @@ pub fn remove(c: Clause, just_dealloc: bool, solver_state: &mut SolverState) {
 
     if !just_dealloc {
         remove_watch(
-            &mut solver_state.watches[index(!c.clone().data[0]) as usize],
+            &mut solver_state.watches[(!c.clone().data[0]).x as usize],
             c.clone(),
         );
         remove_watch(
-            &mut solver_state.watches[index(!c.clone().data[1]) as usize],
+            &mut solver_state.watches[(!c.clone().data[1]).x as usize],
             c.clone(),
         );
     }
@@ -324,7 +320,7 @@ pub fn new_var(solver_state: &mut SolverState) -> i32 {
     solver_state.level.push(-1);
     solver_state.trail_pos.push(-1);
     solver_state.activity.push(0.0);
-    solver_state.order.new_var(solver_state.clone());
+    solver_state.order.new_var(&mut solver_state.clone());
     solver_state.analyze_seen.push(Lbool::Undef0);
 
     return index;
@@ -372,4 +368,3 @@ pub fn cancel_until(level: i32, solver_state: &mut SolverState) {
         solver_state.qhead = solver_state.trail.len() as i32;
     }
 }
-pub fn new_clause_callback(_c: Clause) {}

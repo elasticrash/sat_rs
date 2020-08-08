@@ -80,10 +80,6 @@ pub fn var(lit: &Lit) -> i32 {
     return lit.x >> 1;
 }
 
-pub fn index(lit: Lit) -> i32 {
-    return lit.x;
-}
-
 pub fn swap(i: i32, j: i32, data: &mut Vec<Lit>) {
     let tmp = data[i as usize];
     data[i as usize] = data[j as usize];
