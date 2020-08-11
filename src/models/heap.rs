@@ -50,7 +50,7 @@ impl IHeap for Heap {
         reportf("percolate_up".to_string(), file!(), line!(), 0);
 
         let x = self.heap[_i as usize];
-        while (_i >> 1) != 0 && comp(act.clone(), x, self.heap[(_i >> 1) as usize] as i32) {
+        while (_i >> 1) != 0 && comp(act.to_vec(), x, self.heap[(_i >> 1) as usize] as i32) {
             self.heap[_i as usize] = self.heap[(_i >> 1) as usize];
             self.indices[self.heap[_i as usize] as usize] = _i;
             _i = _i >> 1;
