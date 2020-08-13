@@ -94,7 +94,7 @@ impl Search for SolverState {
                     let next: Lit = self.order.select(parms.random_var_freq, self.clone());
 
                     if next == Lit::undefined() {
-                        if model_found(self) {
+                        if self.model_found() {
                             continue;
                         }
                         self.model

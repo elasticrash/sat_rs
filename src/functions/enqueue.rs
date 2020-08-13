@@ -20,35 +20,36 @@ use crate::models::solverstate::*;
 |  Output:
 |    TRUE if fact was enqueued without conflict, FALSE otherwise.
 |________________________________________________________________________________________________@*/
-
-pub fn enqueue(p: &Lit, from: Option<Clause>, solver_state: &mut SolverState) -> bool {
-    reportf(
-        "enqueue".to_string(),
-        file!(),
-        line!(),
-        solver_state.verbosity,
-    );
-
-    if !is_undefined(value_by_lit(*p, solver_state)) {
-        return value_by_lit(*p, solver_state) != L_FALSE;
-    } else {
-        let x: usize = var(&p) as usize;
-        solver_state.assigns[x] = to_bool(!sign(p));
-        solver_state.level[x] = solver_state.decision_level();
-        solver_state.trail_pos[x] = solver_state.trail.len() as i32;
-        solver_state.reason[x] = from;
-        solver_state.trail.push(*p);
-        return true;
-    }
+pub trait NQueue {
+    fn enqueue(&mut self, p: &Lit, from: Option<Clause>) -> bool;
+    fn internal_enqueue(&mut self, _fact: &Lit) -> bool;
 }
 
-pub fn internal_enqueue(_fact: &Lit, solver_state: &mut SolverState) -> bool {
-    reportf(
-        "internal_enqueue".to_string(),
-        file!(),
-        line!(),
-        solver_state.verbosity,
-    );
+impl NQueue for SolverState {
+    fn enqueue(&mut self, p: &Lit, from: Option<Clause>) -> bool {
+        reportf("enqueue".to_string(), file!(), line!(), self.verbosity);
 
-    return enqueue(&_fact, None, solver_state);
+        if !is_undefined(value_by_lit(*p, self)) {
+            return value_by_lit(*p, self) != L_FALSE;
+        } else {
+            let x: usize = var(&p) as usize;
+            self.assigns[x] = to_bool(!sign(p));
+            self.level[x] = self.decision_level();
+            self.trail_pos[x] = self.trail.len() as i32;
+            self.reason[x] = from;
+            self.trail.push(*p);
+            return true;
+        }
+    }
+
+    fn internal_enqueue(&mut self, _fact: &Lit) -> bool {
+        reportf(
+            "internal_enqueue".to_string(),
+            file!(),
+            line!(),
+            self.verbosity,
+        );
+
+        return self.enqueue(&_fact, None);
+    }
 }

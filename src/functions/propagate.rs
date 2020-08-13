@@ -70,7 +70,7 @@ impl Prop for SolverState {
                     if !foundwatch {
                         ws[j as usize] = c.clone();
                         j += 1;
-                        if !enqueue(&first, Some(c.clone()), self) {
+                        if !self.enqueue(&first, Some(c.clone())) {
                             if self.decision_level() == 0 {
                                 self.ok = false;
                             }

@@ -162,7 +162,7 @@ impl NewClause for SolverState {
                 self.cancel_until(0);
             }
             let ps_clone: &mut Vec<Lit> = &mut ps.to_vec();
-            if !internal_enqueue(&ps_clone[0], self) {
+            if !self.internal_enqueue(&ps_clone[0]) {
                 self.ok = false;
             }
         } else {
@@ -188,7 +188,7 @@ impl NewClause for SolverState {
                     c.data[1] = ps[max_i as usize];
                     c.data[max_i as usize] = ps[1];
 
-                    assert!(enqueue(&c.data[0], Some(c.clone()), self));
+                    assert!(self.enqueue(&c.data[0], Some(c.clone())));
                 } else {
                     move_back(c.clone().data[0], c.clone().data[1], self);
                 }
