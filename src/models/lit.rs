@@ -16,6 +16,7 @@ pub trait ILit {
     fn to_string(lit: &Lit) -> String;
     fn get_hash_code(lit: &Lit) -> i32;
     fn equals(&self, lit: &Lit) -> bool;
+    fn undefined() -> Self;
 }
 
 impl ILit for Lit {
@@ -42,6 +43,9 @@ impl ILit for Lit {
             return true;
         }
         return false;
+    }
+    fn undefined() -> Self {
+        Self::new(VAR_UNDEFINED, false)
     }
 }
 

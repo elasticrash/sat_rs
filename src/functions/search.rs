@@ -27,125 +27,117 @@ use std::cmp::max;
 |    all variables are decision variables, this means that the clause set is satisfiable. 'l_False'
 |    if the clause set is unsatisfiable. 'l_Undef' if the bound on number of conflicts is reached.
 |________________________________________________________________________________________________@*/
+pub trait Search {
+    fn search(&mut self, nof_conflicts: i32, nof_learnts: i32, parms: SearchParams) -> Lbool;
+    fn var_rescale_activity(&mut self);
+    fn cla_rescale_activity(&mut self);
+}
 
-pub fn search(
-    nof_conflicts: i32,
-    nof_learnts: i32,
-    parms: SearchParams,
-    solver_state: &mut SolverState,
-) -> Lbool {
-    reportf(
-        "search".to_string(),
-        file!(),
-        line!(),
-        solver_state.verbosity,
-    );
+impl Search for SolverState {
+    fn search(&mut self, nof_conflicts: i32, nof_learnts: i32, parms: SearchParams) -> Lbool {
+        reportf("search".to_string(), file!(), line!(), self.verbosity);
 
-    if !solver_state.ok {
-        return Lbool::False;
-    }
-    assert!(solver_state.root_level == solver_state.decision_level());
+        if !self.ok {
+            return Lbool::False;
+        }
+        assert!(self.root_level == self.decision_level());
 
-    solver_state.solver_stats.starts += 1.0;
-    let mut conflict_c: i32 = 0;
-    solver_state.var_decay = 1.0 / parms.var_decay;
-    solver_state.cla_decay = 1.0 / parms.clause_decay;
-    solver_state.model.clear();
+        self.solver_stats.starts += 1.0;
+        let mut conflict_c: i32 = 0;
+        self.var_decay = 1.0 / parms.var_decay;
+        self.cla_decay = 1.0 / parms.clause_decay;
+        self.model.clear();
 
-    loop {
-        match propagate(solver_state) {
-            Some(_c) => {
-                solver_state.solver_stats.conflicts += 1.0;
-                conflict_c += 1;
-                let mut learnt_clause: Vec<Lit> = Vec::new();
+        loop {
+            match self.propagate() {
+                Some(_c) => {
+                    self.solver_stats.conflicts += 1.0;
+                    conflict_c += 1;
+                    let mut learnt_clause: Vec<Lit> = Vec::new();
 
-                if solver_state.decision_level() == solver_state.root_level {
-                    analyse_final(&_c, false, solver_state);
-                    return L_FALSE;
-                }
-
-                let backtrack_level: i32 =
-                    analyze(Some(_c.clone()), &mut learnt_clause, solver_state);
-
-                cancel_until(max(backtrack_level, solver_state.root_level), solver_state);
-                new_clause(&mut learnt_clause, true, solver_state);
-                if learnt_clause.len() == 1 {
-                    solver_state.level[var(&learnt_clause[0]) as usize] = 0;
-                }
-                solver_state.var_decay_activity();
-                solver_state.cla_decay_activity();
-            }
-            None => {
-                if nof_conflicts >= 0 && conflict_c >= nof_conflicts {
-                    solver_state.progress_estimate = progress_estimate();
-                    cancel_until(solver_state.root_level, solver_state);
-                    return Lbool::Undef0;
-                }
-
-                if solver_state.decision_level() == 0 {
-                    simplify_db(solver_state);
-                    if !solver_state.ok {
+                    if self.decision_level() == self.root_level {
+                        self.analyse_final(&_c, false);
                         return L_FALSE;
                     }
-                }
 
-                if nof_learnts >= 0
-                    && solver_state.learnts.len() as i32 - solver_state.clone().n_assigns() as i32
-                        >= nof_learnts
-                {
-                    reduce_db(solver_state);
-                }
+                    let backtrack_level: i32 = self.analyze(Some(_c.clone()), &mut learnt_clause);
 
-                solver_state.solver_stats.decisions += 1.0;
-                let next: Lit = solver_state
-                    .order
-                    .select(parms.random_var_freq, solver_state.clone());
-
-                if next == Lit::new(VAR_UNDEFINED, false) {
-                    if model_found(solver_state) {
-                        continue;
+                    self.cancel_until(max(backtrack_level, self.root_level));
+                    self.new_clause(&mut learnt_clause, true);
+                    if learnt_clause.len() == 1 {
+                        self.level[var(&learnt_clause[0]) as usize] = 0;
                     }
-                    solver_state
-                        .model
-                        .resize(solver_state.clone().n_vars() as usize, Lbool::Undef0);
-
-                    for y in 0..solver_state.clone().n_vars() {
-                        solver_state.model[y as usize] = value_by_var(y, solver_state);
-                    }
-                    cancel_until(solver_state.root_level, solver_state);
-                    return L_TRUE;
+                    self.var_decay_activity();
+                    self.cla_decay_activity();
                 }
+                None => {
+                    if nof_conflicts >= 0 && conflict_c >= nof_conflicts {
+                        self.progress_estimate = progress_estimate();
+                        self.cancel_until(self.root_level);
+                        return Lbool::Undef0;
+                    }
 
-                assert!(assume(next, solver_state));
+                    if self.decision_level() == 0 {
+                        self.simplify_db();
+                        if !self.ok {
+                            return L_FALSE;
+                        }
+                    }
+
+                    if nof_learnts >= 0
+                        && self.learnts.len() as i32 - self.trail.len() as i32 >= nof_learnts
+                    {
+                        self.reduce_db();
+                    }
+
+                    self.solver_stats.decisions += 1.0;
+                    let next: Lit = self.order.select(parms.random_var_freq, self.clone());
+
+                    if next == Lit::undefined() {
+                        if model_found(self) {
+                            continue;
+                        }
+                        self.model
+                            .resize(self.clone().n_vars() as usize, Lbool::Undef0);
+
+                        for y in 0..self.clone().n_vars() {
+                            self.model[y as usize] = value_by_var(y, self);
+                        }
+                        self.cancel_until(self.root_level);
+                        return L_TRUE;
+                    }
+
+                    assert!(self.assume(next));
+                }
             }
         }
     }
-}
 
-pub fn var_rescale_activity(solver_state: &mut SolverState) {
-    reportf(
-        "var_rescale_activity".to_string(),
-        file!(),
-        line!(),
-        solver_state.verbosity,
-    );
+    fn var_rescale_activity(&mut self) {
+        reportf(
+            "var_rescale_activity".to_string(),
+            file!(),
+            line!(),
+            self.verbosity,
+        );
 
-    for y in 0..solver_state.clone().n_vars() {
-        solver_state.activity[y as usize] *= 1e-100;
+        for y in 0..self.clone().n_vars() {
+            self.activity[y as usize] *= 1e-100;
+        }
+        self.var_inc *= 1e-100;
     }
-    solver_state.var_inc *= 1e-100;
-}
 
-pub fn cla_rescale_activity(solver_state: &mut SolverState) {
-    reportf(
-        "cla_rescale_activity".to_string(),
-        file!(),
-        line!(),
-        solver_state.verbosity,
-    );
+    fn cla_rescale_activity(&mut self) {
+        reportf(
+            "cla_rescale_activity".to_string(),
+            file!(),
+            line!(),
+            self.verbosity,
+        );
 
-    for y in 0..solver_state.learnts.len() {
-        solver_state.learnts[y as usize].activity *= 1e-20;
+        for y in 0..self.learnts.len() {
+            self.learnts[y as usize].activity *= 1e-20;
+        }
+        self.cla_inc *= 1e-20;
     }
-    solver_state.cla_inc *= 1e-20;
 }

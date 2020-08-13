@@ -32,7 +32,7 @@ fn main() {
                     let parsed_lit: i32 = var.parse::<i32>().unwrap();
                     let zero_based_abs_var = parsed_lit.abs() - 1;
                     while zero_based_abs_var >= state.n_vars() {
-                        new_var(&mut state);
+                        state.new_var();
                     }
                     let solver_lit;
                     if parsed_lit > 0 {
@@ -50,9 +50,9 @@ fn main() {
     }
 
     if state.verbosity == 0 {
-        solve_no_assumptions(&mut state);
+        state.solve_no_assumptions();
     } else {
-        solve_no_assumptions(&mut state);
+        state.solve_no_assumptions();
         let mut result: String = String::new();
         if state.ok {
             result.push_str("SATISFIABLE");

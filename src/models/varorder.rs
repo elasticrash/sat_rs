@@ -72,7 +72,7 @@ impl IVarOrder for VarOrder {
             }
         }
 
-        return Lit::new(-1, false);
+        return Lit::undefined();
     }
     fn sync(&mut self, solver_state: SolverState) {
         self.assigns = solver_state.assigns.clone();

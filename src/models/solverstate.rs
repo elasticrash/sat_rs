@@ -167,7 +167,7 @@ pub trait SemiInternal {
 
 impl Internal for SolverState {
     fn i_analyze_final(&mut self, confl: Clause) {
-        analyse_final(&confl, false, self);
+        self.analyse_final(&confl, false);
     }
     fn i_enqueue(&mut self, fact: Lit) -> bool {
         return enqueue(&fact, None, self);
@@ -179,7 +179,7 @@ impl Internal for SolverState {
         let index: i32 = var(&p);
         self.activity[index as usize] += self.var_inc;
         if self.activity[index as usize] > 1e100 {
-            var_rescale_activity(self);
+            self.var_rescale_activity();
         }
         self.order.update(var(&p));
     }
@@ -192,12 +192,12 @@ impl Internal for SolverState {
         self.cla_inc *= self.cla_decay;
     }
     fn i_new_clause(mut self, ps: &mut Vec<Lit>) {
-        new_clause(ps, false, &mut self);
+        self.new_clause(ps, false);
     }
     fn cla_bump_activity(&mut self, c: &mut Clause) {
         c.activity += self.cla_inc;
         if c.activity > 1e20 {
-            cla_rescale_activity(self);
+            self.cla_rescale_activity();
         }
     }
     fn locked(&mut self, _c: &Clause) -> bool {
@@ -244,7 +244,7 @@ impl NewVar for SolverState {
     }
     fn add_clause(&mut self, ps: &mut Vec<Lit>) {
         reportf("add_clause".to_string(), file!(), line!(), self.verbosity);
-        new_clause(ps, false, self);
+        self.new_clause(ps, false);
     }
 }
 

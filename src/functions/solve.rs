@@ -22,115 +22,112 @@ use crate::models::solverstate::*;
 |    not contain both 'x' and '~x' for any variable 'x'.
 |________________________________________________________________________________________________@*/
 
-pub fn solve(assumptions: Vec<Lit>, solver_state: &mut SolverState) -> bool {
-    reportf(
-        "solve".to_string(),
-        file!(),
-        line!(),
-        solver_state.verbosity,
-    );
-
-    simplify_db(solver_state);
-    if !solver_state.ok {
-        return false;
-    };
-
-    let parms: SearchParams = solver_state.default_parms;
-
-    let mut nof_conflicts: f64 = 100.0;
-    let mut nof_learnts: f64 = solver_state.clauses.len() as f64 / 3.0;
-    let mut status: Lbool = Lbool::Undef0;
-
-    solver_state.root_level = assumptions.len() as i32;
-    for y in 0..assumptions.len() {
-        let p: Lit = assumptions[y];
-        assert!(var(&p) < solver_state.n_vars());
-
-        if !assume(p, solver_state) {
-            match &solver_state.reason[var(&p) as usize] {
-                Some(r) => {
-                    analyse_final(&(r.clone()), true, solver_state);
-                    solver_state.conflict.push(!p);
-                }
-                None => {
-                    solver_state.conflict.clear();
-                    solver_state.conflict.push(!p);
-                }
-            }
-
-            cancel_until(0, solver_state);
-            return false;
-        }
-        match propagate(solver_state) {
-            Some(confl) => {
-                analyse_final(&confl, false, solver_state);
-                assert!(solver_state.conflict.len() > 0);
-                cancel_until(0, solver_state);
-                return false;
-            }
-            None => {}
-        }
-    }
-    assert!(solver_state.root_level == solver_state.decision_level());
-
-    if solver_state.verbosity >= 1 {
-        println!(
-            "==================================[MINISAT]======================================="
-        );
-        println!(
-            "| Conflicts |       ORIGINAL        |              LEARNT              | Progress |"
-        );
-        println!(
-            "|           | Clauses      Literals |   Limit Clauses Literals  Lit/Cl |          |"
-        );
-        println!(
-            "=================================================================================="
-        );
-    }
-
-    while is_undefined(status) {
-        //println!("{}:{}", file!(), line!());
-        if solver_state.verbosity >= 1 {
-            println!(
-                    "|      {0}    |     {1}        {2}    |   {3}      {4}       {5}       {6}    |   {7} %%   |",
-                    solver_state.solver_stats.conflicts,
-                    solver_state.clone().n_clauses(),
-                    solver_state.solver_stats.clauses_literals,
-                    nof_learnts.floor(),
-                    solver_state.clone().n_learnts(),
-                    solver_state.solver_stats.learnts_literals,
-                    (solver_state.solver_stats.learnts_literals
-                        / solver_state.clone().n_learnts() as f64).floor(),
-                    solver_state.progress_estimate * 100.0
-            );
-
-            status = search(
-                nof_conflicts as i32,
-                nof_learnts as i32,
-                parms,
-                solver_state,
-            );
-            nof_conflicts *= 1.5;
-            nof_learnts *= 1.1;
-        }
-    }
-
-    if solver_state.verbosity >= 1 {
-        println!(
-            "=================================================================================="
-        );
-    }
-    cancel_until(0, solver_state);
-    return true;
+pub trait Solver {
+    fn solve(&mut self, assumptions: Vec<Lit>) -> bool;
+    fn solve_no_assumptions(&mut self) -> bool;
 }
 
-pub fn solve_no_assumptions(solver_state: &mut SolverState) {
-    reportf(
-        "solve_no_assumptions".to_string(),
-        file!(),
-        line!(),
-        solver_state.verbosity,
-    );
-    let assumptions: Vec<Lit> = Vec::new();
-    solve(assumptions, solver_state);
+impl Solver for SolverState {
+    fn solve(&mut self, assumptions: Vec<Lit>) -> bool {
+        reportf("solve".to_string(), file!(), line!(), self.verbosity);
+
+        self.simplify_db();
+        if !self.ok {
+            return false;
+        };
+
+        let parms: SearchParams = self.default_parms;
+
+        let mut nof_conflicts: f64 = 100.0;
+        let mut nof_learnts: f64 = self.clauses.len() as f64 / 3.0;
+        let mut status: Lbool = Lbool::Undef0;
+
+        self.root_level = assumptions.len() as i32;
+        for y in 0..assumptions.len() {
+            let p: Lit = assumptions[y];
+            assert!(var(&p) < self.n_vars());
+
+            if !self.assume(p) {
+                match &self.reason[var(&p) as usize] {
+                    Some(r) => {
+                        self.clone().analyse_final(&(r.clone()), true);
+                        self.conflict.push(!p);
+                    }
+                    None => {
+                        self.conflict.clear();
+                        self.conflict.push(!p);
+                    }
+                }
+
+                self.cancel_until(0);
+                return false;
+            }
+            match self.propagate() {
+                Some(confl) => {
+                    self.analyse_final(&confl, false);
+                    assert!(self.conflict.len() > 0);
+                    self.cancel_until(0);
+                    return false;
+                }
+                None => {}
+            }
+        }
+        assert!(self.root_level == self.decision_level());
+
+        if self.verbosity >= 1 {
+            println!(
+            "==================================[MINISAT]======================================="
+        );
+            println!(
+            "| Conflicts |       ORIGINAL        |              LEARNT              | Progress |"
+        );
+            println!(
+            "|           | Clauses      Literals |   Limit Clauses Literals  Lit/Cl |          |"
+        );
+            println!(
+            "=================================================================================="
+        );
+        }
+
+        while is_undefined(status) {
+            //println!("{}:{}", file!(), line!());
+            if self.verbosity >= 1 {
+                println!(
+                    "|      {0}    |     {1}        {2}    |   {3}      {4}       {5}       {6}    |   {7} %%   |",
+                    self.solver_stats.conflicts,
+                    self.clone().n_clauses(),
+                    self.solver_stats.clauses_literals,
+                    nof_learnts.floor(),
+                    self.clone().n_learnts(),
+                    self.solver_stats.learnts_literals,
+                    (self.solver_stats.learnts_literals
+                        / self.clone().n_learnts() as f64).floor(),
+                        self.progress_estimate * 100.0
+            );
+
+                status = self.search(nof_conflicts as i32, nof_learnts as i32, parms);
+                nof_conflicts *= 1.5;
+                nof_learnts *= 1.1;
+            }
+        }
+
+        if self.verbosity >= 1 {
+            println!(
+            "=================================================================================="
+        );
+        }
+        self.cancel_until(0);
+        return true;
+    }
+
+    fn solve_no_assumptions(&mut self) -> bool {
+        reportf(
+            "solve_no_assumptions".to_string(),
+            file!(),
+            line!(),
+            self.verbosity,
+        );
+        let assumptions: Vec<Lit> = Vec::new();
+        return self.solve(assumptions);
+    }
 }
