@@ -52,14 +52,14 @@ impl Prop for SolverState {
                 assert!(c.data[1] == false_lit);
 
                 let first: Lit = c.data[0];
-                let val: Lbool = value_by_lit(first, self);
+                let val: Lbool = self.value_by_lit(first);
                 if val == L_TRUE {
                     ws[j as usize] = c.clone();
                     j += 1;
                 } else {
                     let mut foundwatch: bool = false;
                     for k in 2..c.data.len() {
-                        if value_by_lit(c.data[k], self) != L_FALSE {
+                        if self.value_by_lit(c.data[k]) != L_FALSE {
                             c.data[1] = c.data[k];
                             c.data[k] = false_lit;
                             self.watches[(!c.data[1]).x as usize].push(c.clone());

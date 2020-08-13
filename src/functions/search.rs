@@ -101,7 +101,7 @@ impl Search for SolverState {
                             .resize(self.clone().n_vars() as usize, Lbool::Undef0);
 
                         for y in 0..self.clone().n_vars() {
-                            self.model[y as usize] = value_by_var(y, self);
+                            self.model[y as usize] = self.value_by_var(y);
                         }
                         self.cancel_until(self.root_level);
                         return L_TRUE;

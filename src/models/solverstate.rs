@@ -165,6 +165,25 @@ pub trait SemiInternal {
     fn n_learnts(self) -> usize;
 }
 
+pub trait Setters {
+    fn value_by_var(&mut self, x: i32) -> Lbool;
+    fn value_by_lit(&mut self, x: Lit) -> Lbool;
+}
+
+impl Setters for SolverState {
+    fn value_by_var(&mut self, x: i32) -> Lbool {
+        return self.assigns[x as usize];
+    }
+
+    fn value_by_lit(&mut self, x: Lit) -> Lbool {
+        let mut assign = self.assigns[var(&x) as usize];
+        if sign(&x) {
+            assign = bit_not(assign);
+        }
+        return assign;
+    }
+}
+
 impl Internal for SolverState {
     fn i_analyze_final(&mut self, confl: Clause) {
         self.analyse_final(&confl, false);
@@ -266,14 +285,14 @@ pub fn move_back(_l1: Lit, _l2: Lit, solver_state: &mut SolverState) {
     }
 
     if lev1 < solver_state.level_to_backtrack || lev2 < solver_state.level_to_backtrack {
-        if value_by_lit(_l1, solver_state) == Lbool::True {
-            if value_by_lit(_l2, solver_state) == Lbool::True {
+        if solver_state.value_by_lit(_l1) == Lbool::True {
+            if solver_state.value_by_lit(_l2) == Lbool::True {
             } else if lev1 <= lev2 || solver_state.level_to_backtrack <= lev2 {
             } else {
                 solver_state.level_to_backtrack = lev2;
             }
         } else {
-            if value_by_lit(_l2, solver_state) == Lbool::True {
+            if solver_state.value_by_lit(_l2) == Lbool::True {
                 if lev2 <= lev1 || solver_state.level_to_backtrack <= lev1 {
                 } else {
                     solver_state.level_to_backtrack = lev1;

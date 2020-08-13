@@ -1,6 +1,3 @@
-use crate::models::lit::*;
-use crate::models::solverstate::SolverState;
-
 pub static L_TRUE: Lbool = Lbool::True;
 pub static L_FALSE: Lbool = Lbool::False;
 
@@ -24,20 +21,8 @@ pub fn is_undefined(value: Lbool) -> bool {
     return value != Lbool::True && value != Lbool::False;
 }
 
-pub fn value_by_var(x: i32, y: &SolverState) -> Lbool {
-    return y.assigns[x as usize];
-}
-
-pub fn value_by_lit(x: Lit, solver_state: &SolverState) -> Lbool {
-    let mut assign = solver_state.assigns[var(&x) as usize];
-    if sign(&x) {
-        assign = bit_not(assign);
-    }
-    return assign;
-}
-
 // bitwise not for lbool
-fn bit_not(lb: Lbool) -> Lbool {
+pub fn bit_not(lb: Lbool) -> Lbool {
     let result = !(lb as i8);
     return match result {
         1 => Lbool::True,

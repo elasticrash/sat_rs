@@ -29,8 +29,8 @@ impl NQueue for SolverState {
     fn enqueue(&mut self, p: &Lit, from: Option<Clause>) -> bool {
         reportf("enqueue".to_string(), file!(), line!(), self.verbosity);
 
-        if !is_undefined(value_by_lit(*p, self)) {
-            return value_by_lit(*p, self) != L_FALSE;
+        if !is_undefined(self.value_by_lit(*p)) {
+            return self.value_by_lit(*p) != L_FALSE;
         } else {
             let x: usize = var(&p) as usize;
             self.assigns[x] = to_bool(!sign(p));

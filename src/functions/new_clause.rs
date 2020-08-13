@@ -66,7 +66,7 @@ impl NewClause for SolverState {
             let mut lev: i32 = self.level[var(&_ps[i]) as usize];
             if lev == -1 {
                 lev = std::i32::MAX;
-            } else if value_by_lit(_ps[i], &self) == Lbool::True {
+            } else if self.value_by_lit(_ps[i]) == Lbool::True {
                 lev = std::i32::MAX;
             }
 
@@ -128,7 +128,7 @@ impl NewClause for SolverState {
             let mut unqs = qs.unwrap();
             for i in 0..unqs.len() {
                 if self.level[var(&unqs[i]) as usize] == 0
-                    && value_by_lit(unqs[i], &self) == Lbool::True
+                    && self.value_by_lit(unqs[i]) == Lbool::True
                 {
                     return;
                 }
@@ -140,7 +140,7 @@ impl NewClause for SolverState {
 
                 for _y in 0..unqs.len() {
                     if self.level[var(&unqs[_i]) as usize] != 0
-                        || value_by_lit(unqs[_i], &self) != Lbool::False
+                        || self.value_by_lit(unqs[_i]) != Lbool::False
                     {
                         unqs[_j] = unqs[_i];
                         _j += 1;
@@ -238,7 +238,7 @@ impl NewClause for SolverState {
         }
 
         for y in 0..c.size() {
-            let f = value_by_lit(c.data[y as usize], &self);
+            let f = self.clone().value_by_lit(c.data[y as usize]);
             if f == Lbool::True {
                 return true;
             }
