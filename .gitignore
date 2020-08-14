@@ -1,3 +1,4 @@
 /target
 **/*.rs.bk
-/MiniSAT.cs
+MiniSAT/bin/*
+MiniSAT/obj/*
