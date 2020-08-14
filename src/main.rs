@@ -12,7 +12,6 @@ use std::fs::File;
 use std::io::prelude::*;
 
 fn main() {
-    debug("=========================================".to_string());
     let _args: Vec<String> = env::args().collect();
 
     let arguments: InputArguments = read_input_arguments(_args);
@@ -23,9 +22,14 @@ fn main() {
 
     file.read_to_string(&mut buffer).unwrap();
 
-    let problem_lines = regex::Regex::new(r" 0|\n|\r").unwrap();
+    let problem_lines = regex::Regex::new(r"\n|\r").unwrap();
+    let mut lits: Vec<Lit> = Vec::new();
+    let mut last_var_zero = false;
     for part in problem_lines.split(&buffer) {
-        let mut lits: Vec<Lit> = Vec::new();
+        if last_var_zero {
+            lits = Vec::new();
+            last_var_zero = false;
+        }
         if part != "" && !part.starts_with('c') && !part.starts_with('p') {
             let line_vars = regex::Regex::new(r" ").unwrap();
             for var in line_vars.split(&part) {
@@ -33,34 +37,39 @@ fn main() {
                     let parsed_lit: i32 = var.parse::<i32>().unwrap();
                     let zero_based_abs_var = parsed_lit.abs() - 1;
                     while zero_based_abs_var >= state.n_vars() {
-                        new_var(&mut state);
+                        state.new_var();
                     }
                     let solver_lit;
                     if parsed_lit > 0 {
                         solver_lit = Lit::simple(zero_based_abs_var);
+                        lits.push(solver_lit);
+                    } else if parsed_lit == 0 {
+                        last_var_zero = true;
                     } else {
                         solver_lit = !Lit::simple(zero_based_abs_var);
+                        lits.push(solver_lit);
                     }
-                    lits.push(solver_lit);
                 }
             }
         }
-        if lits.len() > 0 {
-            state.add_clause(&mut lits);
+        if last_var_zero {
+            if lits.len() > 0 {
+                state.add_clause(&mut lits);
+            }
         }
     }
 
     if state.verbosity == 0 {
-        solve_no_assumptions(&mut state);
+        state.solve_no_assumptions();
     } else {
-        solve_no_assumptions(&mut state);
+        state.solve_no_assumptions();
         let mut result: String = String::new();
         if state.ok {
             result.push_str("SATISFIABLE");
         } else {
             result.push_str("UNSATISFIABLE");
         }
-        reportf(result, 2);
+        reportf(result, file!(), line!(), 2);
         print_stats(state.solver_stats);
     }
 }

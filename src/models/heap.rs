@@ -4,22 +4,18 @@ use crate::models::logger::*;
 pub struct Heap {
     pub heap: Vec<i32>,
     pub indices: Vec<i32>,
-    pub activities: Vec<f64>,
 }
 
 pub trait IHeap {
     fn new() -> Self;
     fn set_bounds(&mut self, n: i32);
     fn in_heap(&self, n: i32) -> bool;
-    fn increase(&mut self, n: i32);
-    fn insert(&mut self, n: i32, act: Vec<f64>);
-    fn percolate_up(&mut self, i: i32);
-    fn percolate_down(&mut self, i: i32);
+    fn increase(&mut self, n: i32, comp: &dyn Fn(f64, f64) -> bool, act: Vec<f64>);
+    fn insert(&mut self, n: i32, comp: &dyn Fn(f64, f64) -> bool, act: Vec<f64>);
+    fn percolate_up(&mut self, i: i32, comp: &dyn Fn(f64, f64) -> bool, act: Vec<f64>);
+    fn percolate_down(&mut self, i: i32, comp: &dyn Fn(f64, f64) -> bool, act: Vec<f64>);
     fn empty(&self) -> bool;
-    fn getmin(&mut self, act: Vec<f64>) -> i32;
-    fn left(n: i32) -> i32;
-    fn right(n: i32) -> i32;
-    fn parent(n: i32) -> i32;
+    fn getmin(&mut self, comp: &dyn Fn(f64, f64) -> bool, act: Vec<f64>) -> i32;
 }
 
 impl IHeap for Heap {
@@ -29,7 +25,6 @@ impl IHeap for Heap {
         return Self {
             heap: h,
             indices: Vec::new(),
-            activities: Vec::new(),
         };
     }
     fn set_bounds(&mut self, n: i32) {
@@ -38,47 +33,45 @@ impl IHeap for Heap {
     fn in_heap(&self, n: i32) -> bool {
         return self.indices[n as usize] != 0;
     }
-    fn increase(&mut self, n: i32) {
-        <Heap as IHeap>::percolate_up(self, self.indices[n as usize]);
+    fn increase(&mut self, n: i32, comp: &dyn Fn(f64, f64) -> bool, act: Vec<f64>) {
+        <Heap as IHeap>::percolate_up(self, self.indices[n as usize], comp, act.to_vec());
     }
-    fn insert(&mut self, n: i32, act: Vec<f64>) {
-        self.activities = act.clone();
+    fn insert(&mut self, n: i32, comp: &dyn Fn(f64, f64) -> bool, act: Vec<f64>) {
         self.indices[n as usize] = self.heap.len() as i32;
         self.heap.push(n);
-        <Heap as IHeap>::percolate_up(self, self.indices[n as usize]);
+        <Heap as IHeap>::percolate_up(self, self.indices[n as usize], comp, act.to_vec());
     }
-    fn percolate_up(&mut self, mut _i: i32) {
-        reportf("percolate_up".to_string(), 0);
-
+    fn percolate_up(&mut self, mut _i: i32, comp: &dyn Fn(f64, f64) -> bool, act: Vec<f64>) {
+        reportf("percolate_up".to_string(), file!(), line!(), 0);
+        
         let x = self.heap[_i as usize];
-        while <Heap as IHeap>::parent(_i) != 0
-            && self.activities[x as usize]
-                > self.activities[self.heap[<Heap as IHeap>::parent(_i) as usize] as usize]
-        {
-            self.heap[_i as usize] = self.heap[<Heap as IHeap>::parent(_i) as usize];
+        while (_i >> 1) != 0 && comp(act[x as usize], act[self.heap[(_i >> 1) as usize] as usize]) {
+            self.heap[_i as usize] = self.heap[(_i >> 1) as usize];
             self.indices[self.heap[_i as usize] as usize] = _i;
-            _i = <Heap as IHeap>::parent(_i);
+            _i = _i >> 1;
         }
 
         self.heap[_i as usize] = x;
         self.indices[x as usize] = _i;
     }
-    fn percolate_down(&mut self, mut _i: i32) {
-        reportf("percolate_down".to_string(), 0);
+    fn percolate_down(&mut self, mut _i: i32, comp: &dyn Fn(f64, f64) -> bool, act: Vec<f64>) {
+        reportf("percolate_down".to_string(), file!(), line!(), 0);
 
         let x = self.heap[_i as usize];
-        while <Heap as IHeap>::left(_i) < self.heap.len() as i32 {
+        while _i + _i < self.heap.len() as i32 {
             let child: i32;
-            if <Heap as IHeap>::right(_i) < self.heap.len() as i32
-                && self.activities[self.heap[<Heap as IHeap>::right(_i) as usize] as usize]
-                    > self.activities[self.heap[<Heap as IHeap>::left(_i) as usize] as usize]
+            if (_i + _i + 1) < self.heap.len() as i32
+                && comp(
+                    act[self.heap[(_i + _i + 1) as usize] as usize],
+                    act[self.heap[(_i + _i) as usize] as usize],
+                )
             {
-                child = <Heap as IHeap>::right(_i)
+                child = _i + _i + 1;
             } else {
-                child = <Heap as IHeap>::left(_i);
+                child = _i + _i;
             }
 
-            if !(self.activities[child as usize] > self.activities[x as usize]) {
+            if !(comp(act[self.heap[child as usize] as usize], act[x as usize])) {
                 break;
             }
 
@@ -93,25 +86,15 @@ impl IHeap for Heap {
     fn empty(&self) -> bool {
         return self.heap.len() == 1 as usize;
     }
-    fn getmin(&mut self, act: Vec<f64>) -> i32 {
-        self.activities = act.to_vec();
+    fn getmin(&mut self, comp: &dyn Fn(f64, f64) -> bool, act: Vec<f64>) -> i32 {
         let r = self.heap[1];
         self.heap[1] = *self.heap.last().unwrap();
         self.indices[self.heap[1] as usize] = 1;
         self.indices[r as usize] = 0;
         self.heap.pop();
         if self.heap.len() > 1 {
-            <Heap as IHeap>::percolate_down(self, 1);
+            <Heap as IHeap>::percolate_down(self, 1, comp, act.to_vec());
         }
         return r;
-    }
-    fn left(n: i32) -> i32 {
-        return n + n;
-    }
-    fn right(n: i32) -> i32 {
-        return n + n + 1;
-    }
-    fn parent(n: i32) -> i32 {
-        return n >> 1;
     }
 }

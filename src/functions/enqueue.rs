@@ -20,26 +20,36 @@ use crate::models::solverstate::*;
 |  Output:
 |    TRUE if fact was enqueued without conflict, FALSE otherwise.
 |________________________________________________________________________________________________@*/
-
-pub fn enqueue(_fact: &Lit, _from: Option<Clause>, solver_state: &mut SolverState) -> bool {
-    reportf("enqueue".to_string(), solver_state.verbosity);
-
-    if !is_undefined(value_by_lit(*_fact, solver_state)) {
-        return value_by_lit(*_fact, solver_state) != L_FALSE;
-    } else {
-        let x: usize = var(&_fact) as usize;
-        solver_state.assigns[x] = to_bool(!sign(_fact));
-        solver_state.level[x] = solver_state.decision_level();
-        solver_state.trail_pos[x] = solver_state.trail.len() as i32;
-        solver_state.trail.push(*_fact);
-        solver_state.reason[x] = _from;
-
-        return true;
-    }
+pub trait NQueue {
+    fn enqueue(&mut self, p: &Lit, from: Option<Clause>) -> bool;
+    fn internal_enqueue(&mut self, _fact: &Lit) -> bool;
 }
 
-pub fn internal_enqueue(_fact: &Lit, solver_state: &mut SolverState) -> bool {
-    reportf("internal_enqueue".to_string(), solver_state.verbosity);
+impl NQueue for SolverState {
+    fn enqueue(&mut self, p: &Lit, from: Option<Clause>) -> bool {
+        reportf("enqueue".to_string(), file!(), line!(), self.verbosity);
 
-    return enqueue(&_fact, None, solver_state);
+        if !is_undefined(self.value_by_lit(*p)) {
+            return self.value_by_lit(*p) != L_FALSE;
+        } else {
+            let x: usize = var(&p) as usize;
+            self.update_assigns(to_bool(!sign(p)), x);
+            self.level[x] = self.decision_level();
+            self.trail_pos[x] = self.trail.len() as i32;
+            self.reason[x] = from;
+            self.trail.push(*p);
+            return true;
+        }
+    }
+
+    fn internal_enqueue(&mut self, _fact: &Lit) -> bool {
+        reportf(
+            "internal_enqueue".to_string(),
+            file!(),
+            line!(),
+            self.verbosity,
+        );
+
+        return self.enqueue(&_fact, None);
+    }
 }

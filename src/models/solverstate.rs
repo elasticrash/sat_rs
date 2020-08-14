@@ -13,18 +13,28 @@ use crate::models::varorder::*;
 use std::cmp;
 
 #[derive(Clone)]
+pub struct Activity {
+    pub col: Vec<f64>,
+}
+
+#[derive(Clone)]
+pub struct Assigns {
+    pub col: Vec<Lbool>,
+}
+
+#[derive(Clone)]
 pub struct SolverState {
     pub ok: bool,
     pub clauses: Vec<Clause>,
     pub learnts: Vec<Clause>,
     pub cla_inc: f64,
     pub cla_decay: f64,
-    pub activity: Vec<f64>,
+    pub activity: Activity,
     pub var_inc: f64,
     pub var_decay: f64,
     pub order: VarOrder,
     pub watches: Vec<Vec<Clause>>,
-    pub assigns: Vec<Lbool>,
+    pub assigns: Assigns,
     pub trail: Vec<Lit>,
     pub trail_lim: Vec<i32>,
     pub reason: Vec<Option<Clause>>,
@@ -59,15 +69,12 @@ pub trait NewState {
 
 impl NewState for SolverState {
     fn new() -> Self {
-        let ass: Vec<Lbool> = Vec::new();
-        let act: Vec<f64> = Vec::new();
-
         let mut solver = Self {
             clauses: Vec::new(),
             learnts: Vec::new(),
-            activity: Vec::new(),
+            activity: Activity { col: Vec::new() },
             watches: Vec::new(),
-            assigns: Vec::new(),
+            assigns: Assigns { col: Vec::new() },
             trail_pos: Vec::new(),
             trail: Vec::new(),
             trail_lim: Vec::new(),
@@ -87,7 +94,7 @@ impl NewState for SolverState {
             cla_decay: 1.0,
             var_inc: 1.0,
             var_decay: 1.0,
-            order: VarOrder::new(ass, act),
+            order: VarOrder::new(),
             qhead: 0,
             simp_db_assigns: 0,
             simp_db_props: 0.0,
@@ -110,7 +117,7 @@ impl NewState for SolverState {
     }
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 pub struct SearchParams {
     pub var_decay: f64,
     pub clause_decay: f64,
@@ -147,7 +154,7 @@ pub trait Internal {
     fn cla_decay_activity(&mut self);
     fn i_new_clause(self, ps: &mut Vec<Lit>);
     fn cla_bump_activity(&mut self, c: &mut Clause);
-    fn locked(&mut self, y: i32, t: i32) -> bool;
+    fn locked(&mut self, _c: &Clause) -> bool;
     fn decision_level(&mut self) -> i32;
 }
 
@@ -165,20 +172,63 @@ pub trait SemiInternal {
     fn n_learnts(self) -> usize;
 }
 
+pub trait Setters {
+    fn value_by_var(&mut self, x: i32) -> Lbool;
+    fn value_by_lit(&mut self, x: Lit) -> Lbool;
+    fn add_activity(&mut self, val: f64);
+    fn add_assigns(&mut self, val: Lbool);
+    fn update_activity(&mut self, val: f64, i: usize);
+    fn update_assigns(&mut self, val: Lbool, i: usize);
+}
+
+impl Setters for SolverState {
+    fn value_by_var(&mut self, x: i32) -> Lbool {
+        return self.assigns.col[x as usize];
+    }
+
+    fn value_by_lit(&mut self, x: Lit) -> Lbool {
+        let mut assign = self.assigns.col[var(&x) as usize];
+        if sign(&x) {
+            assign = bit_not(assign);
+        }
+        return assign;
+    }
+    fn add_activity(&mut self, val: f64) {
+        self.activity.col.push(val);
+        self.order.activity.col.push(val);
+    }
+    fn add_assigns(&mut self, val: Lbool) {
+        self.assigns.col.push(val);
+        self.order.assigns.col.push(val);
+    }
+    fn update_activity(&mut self, val: f64, i: usize) {
+        self.activity.col[i] = val;
+        self.order.activity.col[i] = val;
+    }
+    fn update_assigns(&mut self, val: Lbool, i: usize) {
+        self.assigns.col[i] = val;
+        self.order.assigns.col[i] = val;
+    }
+}
+
 impl Internal for SolverState {
     fn i_analyze_final(&mut self, confl: Clause) {
-        analyse_final(confl, false, self);
+        self.analyse_final(&confl, false);
     }
     fn i_enqueue(&mut self, fact: Lit) -> bool {
-        return enqueue(&fact, None, self);
+        return self.enqueue(&fact, None);
     }
     fn var_bump_activity(&mut self, p: Lit) {
         if self.var_decay < 0.0 {
             return;
         }
-        let index = var(&p) as f64;
-        if self.activity[index as usize] + self.var_inc > 1e100 {
-            var_rescale_activity(self);
+        let index: i32 = var(&p);
+        self.update_activity(
+            self.activity.col[index as usize] + self.var_inc,
+            index as usize,
+        );
+        if self.activity.col[index as usize] > 1e100 {
+            self.var_rescale_activity();
         }
         self.order.update(var(&p));
     }
@@ -191,21 +241,15 @@ impl Internal for SolverState {
         self.cla_inc *= self.cla_decay;
     }
     fn i_new_clause(mut self, ps: &mut Vec<Lit>) {
-        new_clause(ps, false, &mut self);
+        self.new_clause(ps, false);
     }
     fn cla_bump_activity(&mut self, c: &mut Clause) {
         c.activity += self.cla_inc;
         if c.activity > 1e20 {
-            cla_rescale_activity(self);
+            self.cla_rescale_activity();
         }
     }
-    fn locked(&mut self, y: i32, t: i32) -> bool {
-        let _c;
-        if t != 0 {
-            _c = &self.learnts[y as usize];
-        } else {
-            _c = &self.clauses[y as usize];
-        }
+    fn locked(&mut self, _c: &Clause) -> bool {
         return match &self.reason[var(&_c.data[0]) as usize] {
             Some(x) => _c == x,
             _ => false,
@@ -230,7 +274,7 @@ impl SemiInternal for SolverState {
 
 impl NewVar for SolverState {
     fn n_vars(&mut self) -> i32 {
-        return self.assigns.len() as i32;
+        return self.assigns.col.len() as i32;
     }
     fn add_unit(&mut self, _p: Lit) {
         self.add_unit_tmp[0] = _p;
@@ -248,13 +292,18 @@ impl NewVar for SolverState {
         self.add_clause(&mut self.add_ternary_tmp.clone());
     }
     fn add_clause(&mut self, ps: &mut Vec<Lit>) {
-        reportf("add_clause".to_string(), self.verbosity);
-        new_clause(ps, false, self);
+        reportf("add_clause".to_string(), file!(), line!(), self.verbosity);
+        self.new_clause(ps, false);
     }
 }
 
 pub fn move_back(_l1: Lit, _l2: Lit, solver_state: &mut SolverState) {
-    reportf("move_back".to_string(), solver_state.verbosity);
+    reportf(
+        "move_back".to_string(),
+        file!(),
+        line!(),
+        solver_state.verbosity,
+    );
 
     let mut lev1: i32 = solver_state.level[var(&_l1) as usize];
     let mut lev2: i32 = solver_state.level[var(&_l2) as usize];
@@ -266,14 +315,14 @@ pub fn move_back(_l1: Lit, _l2: Lit, solver_state: &mut SolverState) {
     }
 
     if lev1 < solver_state.level_to_backtrack || lev2 < solver_state.level_to_backtrack {
-        if value_by_lit(_l1, solver_state) == Lbool::True {
-            if value_by_lit(_l2, solver_state) == Lbool::True {
+        if solver_state.value_by_lit(_l1) == Lbool::True {
+            if solver_state.value_by_lit(_l2) == Lbool::True {
             } else if lev1 <= lev2 || solver_state.level_to_backtrack <= lev2 {
             } else {
                 solver_state.level_to_backtrack = lev2;
             }
         } else {
-            if value_by_lit(_l2, solver_state) == Lbool::True {
+            if solver_state.value_by_lit(_l2) == Lbool::True {
                 if lev2 <= lev1 || solver_state.level_to_backtrack <= lev1 {
                 } else {
                     solver_state.level_to_backtrack = lev1;

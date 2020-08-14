@@ -1,9 +1,5 @@
-pub fn reportf(a: String, verbosity: i32) {
+pub fn reportf(a: String, file: &str, line: u32, verbosity: i32) {
     if verbosity > 1 {
-        println!("{:?}", a);
+        println!("{}:{}: {:?}", file, line, a);
     }
-}
-
-pub fn debug(a: String) {
-    println!("{:?}", a);
 }
