@@ -198,8 +198,8 @@ impl NewClause for SolverState {
                 self.solver_stats.learnts_literals += c.clone().size() as f64;
             }
 
-            let watch_position_zero = (!c.clone().data[0]).x as usize;
-            let watch_position_one = (!c.clone().data[1]).x as usize;
+            let watch_position_zero = (!c.data[0]).x as usize;
+            let watch_position_one = (!c.data[1]).x as usize;
 
             self.watches[watch_position_zero].push(c.clone());
             self.watches[watch_position_one].push(c.clone());
@@ -250,15 +250,15 @@ impl NewClause for SolverState {
         reportf("new_var".to_string(), file!(), line!(), self.verbosity);
 
         let index: i32;
-        index = self.assigns.len() as i32;
+        index = self.assigns.col.len() as i32;
         self.watches.push(Vec::new());
         self.watches.push(Vec::new());
         self.reason.push(None);
-        self.assigns.push(Lbool::Undef0);
+        self.add_assigns(Lbool::Undef0);
         self.level.push(-1);
         self.trail_pos.push(-1);
-        self.activity.push(0.0);
-        self.order.new_var(self.clone());
+        self.add_activity(0.0);
+        self.order.new_var();
         self.analyze_seen.push(Lbool::Undef0);
 
         return index;
@@ -278,9 +278,9 @@ impl NewClause for SolverState {
 
             loop {
                 let x = var(&self.trail[c as usize]) as usize;
-                self.assigns[x] = Lbool::Undef0;
+                self.update_assigns(Lbool::Undef0, x);
                 self.reason[x] = None;
-                self.order.clone().undo(x as i32, self.clone()); //revisit:: should no reason to clone here
+                self.order.clone().undo(x as i32); //revisit:: should no reason to clone here
                 c -= 1;
                 if c < self.trail_lim[level as usize] {
                     break;
@@ -346,9 +346,8 @@ fn remove_watch(ws: &mut Vec<Clause>, elem: Clause) -> bool {
         assert!(j < ws.len() - 1);
         j += 1;
     }
-    for _y in j..ws.len() - 1 {
-        ws[j] = ws[j + 1].clone();
-        j += 1;
+    for y in j..ws.len() - 1 {
+        ws[y] = ws[y + 1].clone();
     }
     ws.pop();
     return true;

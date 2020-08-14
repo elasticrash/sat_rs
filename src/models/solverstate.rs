@@ -13,18 +13,28 @@ use crate::models::varorder::*;
 use std::cmp;
 
 #[derive(Clone)]
+pub struct Activity {
+    pub col: Vec<f64>,
+}
+
+#[derive(Clone)]
+pub struct Assigns {
+    pub col: Vec<Lbool>,
+}
+
+#[derive(Clone)]
 pub struct SolverState {
     pub ok: bool,
     pub clauses: Vec<Clause>,
     pub learnts: Vec<Clause>,
     pub cla_inc: f64,
     pub cla_decay: f64,
-    pub activity: Vec<f64>,
+    pub activity: Activity,
     pub var_inc: f64,
     pub var_decay: f64,
     pub order: VarOrder,
     pub watches: Vec<Vec<Clause>>,
-    pub assigns: Vec<Lbool>,
+    pub assigns: Assigns,
     pub trail: Vec<Lit>,
     pub trail_lim: Vec<i32>,
     pub reason: Vec<Option<Clause>>,
@@ -59,15 +69,12 @@ pub trait NewState {
 
 impl NewState for SolverState {
     fn new() -> Self {
-        let ass: Vec<Lbool> = Vec::new();
-        let act: Vec<f64> = Vec::new();
-
         let mut solver = Self {
             clauses: Vec::new(),
             learnts: Vec::new(),
-            activity: Vec::new(),
+            activity: Activity { col: Vec::new() },
             watches: Vec::new(),
-            assigns: Vec::new(),
+            assigns: Assigns { col: Vec::new() },
             trail_pos: Vec::new(),
             trail: Vec::new(),
             trail_lim: Vec::new(),
@@ -87,7 +94,7 @@ impl NewState for SolverState {
             cla_decay: 1.0,
             var_inc: 1.0,
             var_decay: 1.0,
-            order: VarOrder::new(ass, act),
+            order: VarOrder::new(),
             qhead: 0,
             simp_db_assigns: 0,
             simp_db_props: 0.0,
@@ -168,19 +175,39 @@ pub trait SemiInternal {
 pub trait Setters {
     fn value_by_var(&mut self, x: i32) -> Lbool;
     fn value_by_lit(&mut self, x: Lit) -> Lbool;
+    fn add_activity(&mut self, val: f64);
+    fn add_assigns(&mut self, val: Lbool);
+    fn update_activity(&mut self, val: f64, i: usize);
+    fn update_assigns(&mut self, val: Lbool, i: usize);
 }
 
 impl Setters for SolverState {
     fn value_by_var(&mut self, x: i32) -> Lbool {
-        return self.assigns[x as usize];
+        return self.assigns.col[x as usize];
     }
 
     fn value_by_lit(&mut self, x: Lit) -> Lbool {
-        let mut assign = self.assigns[var(&x) as usize];
+        let mut assign = self.assigns.col[var(&x) as usize];
         if sign(&x) {
             assign = bit_not(assign);
         }
         return assign;
+    }
+    fn add_activity(&mut self, val: f64) {
+        self.activity.col.push(val);
+        self.order.activity.col.push(val);
+    }
+    fn add_assigns(&mut self, val: Lbool) {
+        self.assigns.col.push(val);
+        self.order.assigns.col.push(val);
+    }
+    fn update_activity(&mut self, val: f64, i: usize) {
+        self.activity.col[i] = val;
+        self.order.activity.col[i] = val;
+    }
+    fn update_assigns(&mut self, val: Lbool, i: usize) {
+        self.assigns.col[i] = val;
+        self.order.assigns.col[i] = val;
     }
 }
 
@@ -196,8 +223,11 @@ impl Internal for SolverState {
             return;
         }
         let index: i32 = var(&p);
-        self.activity[index as usize] += self.var_inc;
-        if self.activity[index as usize] > 1e100 {
+        self.update_activity(
+            self.activity.col[index as usize] + self.var_inc,
+            index as usize,
+        );
+        if self.activity.col[index as usize] > 1e100 {
             self.var_rescale_activity();
         }
         self.order.update(var(&p));
@@ -244,7 +274,7 @@ impl SemiInternal for SolverState {
 
 impl NewVar for SolverState {
     fn n_vars(&mut self) -> i32 {
-        return self.assigns.len() as i32;
+        return self.assigns.col.len() as i32;
     }
     fn add_unit(&mut self, _p: Lit) {
         self.add_unit_tmp[0] = _p;

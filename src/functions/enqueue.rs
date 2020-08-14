@@ -33,7 +33,7 @@ impl NQueue for SolverState {
             return self.value_by_lit(*p) != L_FALSE;
         } else {
             let x: usize = var(&p) as usize;
-            self.assigns[x] = to_bool(!sign(p));
+            self.update_assigns(to_bool(!sign(p)), x);
             self.level[x] = self.decision_level();
             self.trail_pos[x] = self.trail.len() as i32;
             self.reason[x] = from;

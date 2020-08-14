@@ -91,7 +91,7 @@ impl Search for SolverState {
                     }
 
                     self.solver_stats.decisions += 1.0;
-                    let next: Lit = self.order.select(parms.random_var_freq, self.clone());
+                    let next: Lit = self.order.select(parms.random_var_freq);
 
                     if next == Lit::undefined() {
                         if self.model_found() {
@@ -122,7 +122,7 @@ impl Search for SolverState {
         );
 
         for y in 0..self.clone().n_vars() {
-            self.activity[y as usize] *= 1e-100;
+            self.update_activity(self.activity.col[y as usize] * 1e-100, y as usize);
         }
         self.var_inc *= 1e-100;
     }

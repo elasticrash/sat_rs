@@ -10,12 +10,12 @@ pub trait IHeap {
     fn new() -> Self;
     fn set_bounds(&mut self, n: i32);
     fn in_heap(&self, n: i32) -> bool;
-    fn increase(&mut self, n: i32, comp: &dyn Fn(Vec<f64>, i32, i32) -> bool, act: Vec<f64>);
-    fn insert(&mut self, n: i32, comp: &dyn Fn(Vec<f64>, i32, i32) -> bool, act: Vec<f64>);
-    fn percolate_up(&mut self, i: i32, comp: &dyn Fn(Vec<f64>, i32, i32) -> bool, act: Vec<f64>);
-    fn percolate_down(&mut self, i: i32, comp: &dyn Fn(Vec<f64>, i32, i32) -> bool, act: Vec<f64>);
+    fn increase(&mut self, n: i32, comp: &dyn Fn(f64, f64) -> bool, act: Vec<f64>);
+    fn insert(&mut self, n: i32, comp: &dyn Fn(f64, f64) -> bool, act: Vec<f64>);
+    fn percolate_up(&mut self, i: i32, comp: &dyn Fn(f64, f64) -> bool, act: Vec<f64>);
+    fn percolate_down(&mut self, i: i32, comp: &dyn Fn(f64, f64) -> bool, act: Vec<f64>);
     fn empty(&self) -> bool;
-    fn getmin(&mut self, comp: &dyn Fn(Vec<f64>, i32, i32) -> bool, act: Vec<f64>) -> i32;
+    fn getmin(&mut self, comp: &dyn Fn(f64, f64) -> bool, act: Vec<f64>) -> i32;
 }
 
 impl IHeap for Heap {
@@ -33,24 +33,19 @@ impl IHeap for Heap {
     fn in_heap(&self, n: i32) -> bool {
         return self.indices[n as usize] != 0;
     }
-    fn increase(&mut self, n: i32, comp: &dyn Fn(Vec<f64>, i32, i32) -> bool, act: Vec<f64>) {
+    fn increase(&mut self, n: i32, comp: &dyn Fn(f64, f64) -> bool, act: Vec<f64>) {
         <Heap as IHeap>::percolate_up(self, self.indices[n as usize], comp, act.to_vec());
     }
-    fn insert(&mut self, n: i32, comp: &dyn Fn(Vec<f64>, i32, i32) -> bool, act: Vec<f64>) {
+    fn insert(&mut self, n: i32, comp: &dyn Fn(f64, f64) -> bool, act: Vec<f64>) {
         self.indices[n as usize] = self.heap.len() as i32;
         self.heap.push(n);
         <Heap as IHeap>::percolate_up(self, self.indices[n as usize], comp, act.to_vec());
     }
-    fn percolate_up(
-        &mut self,
-        mut _i: i32,
-        comp: &dyn Fn(Vec<f64>, i32, i32) -> bool,
-        act: Vec<f64>,
-    ) {
+    fn percolate_up(&mut self, mut _i: i32, comp: &dyn Fn(f64, f64) -> bool, act: Vec<f64>) {
         reportf("percolate_up".to_string(), file!(), line!(), 0);
-
+        
         let x = self.heap[_i as usize];
-        while (_i >> 1) != 0 && comp(act.to_vec(), x, self.heap[(_i >> 1) as usize] as i32) {
+        while (_i >> 1) != 0 && comp(act[x as usize], act[self.heap[(_i >> 1) as usize] as usize]) {
             self.heap[_i as usize] = self.heap[(_i >> 1) as usize];
             self.indices[self.heap[_i as usize] as usize] = _i;
             _i = _i >> 1;
@@ -59,12 +54,7 @@ impl IHeap for Heap {
         self.heap[_i as usize] = x;
         self.indices[x as usize] = _i;
     }
-    fn percolate_down(
-        &mut self,
-        mut _i: i32,
-        comp: &dyn Fn(Vec<f64>, i32, i32) -> bool,
-        act: Vec<f64>,
-    ) {
+    fn percolate_down(&mut self, mut _i: i32, comp: &dyn Fn(f64, f64) -> bool, act: Vec<f64>) {
         reportf("percolate_down".to_string(), file!(), line!(), 0);
 
         let x = self.heap[_i as usize];
@@ -72,9 +62,8 @@ impl IHeap for Heap {
             let child: i32;
             if (_i + _i + 1) < self.heap.len() as i32
                 && comp(
-                    act.to_vec(),
-                    self.heap[(_i + _i + 1) as usize],
-                    self.heap[(_i + _i) as usize],
+                    act[self.heap[(_i + _i + 1) as usize] as usize],
+                    act[self.heap[(_i + _i) as usize] as usize],
                 )
             {
                 child = _i + _i + 1;
@@ -82,7 +71,7 @@ impl IHeap for Heap {
                 child = _i + _i;
             }
 
-            if !(comp(act.to_vec(), self.heap[child as usize], x)) {
+            if !(comp(act[self.heap[child as usize] as usize], act[x as usize])) {
                 break;
             }
 
@@ -97,7 +86,7 @@ impl IHeap for Heap {
     fn empty(&self) -> bool {
         return self.heap.len() == 1 as usize;
     }
-    fn getmin(&mut self, comp: &dyn Fn(Vec<f64>, i32, i32) -> bool, act: Vec<f64>) -> i32 {
+    fn getmin(&mut self, comp: &dyn Fn(f64, f64) -> bool, act: Vec<f64>) -> i32 {
         let r = self.heap[1];
         self.heap[1] = *self.heap.last().unwrap();
         self.indices[self.heap[1] as usize] = 1;
