@@ -121,11 +121,11 @@ impl NewClause for SolverState {
 
             let qs = basic_clause_simplification(_ps.to_vec(), _copy);
 
-            if qs == None {
-                return;
-            }
+            let mut unqs = match qs {
+                Some(v) => v,
+                None => return,
+            };
 
-            let mut unqs = qs.unwrap();
             for i in 0..unqs.len() {
                 if self.level[var(&unqs[i]) as usize] == 0
                     && self.value_by_lit(unqs[i]) == Lbool::True
@@ -134,21 +134,23 @@ impl NewClause for SolverState {
                 }
             }
 
-            {
-                let mut _i: usize = 0;
-                let mut _j: usize = 0;
+            let mut _i: usize = 0;
+            let mut _j: usize = 0;
 
-                for _y in 0..unqs.len() {
-                    if self.level[var(&unqs[_i]) as usize] != 0
-                        || self.value_by_lit(unqs[_i]) != Lbool::False
-                    {
-                        unqs[_j] = unqs[_i];
-                        _j += 1;
-                    }
-                    _i += 1;
+            for _y in 0..=unqs.len() {
+                _i = _y;
+                if _i == unqs.len() {
+                    break;
                 }
-                unqs.truncate(unqs.len() - (_i - _j) as usize);
+                if self.level[var(&unqs[_y]) as usize] != 0
+                    || self.value_by_lit(unqs[_y]) != Lbool::False
+                {
+                    unqs[_j] = unqs[_y];
+                    _j += 1;
+                }
             }
+            unqs.truncate(unqs.len() - (_i - _j) as usize);
+
             ps = unqs;
         } else {
             ps = _ps.to_vec();
@@ -161,8 +163,8 @@ impl NewClause for SolverState {
                 self.level_to_backtrack = 0;
                 self.cancel_until(0);
             }
-            let ps_clone: &mut Vec<Lit> = &mut ps.to_vec();
-            if !self.internal_enqueue(&ps_clone[0]) {
+            
+            if !self.internal_enqueue(&ps[0]) {
                 self.ok = false;
             }
         } else {
@@ -177,16 +179,16 @@ impl NewClause for SolverState {
                 self.solver_stats.clauses_literals += c.size() as f64;
             } else {
                 if _learnt {
-                    let mut max_i: i32 = 1;
+                    let mut max_i: usize = 1;
                     let mut max: i32 = self.level[var(&ps[1]) as usize];
                     for y in 2..ps.len() {
                         if self.level[var(&ps[y]) as usize] > max {
                             max = self.level[var(&ps[y]) as usize];
-                            max_i = y as i32;
+                            max_i = y;
                         }
                     }
-                    c.data[1] = ps[max_i as usize];
-                    c.data[max_i as usize] = ps[1];
+                    c.data[1] = ps[max_i];
+                    c.data[max_i] = ps[1];
 
                     assert!(self.enqueue(&c.data[0], Some(c.clone())));
                 } else {
