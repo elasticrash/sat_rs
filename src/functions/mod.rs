@@ -8,4 +8,3 @@ pub mod reduce_db;
 pub mod search;
 pub mod simplify_db;
 pub mod solve;
-pub mod stats;

@@ -43,7 +43,7 @@ impl IHeap for Heap {
     }
     fn percolate_up(&mut self, mut _i: i32, comp: &dyn Fn(f64, f64) -> bool, act: Vec<f64>) {
         reportf("percolate_up".to_string(), file!(), line!(), 0);
-        
+
         let x = self.heap[_i as usize];
         while (_i >> 1) != 0 && comp(act[x as usize], act[self.heap[(_i >> 1) as usize] as usize]) {
             self.heap[_i as usize] = self.heap[(_i >> 1) as usize];

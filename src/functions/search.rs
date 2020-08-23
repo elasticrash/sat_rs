@@ -5,7 +5,7 @@ use crate::functions::new_clause::*;
 use crate::functions::propagate::*;
 use crate::functions::reduce_db::*;
 use crate::functions::simplify_db::*;
-use crate::functions::stats::*;
+use crate::functions::solve::*;
 use crate::models::lbool::*;
 use crate::models::lit::*;
 use crate::models::logger::*;
@@ -72,7 +72,7 @@ impl Search for SolverState {
                 }
                 None => {
                     if nof_conflicts >= 0 && conflict_c >= nof_conflicts {
-                        self.progress_estimate = progress_estimate();
+                        self.progress_estimate = self.progress_estimate();
                         self.cancel_until(self.root_level);
                         return Lbool::Undef0;
                     }

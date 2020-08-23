@@ -7,5 +7,4 @@ pub mod logger;
 pub mod random;
 pub mod solverstate;
 pub mod statsparams;
-pub mod timemem;
 pub mod varorder;

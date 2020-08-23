@@ -25,6 +25,7 @@ use crate::models::solverstate::*;
 pub trait Solver {
     fn solve(&mut self, assumptions: Vec<Lit>) -> bool;
     fn solve_no_assumptions(&mut self) -> bool;
+    fn progress_estimate(&mut self) -> f64;
 }
 
 impl Solver for SolverState {
@@ -129,5 +130,18 @@ impl Solver for SolverState {
         );
         let assumptions: Vec<Lit> = Vec::new();
         return self.solve(assumptions);
+    }
+
+    fn progress_estimate(&mut self) -> f64 {
+        let mut progress = 0.0;
+        let f = 1.0 / self.n_vars() as f64;
+
+        for i in 0..self.n_vars() {
+            if is_undefined(self.value_by_var(i)) {
+                progress += f.powf(self.level[i as usize] as f64);
+            }
+        }
+
+        progress / self.n_vars() as f64
     }
 }

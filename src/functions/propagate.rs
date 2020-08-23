@@ -35,11 +35,11 @@ impl Prop for SolverState {
             let mut ws: Vec<Clause> = self.watches[p.x as usize].clone();
 
             //log p
-            let mut i: i32 = 0;
-            let mut j: i32 = 0;
-            let end = i + ws.len() as i32;
+            let mut i: usize = 0;
+            let mut j: usize = 0;
+            let end: usize = i + ws.len();
             while i != end {
-                let mut c: Clause = ws[i as usize].clone();
+                let mut c: Clause = ws[i].clone();
 
                 i += 1;
                 let false_lit: Lit = !p;
@@ -54,7 +54,7 @@ impl Prop for SolverState {
                 let first: Lit = c.data[0];
                 let val: Lbool = self.value_by_lit(first);
                 if val == L_TRUE {
-                    ws[j as usize] = c.clone();
+                    ws[j] = c.clone();
                     j += 1;
                 } else {
                     let mut foundwatch: bool = false;
@@ -68,17 +68,17 @@ impl Prop for SolverState {
                         }
                     }
                     if !foundwatch {
-                        ws[j as usize] = c.clone();
+                        ws[j] = c.clone();
                         j += 1;
                         if !self.enqueue(&first, Some(c.clone())) {
                             if self.decision_level() == 0 {
                                 self.ok = false;
                             }
                             confl = Some(c.clone());
-
                             self.qhead = self.trail.len() as i32;
+
                             while i < end {
-                                ws[j as usize] = ws[i as usize].clone();
+                                ws[j] = ws[i].clone();
                                 j += 1;
                                 i += 1;
                             }
