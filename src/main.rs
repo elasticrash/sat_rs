@@ -2,7 +2,6 @@ mod functions;
 mod models;
 use crate::functions::new_clause::*;
 use crate::functions::solve::*;
-use crate::functions::stats::*;
 use crate::models::input_arguments::*;
 use crate::models::lit::*;
 use crate::models::logger::*;
@@ -70,7 +69,7 @@ fn main() {
             result.push_str("UNSATISFIABLE");
         }
         reportf(result, file!(), line!(), 2);
-        print_stats(state.solver_stats);
+        println!("{}", state.solver_stats);
     }
 }
 
