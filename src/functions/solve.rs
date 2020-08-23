@@ -94,7 +94,7 @@ impl Solver for SolverState {
             //println!("{}:{}", file!(), line!());
             if self.verbosity >= 1 {
                 println!(
-                    "|      {0}    |     {1}        {2}    |   {3}      {4}       {5}       {6}    |   {7} %%   |",
+                    "|      {0}    |     {1}        {2}    |   {3}      {4}       {5}       {6}   |   {7} %   |",
                     self.solver_stats.conflicts,
                     self.clone().n_clauses(),
                     self.solver_stats.clauses_literals,
