@@ -2,3 +2,4 @@
 **/*.rs.bk
 MiniSAT/bin/*
 MiniSAT/obj/*
+MiniSAT
