@@ -56,7 +56,7 @@ impl Display for SolverStats {
             (self.propagations / duration as f64)
         );
         println!(
-            "conflict literals     : {0}   ({1} %% deleted)",
+            "conflict literals     : {0}   ({1} % deleted)",
             self.tot_literals,
             (self.max_literals - self.tot_literals) * 100.0 / self.max_literals
         );
