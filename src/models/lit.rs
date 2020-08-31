@@ -85,6 +85,7 @@ pub fn var(lit: &Lit) -> i32 {
 }
 
 pub fn swap(i: i32, j: i32, data: &mut Vec<Lit>) {
+    assert!((i as usize) < data.len() && (j as usize) < data.len());
     let tmp = data[i as usize];
     data[i as usize] = data[j as usize];
     data[j as usize] = tmp;
