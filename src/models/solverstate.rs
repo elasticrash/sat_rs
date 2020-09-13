@@ -94,7 +94,7 @@ impl NewState for SolverState {
             cla_decay: 1.0,
             var_inc: 1.0,
             var_decay: 1.0,
-            order: VarOrder::new(),
+            order: VarOrder::default(),
             qhead: 0,
             simp_db_assigns: 0,
             simp_db_props: 0.0,
