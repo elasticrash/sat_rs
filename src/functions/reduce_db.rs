@@ -1,6 +1,5 @@
 use crate::functions::new_clause::*;
 use crate::models::clause::*;
-use crate::models::logger::*;
 use crate::models::solverstate::*;
 use std::cmp::Ordering;
 
@@ -18,7 +17,7 @@ pub trait Reduce {
 
 impl Reduce for SolverState {
     fn reduce_db(&mut self) {
-        reportf("reduce_db".to_string(), file!(), line!(), self.verbosity);
+        trace!("{}|{}|{}", "reduce_db".to_string(), file!(), line!());
 
         let mut i: i32 = 0;
         let mut j: i32 = 0;

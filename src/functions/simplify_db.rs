@@ -2,7 +2,6 @@ use crate::functions::new_clause::*;
 use crate::functions::propagate::*;
 use crate::models::clause::*;
 use crate::models::lit::*;
-use crate::models::logger::*;
 use crate::models::solverstate::*;
 
 /*_________________________________________________________________________________________________
@@ -19,7 +18,7 @@ pub trait Simplify {
 
 impl Simplify for SolverState {
     fn simplify_db(&mut self) {
-        reportf("simplify_db".to_string(), file!(), line!(), self.verbosity);
+        trace!("{}|{}|{}", "simplify_db".to_string(), file!(), line!());
         if !self.ok {
             return;
         }
@@ -27,11 +26,11 @@ impl Simplify for SolverState {
         assert!(self.decision_level() == 0);
         match self.propagate() {
             None => {
-                reportf(
+                trace!(
+                    "{}|{}|{}",
                     "propagate match none".to_string(),
                     file!(),
-                    line!(),
-                    self.verbosity,
+                    line!()
                 );
                 if self.clone().n_assigns() == self.simp_db_assigns as usize
                     || self.simp_db_props > 0.0
@@ -86,11 +85,11 @@ impl Simplify for SolverState {
                     self.solver_stats.clauses_literals + self.solver_stats.learnts_literals;
             }
             _ => {
-                reportf(
+                trace!(
+                    "{}|{}|{}",
                     "solver state false".to_string(),
                     file!(),
                     line!(),
-                    self.verbosity,
                 );
                 self.ok = false;
                 return;

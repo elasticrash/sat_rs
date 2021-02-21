@@ -4,14 +4,27 @@ use crate::functions::new_clause::*;
 use crate::functions::solve::*;
 use crate::models::input_arguments::*;
 use crate::models::lit::*;
-use crate::models::logger::*;
 use crate::models::solverstate::*;
+use simplelog::*;
 use std::env;
 use std::fs::File;
 use std::io::prelude::*;
 
+#[macro_use]
+extern crate log;
+
 fn main() {
     let _args: Vec<String> = env::args().collect();
+
+    CombinedLogger::init(vec![
+        TermLogger::new(LevelFilter::Info, Config::default(), TerminalMode::Mixed),
+        WriteLogger::new(
+            LevelFilter::Trace,
+            Config::default(),
+            File::create("sat.log").unwrap(),
+        ),
+    ])
+    .unwrap();
 
     let arguments: InputArguments = read_input_arguments(_args);
     let mut file = File::open("./input.txt").unwrap();
@@ -68,13 +81,13 @@ fn main() {
         } else {
             result.push_str("UNSATISFIABLE");
         }
-        reportf(result, file!(), line!(), 2);
+        info!("{}|{}|{}|{}", result, file!(), line!(), 2);
         println!("{}", state.solver_stats);
     }
 }
 
 fn read_input_arguments(_args: Vec<String>) -> InputArguments {
-    println!("{:?}", _args);
+    info!("{:?}", _args);
     let mut arguments = InputArguments {
         pre: "".to_string(),
         grow: 1,

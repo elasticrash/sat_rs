@@ -1,7 +1,6 @@
 use crate::models::clause::*;
 use crate::models::lbool::*;
 use crate::models::lit::*;
-use crate::models::logger::*;
 use crate::models::solverstate::*;
 use std::cmp::max;
 
@@ -29,7 +28,14 @@ pub trait Analyze {
 
 impl Analyze for SolverState {
     fn analyze(&mut self, mut confl: Option<Clause>, out_learnt: &mut Vec<Lit>) -> i32 {
-        reportf("analyse".to_string(), file!(), line!(), self.verbosity);
+        trace!(
+            "{}|{}|{}|{:?}",
+            "analyse".to_string(),
+            file!(),
+            line!(),
+            confl
+        );
+
         let mut out_btlevel: i32 = 0;
         let mut path_c: i32 = 0;
         let mut p: Lit = Lit::undefined();
@@ -166,11 +172,12 @@ impl Analyze for SolverState {
     }
 
     fn analyze_removeable(&mut self, _p: Lit, min_level: u32) -> bool {
-        reportf(
+        trace!(
+            "{}|{}|{}|{:?}",
             "analyze removeable".to_string(),
             file!(),
             line!(),
-            self.verbosity,
+            _p,
         );
         assert!(self.reason[var(&_p) as usize] != None);
 

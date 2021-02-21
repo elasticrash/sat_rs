@@ -1,7 +1,6 @@
 use crate::models::clause::*;
 use crate::models::lbool::*;
 use crate::models::lit::*;
-use crate::models::logger::*;
 use crate::models::solverstate::*;
 
 /*_________________________________________________________________________________________________
@@ -20,13 +19,14 @@ pub trait Final {
 
 impl Final for SolverState {
     fn analyse_final(&mut self, _confl: &Clause, _skip_first: bool) {
-        reportf(
+        trace!(
+            "{}|{}|{}|{}",
             "analyse final".to_string(),
             file!(),
             line!(),
             self.verbosity,
         );
-        
+
         self.conflict.clear();
         if self.root_level == 0 {
             return;

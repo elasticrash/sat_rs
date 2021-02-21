@@ -1,5 +1,3 @@
-use crate::models::logger::*;
-
 #[derive(Clone)]
 pub struct Heap {
     pub heap: Vec<i32>,
@@ -44,7 +42,14 @@ impl IHeap for Heap {
         <Heap as IHeap>::percolate_up(self, self.indices[n as usize], act.to_vec());
     }
     fn percolate_up(&mut self, mut _i: i32, act: Vec<f64>) {
-        reportf("percolate_up".to_string(), file!(), line!(), 0);
+        trace!(
+            "{}|{}|{}|{}|{:?}",
+            "percolate_up".to_string(),
+            file!(),
+            line!(),
+            _i,
+            act
+        );
 
         let x = self.heap[_i as usize];
         while (_i >> 1) != 0
@@ -62,7 +67,14 @@ impl IHeap for Heap {
         self.indices[x as usize] = _i;
     }
     fn percolate_down(&mut self, mut _i: i32, act: Vec<f64>) {
-        reportf("percolate_down".to_string(), file!(), line!(), 0);
+        trace!(
+            "{}|{}|{}|{}|{:?}",
+            "percolate_down".to_string(),
+            file!(),
+            line!(),
+            _i,
+            act
+        );
 
         let x = self.heap[_i as usize];
         while _i + _i < self.heap.len() as i32 {

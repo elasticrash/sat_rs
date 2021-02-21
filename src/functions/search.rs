@@ -8,7 +8,6 @@ use crate::functions::simplify_db::*;
 use crate::functions::solve::*;
 use crate::models::lbool::*;
 use crate::models::lit::*;
-use crate::models::logger::*;
 use crate::models::solverstate::*;
 use crate::models::varorder::*;
 use std::cmp::max;
@@ -35,7 +34,14 @@ pub trait Search {
 
 impl Search for SolverState {
     fn search(&mut self, nof_conflicts: i32, nof_learnts: i32, parms: SearchParams) -> Lbool {
-        reportf("search".to_string(), file!(), line!(), self.verbosity);
+        trace!(
+            "{}|{}|{}|{}|{}",
+            "search".to_string(),
+            file!(),
+            line!(),
+            nof_conflicts,
+            nof_learnts
+        );
 
         if !self.ok {
             return Lbool::False;
@@ -114,11 +120,11 @@ impl Search for SolverState {
     }
 
     fn var_rescale_activity(&mut self) {
-        reportf(
+        trace!(
+            "{}|{}|{}",
             "var_rescale_activity".to_string(),
             file!(),
             line!(),
-            self.verbosity,
         );
 
         for y in 0..self.clone().n_vars() {
@@ -128,11 +134,11 @@ impl Search for SolverState {
     }
 
     fn cla_rescale_activity(&mut self) {
-        reportf(
+        trace!(
+            "{}|{}|{}",
             "cla_rescale_activity".to_string(),
             file!(),
-            line!(),
-            self.verbosity,
+            line!()
         );
 
         for y in 0..self.learnts.len() {

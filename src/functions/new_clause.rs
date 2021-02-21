@@ -2,7 +2,6 @@ use crate::functions::enqueue::*;
 use crate::models::clause::*;
 use crate::models::lbool::*;
 use crate::models::lit::*;
-use crate::models::logger::*;
 use crate::models::solverstate::*;
 use crate::models::varorder::*;
 
@@ -50,11 +49,12 @@ struct Dict {
 
 impl NewClause for SolverState {
     fn reorder_by_level(&mut self, mut _ps: &mut Vec<Lit>) {
-        reportf(
+        trace!(
+            "{}|{}|{}|{:?}",
             "reorder_by_level".to_string(),
             file!(),
             line!(),
-            self.verbosity,
+            _ps,
         );
 
         let mut max: i32 = std::i32::MIN;
@@ -106,7 +106,13 @@ impl NewClause for SolverState {
         _theory_clause: bool,
         _copy: bool,
     ) {
-        reportf("new_clause".to_string(), file!(), line!(), self.verbosity);
+        trace!(
+            "{}|{}|{}|{:?}",
+            "new_clause".to_string(),
+            file!(),
+            line!(),
+            _ps
+        );
 
         if !self.ok {
             return;
@@ -163,7 +169,6 @@ impl NewClause for SolverState {
                 self.level_to_backtrack = 0;
                 self.cancel_until(0);
             }
-            
             if !self.internal_enqueue(&ps[0]) {
                 self.ok = false;
             }
@@ -209,7 +214,7 @@ impl NewClause for SolverState {
     }
 
     fn remove(&mut self, c: Clause, just_dealloc: bool) {
-        reportf("remove".to_string(), file!(), line!(), self.verbosity);
+        trace!("{}|{}|{}|{:?}", "remove".to_string(), file!(), line!(), c);
 
         if !just_dealloc {
             remove_watch(
@@ -229,7 +234,14 @@ impl NewClause for SolverState {
         }
     }
     fn simplify(&mut self, k: i32, t: i32) -> bool {
-        reportf("simplify".to_string(), file!(), line!(), self.verbosity);
+        trace!(
+            "{}|{}|{}|{}|{}",
+            "simplify".to_string(),
+            file!(),
+            line!(),
+            k,
+            t
+        );
         assert!(self.decision_level() == 0);
 
         let c;
@@ -249,7 +261,7 @@ impl NewClause for SolverState {
     }
 
     fn new_var(&mut self) -> i32 {
-        reportf("new_var".to_string(), file!(), line!(), self.verbosity);
+        trace!("{}|{}|{}", "new_var".to_string(), file!(), line!(),);
 
         let index: i32;
         index = self.assigns.col.len() as i32;
@@ -266,14 +278,20 @@ impl NewClause for SolverState {
         return index;
     }
     fn assume(&mut self, p: Lit) -> bool {
-        reportf("assume".to_string(), file!(), line!(), self.verbosity);
+        trace!("{}|{}|{}|{:?}", "assume".to_string(), file!(), line!(), p);
 
         self.trail_lim.push(self.trail.len() as i32);
         return self.i_enqueue(p);
     }
 
     fn cancel_until(&mut self, level: i32) {
-        reportf("cancel_until".to_string(), file!(), line!(), self.verbosity);
+        trace!(
+            "{}|{}|{}|{}",
+            "cancel_until".to_string(),
+            file!(),
+            line!(),
+            level
+        );
 
         if self.decision_level() > level {
             let mut c: i32 = (self.trail.len() as i32 - 1) as i32;
@@ -296,11 +314,12 @@ impl NewClause for SolverState {
 }
 
 fn basic_clause_simplification(_ps: Vec<Lit>, _copy: bool) -> Option<Vec<Lit>> {
-    reportf(
+    trace!(
+        "{}|{}|{}|{:?}",
         "basic_clause_simplification".to_string(),
         file!(),
         line!(),
-        0,
+        _ps,
     );
 
     let mut qs: Vec<Lit>;
@@ -338,7 +357,13 @@ fn basic_clause_simplification(_ps: Vec<Lit>, _copy: bool) -> Option<Vec<Lit>> {
 }
 
 fn remove_watch(ws: &mut Vec<Clause>, elem: Clause) -> bool {
-    reportf("remove_watch".to_string(), file!(), line!(), 0);
+    trace!(
+        "{}|{}|{}|{:?}",
+        "remove_watch".to_string(),
+        file!(),
+        line!(),
+        ws
+    );
 
     if ws.len() == 0 {
         return false;

@@ -1,7 +1,6 @@
 use crate::models::clause::*;
 use crate::models::lbool::*;
 use crate::models::lit::*;
-use crate::models::logger::*;
 use crate::models::solverstate::*;
 
 /*_________________________________________________________________________________________________
@@ -27,7 +26,13 @@ pub trait NQueue {
 
 impl NQueue for SolverState {
     fn enqueue(&mut self, p: &Lit, from: Option<Clause>) -> bool {
-        reportf("enqueue".to_string(), file!(), line!(), self.verbosity);
+        trace!(
+            "{}|{}|{}|{:?}",
+            "enqueue".to_string(),
+            file!(),
+            line!(),
+            p
+        );
 
         if !is_undefined(self.value_by_lit(*p)) {
             return self.value_by_lit(*p) != L_FALSE;
@@ -43,11 +48,12 @@ impl NQueue for SolverState {
     }
 
     fn internal_enqueue(&mut self, _fact: &Lit) -> bool {
-        reportf(
+        trace!(
+            "{}|{}|{}|{:?}",
             "internal_enqueue".to_string(),
             file!(),
             line!(),
-            self.verbosity,
+            _fact,
         );
 
         return self.enqueue(&_fact, None);
