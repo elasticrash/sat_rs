@@ -2,7 +2,6 @@ mod functions;
 mod models;
 use crate::functions::new_clause::*;
 use crate::functions::solve::*;
-use crate::models::input_arguments::*;
 use crate::models::lit::*;
 use crate::models::solverstate::*;
 use simplelog::*;
@@ -26,7 +25,6 @@ fn main() {
     ])
     .unwrap();
 
-    let arguments: InputArguments = read_input_arguments(_args);
     let mut file = File::open("./input.txt").unwrap();
     let mut buffer = String::new();
     let mut state: SolverState = SolverState::new();
@@ -79,40 +77,4 @@ fn main() {
     }
     info!("{}|{}|{}|{}", result, file!(), line!(), 2);
     println!("{}", state.solver_stats);
-}
-
-fn read_input_arguments(_args: Vec<String>) -> InputArguments {
-    info!("{:?}", _args);
-    let mut arguments = InputArguments {
-        pre: "".to_string(),
-        grow: 1,
-        polarity_mode: "true".to_string(),
-        decay: 0,
-        rnd_freq: 0,
-    };
-
-    for arg in _args {
-        let arg_value: Vec<&str> = arg.split('=').collect();
-
-        if arg.starts_with("-pre") {
-            arguments.pre = String::from(arg_value[1]);
-        }
-
-        if arg.starts_with("-grow") {
-            arguments.grow = String::from(arg_value[1]).parse::<i32>().unwrap();
-        }
-
-        if arg.starts_with("-polarity_mode") {
-            arguments.polarity_mode = String::from(arg_value[1]);
-        }
-
-        if arg.starts_with("-decay") {
-            arguments.decay = String::from(arg_value[1]).parse::<i32>().unwrap();
-        }
-
-        if arg.starts_with("-rnd_freq") {
-            arguments.rnd_freq = String::from(arg_value[1]).parse::<i32>().unwrap();
-        }
-    }
-    return arguments;
 }
