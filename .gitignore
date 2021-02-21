@@ -1,5 +1,5 @@
 /target
 **/*.rs.bk
-MiniSAT/bin/*
-MiniSAT/obj/*
-MiniSAT
+cs/bin/*
+cs/obj/*
+cs

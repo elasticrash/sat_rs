@@ -26,6 +26,7 @@ impl Final for SolverState {
             line!(),
             self.verbosity,
         );
+        
         self.conflict.clear();
         if self.root_level == 0 {
             return;
