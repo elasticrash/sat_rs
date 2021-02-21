@@ -30,7 +30,6 @@ fn main() {
     let mut file = File::open("./input.txt").unwrap();
     let mut buffer = String::new();
     let mut state: SolverState = SolverState::new();
-    state.verbosity = arguments.verbosity as i32;
 
     file.read_to_string(&mut buffer).unwrap();
 
@@ -71,19 +70,15 @@ fn main() {
         }
     }
 
-    if state.verbosity == 0 {
-        state.solve_no_assumptions();
+    state.solve_no_assumptions();
+    let mut result: String = String::new();
+    if state.ok {
+        result.push_str("SATISFIABLE");
     } else {
-        state.solve_no_assumptions();
-        let mut result: String = String::new();
-        if state.ok {
-            result.push_str("SATISFIABLE");
-        } else {
-            result.push_str("UNSATISFIABLE");
-        }
-        info!("{}|{}|{}|{}", result, file!(), line!(), 2);
-        println!("{}", state.solver_stats);
+        result.push_str("UNSATISFIABLE");
     }
+    info!("{}|{}|{}|{}", result, file!(), line!(), 2);
+    println!("{}", state.solver_stats);
 }
 
 fn read_input_arguments(_args: Vec<String>) -> InputArguments {
@@ -94,7 +89,6 @@ fn read_input_arguments(_args: Vec<String>) -> InputArguments {
         polarity_mode: "true".to_string(),
         decay: 0,
         rnd_freq: 0,
-        verbosity: 1,
     };
 
     for arg in _args {
@@ -118,10 +112,6 @@ fn read_input_arguments(_args: Vec<String>) -> InputArguments {
 
         if arg.starts_with("-rnd_freq") {
             arguments.rnd_freq = String::from(arg_value[1]).parse::<i32>().unwrap();
-        }
-
-        if arg.starts_with("-verbosity") {
-            arguments.verbosity = String::from(arg_value[1]).parse::<i16>().unwrap();
         }
     }
     return arguments;

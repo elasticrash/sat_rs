@@ -80,29 +80,22 @@ impl Solver for SolverState {
         }
         assert!(self.root_level == self.decision_level());
 
-        if self.verbosity >= 1 {
-            info!(
-            "==================================[MINISAT]======================================="
-        );
-            info!(
+        info!("==================================[MINISAT]=======================================");
+        info!(
             "| Conflicts |       ORIGINAL        |              LEARNT              | Progress |"
         );
-            info!(
+        info!(
             "|           | Clauses      Literals |   Limit Clauses Literals  Lit/Cl |          |"
         );
-            info!(
-            "=================================================================================="
-        );
-        }
+        info!("==================================================================================");
 
         while is_undefined(status) {
-            if self.verbosity >= 1 {
-                info!(
+            info!(
                     "|      {0}    |     {1}        {2}    |   {3}      {4}       {5}       {6}   |   {7} %   |",
                     self.solver_stats.conflicts,
                     self.clone().n_clauses(),
                     self.solver_stats.clauses_literals,
-                    nof_learnts.floor(),
+            nof_learnts.floor(),
                     self.clone().n_learnts(),
                     self.solver_stats.learnts_literals,
                     (self.solver_stats.learnts_literals
@@ -110,17 +103,12 @@ impl Solver for SolverState {
                         self.progress_estimate * 100.0
             );
 
-                status = self.search(nof_conflicts as i32, nof_learnts as i32, parms);
-                nof_conflicts *= 1.5;
-                nof_learnts *= 1.1;
-            }
+            status = self.search(nof_conflicts as i32, nof_learnts as i32, parms);
+            nof_conflicts *= 1.5;
+            nof_learnts *= 1.1;
         }
 
-        if self.verbosity >= 1 {
-            info!(
-            "=================================================================================="
-        );
-        }
+        info!("==================================================================================");
         self.cancel_until(0);
         return true;
     }

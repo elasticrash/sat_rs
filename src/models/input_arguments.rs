@@ -4,5 +4,4 @@ pub struct InputArguments {
     pub polarity_mode: String,
     pub decay: i32,
     pub rnd_freq: i32,
-    pub verbosity: i16,
 }

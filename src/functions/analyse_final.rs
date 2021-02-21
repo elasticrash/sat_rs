@@ -20,11 +20,11 @@ pub trait Final {
 impl Final for SolverState {
     fn analyse_final(&mut self, _confl: &Clause, _skip_first: bool) {
         trace!(
-            "{}|{}|{}|{}",
+            "{}|{}|{}|{:?}",
             "analyse final".to_string(),
             file!(),
             line!(),
-            self.verbosity,
+            _confl,
         );
 
         self.conflict.clear();

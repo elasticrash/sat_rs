@@ -59,7 +59,6 @@ pub struct SolverState {
     //MOO
     pub default_parms: SearchParams,
     pub expensive_ccmin: bool,
-    pub verbosity: i32,
 }
 
 pub trait NewState {
@@ -103,7 +102,6 @@ impl NewState for SolverState {
                 random_var_freq: 0.02,
             },
             expensive_ccmin: true,
-            verbosity: 0,
             progress_estimate: 0.0,
             root_level: 0,
             level_to_backtrack: 0,
