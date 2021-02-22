@@ -294,18 +294,13 @@ impl NewClause for SolverState {
         );
 
         if self.decision_level() > level {
-            let mut c: i32 = (self.trail.len() as i32 - 1) as i32;
-
-            loop {
-                let x = var(&self.trail[c as usize]) as usize;
+            for y in (self.trail_lim[level as usize]..=(self.trail.len() as i32 - 1)).rev() {
+                let x = var(&self.trail[y as usize]) as usize;
                 self.update_assigns(Lbool::Undef0, x);
                 self.reason[x] = None;
-                self.order.clone().undo(x as i32); //revisit:: should no reason to clone here
-                c -= 1;
-                if c < self.trail_lim[level as usize] {
-                    break;
-                }
+                self.order.undo(x as i32);
             }
+
             self.trail.truncate(self.trail_lim[level as usize] as usize);
             self.trail_lim.truncate(level as usize);
             self.qhead = self.trail.len() as i32;
