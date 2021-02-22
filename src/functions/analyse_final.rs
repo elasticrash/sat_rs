@@ -44,12 +44,12 @@ impl Final for SolverState {
             }
         }
 
-        let start: i32 = match self.root_level >= self.trail_lim.len() as i32 {
+        let end: i32 = match self.root_level >= self.trail_lim.len() as i32 {
             true => (self.trail.len() - 1) as i32,
             false => self.trail_lim[self.root_level as usize],
         };
 
-        for y in (self.trail_lim[0]..=start).rev() {
+        for y in (self.trail_lim[0]..=end).rev() {
             let x: usize = var(&self.trail[y as usize]) as usize;
 
             if self.analyze_seen[x] != Lbool::Undef0 {
