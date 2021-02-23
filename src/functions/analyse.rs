@@ -186,10 +186,9 @@ impl Analyze for SolverState {
         let top: i32 = self.analyze_toclear.len() as i32;
 
         while self.analyze_stack.len() > 0 {
-            let p_last = &self.analyze_stack.last();
-            assert!(self.reason[var(&p_last.unwrap()) as usize] != None);
+            assert!(self.reason[var(&self.analyze_stack.last().unwrap()) as usize] != None);
             let c: &Clause;
-            match &self.reason[var(&p_last.unwrap()) as usize] {
+            match &self.reason[var(&self.analyze_stack.last().unwrap()) as usize] {
                 Some(clause) => {
                     c = &clause;
                     self.analyze_stack.pop();
@@ -198,28 +197,27 @@ impl Analyze for SolverState {
                         if self.analyze_seen[var(&p) as usize] == Lbool::Undef0
                             && self.level[var(&p) as usize] != 0
                         {
-                            match &self.reason[var(&p) as usize] {
-                                None => {}
-                                _ => {
-                                    if ((1 << self.level[var(&p) as usize] & 31) & min_level) != 0 {
-                                        self.analyze_seen[var(&p) as usize] = Lbool::True;
-                                        self.analyze_stack.push(p);
-                                        self.analyze_toclear.push(p);
-                                    } else {
-                                        for j in top..self.analyze_toclear.len() as i32 {
-                                            self.analyze_seen
-                                                [var(&self.analyze_toclear[j as usize]) as usize] =
-                                                Lbool::Undef0;
-                                            self.analyze_toclear.truncate(top as usize);
-                                            return false;
-                                        }
-                                    }
+                            if !self.reason[var(&p) as usize].is_none()
+                                && ((1 << self.level[var(&p) as usize] & 31) & min_level) != 0
+                            {
+                                self.analyze_seen[var(&p) as usize] = Lbool::True;
+                                self.analyze_stack.push(p);
+                                self.analyze_toclear.push(p);
+                            } else {
+                                for j in top..self.analyze_toclear.len() as i32 {
+                                    self.analyze_seen
+                                        [var(&self.analyze_toclear[j as usize]) as usize] =
+                                        Lbool::Undef0;
+                                    self.analyze_toclear.truncate(top as usize);
+                                    return false;
                                 }
                             }
                         }
                     }
                 }
-                None => {}
+                None => {
+                    self.analyze_stack.pop();
+                }
             }
         }
         self.analyze_toclear.push(_p);
