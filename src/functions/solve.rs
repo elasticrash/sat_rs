@@ -5,7 +5,6 @@ use crate::functions::search::*;
 use crate::functions::simplify_db::*;
 use crate::models::lbool::*;
 use crate::models::lit::*;
-use crate::models::logger::*;
 use crate::models::solverstate::*;
 
 /*_________________________________________________________________________________________________
@@ -30,7 +29,13 @@ pub trait Solver {
 
 impl Solver for SolverState {
     fn solve(&mut self, assumptions: Vec<Lit>) -> bool {
-        reportf("solve".to_string(), file!(), line!(), self.verbosity);
+        trace!(
+            "{}|{}|{}|{:?}",
+            "solve".to_string(),
+            file!(),
+            line!(),
+            assumptions
+        );
 
         self.simplify_db();
         if !self.ok {
@@ -75,30 +80,22 @@ impl Solver for SolverState {
         }
         assert!(self.root_level == self.decision_level());
 
-        if self.verbosity >= 1 {
-            println!(
-            "==================================[MINISAT]======================================="
-        );
-            println!(
+        info!("==================================[MINISAT]=======================================");
+        info!(
             "| Conflicts |       ORIGINAL        |              LEARNT              | Progress |"
         );
-            println!(
+        info!(
             "|           | Clauses      Literals |   Limit Clauses Literals  Lit/Cl |          |"
         );
-            println!(
-            "=================================================================================="
-        );
-        }
+        info!("==================================================================================");
 
         while is_undefined(status) {
-            //println!("{}:{}", file!(), line!());
-            if self.verbosity >= 1 {
-                println!(
+            info!(
                     "|      {0}    |     {1}        {2}    |   {3}      {4}       {5}       {6}   |   {7} %   |",
                     self.solver_stats.conflicts,
                     self.clone().n_clauses(),
                     self.solver_stats.clauses_literals,
-                    nof_learnts.floor(),
+            nof_learnts.floor(),
                     self.clone().n_learnts(),
                     self.solver_stats.learnts_literals,
                     (self.solver_stats.learnts_literals
@@ -106,27 +103,22 @@ impl Solver for SolverState {
                         self.progress_estimate * 100.0
             );
 
-                status = self.search(nof_conflicts as i32, nof_learnts as i32, parms);
-                nof_conflicts *= 1.5;
-                nof_learnts *= 1.1;
-            }
+            status = self.search(nof_conflicts as i32, nof_learnts as i32, parms);
+            nof_conflicts *= 1.5;
+            nof_learnts *= 1.1;
         }
 
-        if self.verbosity >= 1 {
-            println!(
-            "=================================================================================="
-        );
-        }
+        info!("==================================================================================");
         self.cancel_until(0);
         return true;
     }
 
     fn solve_no_assumptions(&mut self) -> bool {
-        reportf(
+        trace!(
+            "{}|{}|{}",
             "solve_no_assumptions".to_string(),
             file!(),
             line!(),
-            self.verbosity,
         );
         let assumptions: Vec<Lit> = Vec::new();
         return self.solve(assumptions);

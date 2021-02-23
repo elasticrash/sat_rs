@@ -2,7 +2,6 @@ use crate::functions::enqueue::*;
 use crate::models::clause::*;
 use crate::models::lbool::*;
 use crate::models::lit::*;
-use crate::models::logger::*;
 use crate::models::solverstate::*;
 
 /*_________________________________________________________________________________________________
@@ -22,7 +21,12 @@ pub trait Prop {
 
 impl Prop for SolverState {
     fn propagate(&mut self) -> Option<Clause> {
-        reportf("propagate".to_string(), file!(), line!(), self.verbosity);
+        trace!(
+            "{}|{}|{}",
+            "propagate".to_string(),
+            file!(),
+            line!(),
+        );
 
         let mut confl: Option<Clause> = None;
 

@@ -1,4 +1,6 @@
 /target
 **/*.rs.bk
-MiniSAT/bin/*
-MiniSAT/obj/*
+cs/bin/*
+cs/obj/*
+cs
+.vscode

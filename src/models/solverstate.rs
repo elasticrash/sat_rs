@@ -6,7 +6,6 @@ use crate::functions::search::*;
 use crate::models::clause::*;
 use crate::models::lbool::*;
 use crate::models::lit::*;
-use crate::models::logger::*;
 use crate::models::statsparams::*;
 use crate::models::varorder::*;
 
@@ -60,7 +59,6 @@ pub struct SolverState {
     //MOO
     pub default_parms: SearchParams,
     pub expensive_ccmin: bool,
-    pub verbosity: i32,
 }
 
 pub trait NewState {
@@ -94,7 +92,7 @@ impl NewState for SolverState {
             cla_decay: 1.0,
             var_inc: 1.0,
             var_decay: 1.0,
-            order: VarOrder::new(),
+            order: VarOrder::default(),
             qhead: 0,
             simp_db_assigns: 0,
             simp_db_props: 0.0,
@@ -104,7 +102,6 @@ impl NewState for SolverState {
                 random_var_freq: 0.02,
             },
             expensive_ccmin: true,
-            verbosity: 0,
             progress_estimate: 0.0,
             root_level: 0,
             level_to_backtrack: 0,
@@ -292,17 +289,25 @@ impl NewVar for SolverState {
         self.add_clause(&mut self.add_ternary_tmp.clone());
     }
     fn add_clause(&mut self, ps: &mut Vec<Lit>) {
-        reportf("add_clause".to_string(), file!(), line!(), self.verbosity);
+        trace!(
+            "{}|{}|{}|{:?}",
+            "add_clause".to_string(),
+            file!(),
+            line!(),
+            ps
+        );
         self.new_clause(ps, false);
     }
 }
 
 pub fn move_back(_l1: Lit, _l2: Lit, solver_state: &mut SolverState) {
-    reportf(
+    trace!(
+        "{}|{}|{}|{:?}|{:?}",
         "move_back".to_string(),
         file!(),
         line!(),
-        solver_state.verbosity,
+        _l1,
+        _l2
     );
 
     let mut lev1: i32 = solver_state.level[var(&_l1) as usize];
