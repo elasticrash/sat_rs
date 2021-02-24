@@ -140,22 +140,17 @@ impl NewClause for SolverState {
                 }
             }
 
-            let mut _i: usize = 0;
             let mut _j: usize = 0;
 
-            for _y in 0..=unqs.len() {
-                _i = _y;
-                if _i == unqs.len() {
-                    break;
-                }
-                if self.level[var(&unqs[_y]) as usize] != 0
-                    || self.value_by_lit(unqs[_y]) != Lbool::False
+            for _i in 0..unqs.len() {
+                if self.level[var(&unqs[_i]) as usize] != 0
+                    || self.value_by_lit(unqs[_i]) != Lbool::False
                 {
-                    unqs[_j] = unqs[_y];
+                    unqs[_j] = unqs[_i];
                     _j += 1;
                 }
             }
-            unqs.truncate(unqs.len() - (_i - _j) as usize);
+            unqs.truncate(unqs.len() - (unqs.len() - _j) as usize);
 
             ps = unqs;
         } else {
@@ -194,7 +189,6 @@ impl NewClause for SolverState {
                     }
                     c.data[1] = ps[max_i];
                     c.data[max_i] = ps[1];
-
                     assert!(self.enqueue(&c.data[0], Some(c.clone())));
                 } else {
                     move_back(c.clone().data[0], c.clone().data[1], self);
