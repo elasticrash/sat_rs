@@ -10,25 +10,24 @@ pub enum Lbool {
 }
 
 pub fn to_bool(value: bool) -> Lbool {
-    if value {
-        return Lbool::True;
-    } else {
-        return Lbool::False;
+    match value {
+        true => Lbool::True,
+        false => Lbool::False,
     }
 }
 
 pub fn is_undefined(value: Lbool) -> bool {
-    return value != Lbool::True && value != Lbool::False;
+    value != Lbool::True && value != Lbool::False
 }
 
 // bitwise not for lbool
 pub fn bit_not(lb: Lbool) -> Lbool {
     let result = !(lb as i8);
-    return match result {
+    match result {
         1 => Lbool::True,
         -2 => Lbool::False,
         0 => Lbool::Undef0,
         -1 => Lbool::Undef1,
         _ => Lbool::Undef1,
-    };
+    }
 }

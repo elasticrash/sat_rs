@@ -21,12 +21,7 @@ pub trait Prop {
 
 impl Prop for SolverState {
     fn propagate(&mut self) -> Option<Clause> {
-        trace!(
-            "{}|{}|{}",
-            "propagate".to_string(),
-            file!(),
-            line!(),
-        );
+        trace!("{}|{}|{}", "propagate".to_string(), file!(), line!(),);
 
         let mut confl: Option<Clause> = None;
 
@@ -90,8 +85,8 @@ impl Prop for SolverState {
                     }
                 }
             }
-            ws.truncate(ws.len() - (i - j) as usize);
+            ws.truncate(ws.len() - (i - j));
         }
-        return confl;
+        confl
     }
 }

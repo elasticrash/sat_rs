@@ -22,7 +22,7 @@ pub trait ISolverStats {
 
 impl ISolverStats for SolverStats {
     fn new() -> Self {
-        return Self {
+        Self {
             start_time: Instant::now(),
             starts: 0.0,
             decisions: 0.0,
@@ -32,13 +32,13 @@ impl ISolverStats for SolverStats {
             learnts_literals: 0.0,
             max_literals: 0.0,
             tot_literals: 0.0,
-        };
+        }
     }
 }
 
 impl Display for SolverStats {
     fn fmt(&self, _: &mut std::fmt::Formatter<'_>) -> std::result::Result<(), std::fmt::Error> {
-        let duration: u64 = (self.start_time.elapsed().subsec_nanos() / 1000000) as u64;
+        let duration: u64 = (self.start_time.elapsed().subsec_millis()) as u64;
         info!("restarts              : {0}", self.starts);
         info!(
             "conflicts             : {0}    ({1}/ms)",
@@ -72,5 +72,5 @@ impl Display for SolverStats {
 }
 
 pub fn mem_used() -> MemInfo {
-    return mem_info().unwrap();
+    mem_info().unwrap()
 }

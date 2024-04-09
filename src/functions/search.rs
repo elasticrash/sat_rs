@@ -142,7 +142,7 @@ impl Search for SolverState {
         );
 
         for y in 0..self.learnts.len() {
-            self.learnts[y as usize].activity *= 1e-20;
+            self.learnts[y].activity *= 1e-20;
         }
         self.cla_inc *= 1e-20;
     }

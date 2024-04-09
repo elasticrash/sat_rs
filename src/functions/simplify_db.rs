@@ -45,19 +45,17 @@ impl Simplify for SolverState {
                 }
 
                 for t in 0..2 {
-                    let clause_size: usize;
-                    if t != 0 {
-                        clause_size = self.learnts.len();
+                    let clause_size: usize = if t != 0 {
+                        self.learnts.len()
                     } else {
-                        clause_size = self.clauses.len();
-                    }
+                        self.clauses.len()
+                    };
 
-                    let mut cs: Vec<Clause>;
-                    if t != 0 {
-                        cs = self.learnts.clone();
+                    let mut cs: Vec<Clause> = if t != 0 {
+                        self.learnts.clone()
                     } else {
-                        cs = self.clauses.clone();
-                    }
+                        self.clauses.clone()
+                    };
 
                     let mut j: i32 = 0;
                     for k in 0..clause_size {
@@ -92,7 +90,6 @@ impl Simplify for SolverState {
                     line!(),
                 );
                 self.ok = false;
-                return;
             }
         }
     }

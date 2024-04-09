@@ -56,9 +56,8 @@ impl Final for SolverState {
                 match &self.reason[x] {
                     Some(clause) => {
                         for j in 1..clause.data.len() {
-                            if self.level[var(&clause.data[j as usize]) as usize] > 0 {
-                                self.analyze_seen[var(&clause.data[j as usize]) as usize] =
-                                    Lbool::True;
+                            if self.level[var(&clause.data[j]) as usize] > 0 {
+                                self.analyze_seen[var(&clause.data[j]) as usize] = Lbool::True;
                             }
                         }
                     }

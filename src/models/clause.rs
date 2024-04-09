@@ -8,7 +8,7 @@ pub struct Clause {
 }
 
 pub trait IClause {
-    fn new(learnt: bool, ps: &Vec<Lit>) -> Self;
+    fn new(learnt: bool, ps: &[Lit]) -> Self;
     fn size(&self) -> i32;
     fn learnt(&self) -> bool;
     fn get_by_index(&self, i: usize) -> Lit;
@@ -17,58 +17,57 @@ pub trait IClause {
 }
 
 impl IClause for Clause {
-    fn new(_learnt: bool, _ps: &Vec<Lit>) -> Self {
-        return Self {
+    fn new(_learnt: bool, _ps: &[Lit]) -> Self {
+        Self {
             data: _ps.to_vec(),
             is_learnt: false,
             activity: 0.0,
-        };
+        }
     }
     fn size(&self) -> i32 {
-        return self.data.len() as i32;
+        self.data.len() as i32
     }
     fn learnt(&self) -> bool {
-        return self.is_learnt;
+        self.is_learnt
     }
     fn get_by_index(&self, i: usize) -> Lit {
-        return self.data[i];
+        self.data[i]
     }
     fn to_string(&self) -> String {
         let mut sb = String::new();
         sb.push('[');
         for y in &self.data {
             sb.push_str(&y.x.to_string());
-            sb.push_str(&String::from(", ".to_string()));
+            sb.push_str(", ");
         }
         sb.push(']');
-        return sb;
+        sb
     }
     fn get_data(&self) -> &Vec<Lit> {
-        return &self.data;
+        &self.data
     }
 }
 
 impl PartialEq for Clause {
     fn eq(&self, other: &Self) -> bool {
-        if self.activity == other.activity {
-            if self.data.len() == other.data.len() {
-                if self.is_learnt == other.is_learnt {
-                    let mut f: String = String::new();
-                    for y in &self.data {
-                        f.push_str(&y.x.to_string())
-                    }
+        if self.activity == other.activity
+            && self.data.len() == other.data.len()
+            && self.is_learnt == other.is_learnt
+        {
+            let mut f: String = String::new();
+            for y in &self.data {
+                f.push_str(&y.x.to_string())
+            }
 
-                    let mut s: String = String::new();
-                    for y in &other.data {
-                        s.push_str(&y.x.to_string())
-                    }
+            let mut s: String = String::new();
+            for y in &other.data {
+                s.push_str(&y.x.to_string())
+            }
 
-                    if f == s {
-                        return true;
-                    }
-                }
+            if f == s {
+                return true;
             }
         }
-        return false;
+        false
     }
 }

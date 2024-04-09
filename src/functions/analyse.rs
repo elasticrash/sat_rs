@@ -44,22 +44,17 @@ impl Analyze for SolverState {
 
         while {
             {
-                assert!(confl != None);
+                assert!(confl.is_some());
                 let c: &Clause = &confl.unwrap();
 
                 if c.is_learnt {
                     self.cla_bump_activity(&mut c.clone());
                 }
 
-                let mut start: usize;
-                if p == Lit::undefined() {
-                    start = 0;
-                } else {
-                    start = 1;
-                }
+                let start: usize = if p == Lit::undefined() { 0 } else { 1 };
 
-                for _y in start..c.data.len() {
-                    let q: Lit = c.data[start];
+                for idata in start..c.data.len() {
+                    let q: Lit = c.data[idata];
                     if self.analyze_seen[var(&q) as usize] == Lbool::Undef0
                         && self.level[var(&q) as usize] > 0
                     {
@@ -72,7 +67,6 @@ impl Analyze for SolverState {
                             out_btlevel = max(out_btlevel, self.level[var(&q) as usize])
                         }
                     }
-                    start += 1;
                 }
                 loop {
                     if self.analyze_seen[var(&self.trail[index as usize]) as usize] == Lbool::Undef0
@@ -110,12 +104,12 @@ impl Analyze for SolverState {
                 for _y in 1..out_learnt.len() {
                     match self.reason[var(&out_learnt[i]) as usize] {
                         None => {
-                            out_learnt[j as usize] = out_learnt[i];
+                            out_learnt[j] = out_learnt[i];
                             j += 1;
                         }
                         _ => {
                             if !self.analyze_removeable(out_learnt[i], min_level) {
-                                out_learnt[j as usize] = out_learnt[i];
+                                out_learnt[j] = out_learnt[i];
                                 j += 1;
                             }
                         }
@@ -136,14 +130,14 @@ impl Analyze for SolverState {
                                     && self.level[var(&c.data[k]) as usize] != 0
                                 {
                                     j += 1;
-                                    out_learnt[j as usize] = out_learnt[i];
+                                    out_learnt[j] = out_learnt[i];
                                     keep = true;
                                     break;
                                 }
                             }
                         }
                         None => {
-                            out_learnt[j as usize] = out_learnt[i];
+                            out_learnt[j] = out_learnt[i];
                         }
                     }
 
@@ -154,8 +148,8 @@ impl Analyze for SolverState {
                 }
             }
             {
-                for y in 0..out_learnt.len() {
-                    self.analyze_seen[var(&out_learnt[y]) as usize] = Lbool::Undef0;
+                for learnt in out_learnt.iter_mut() {
+                    self.analyze_seen[var(learnt) as usize] = Lbool::Undef0;
                 }
 
                 for y in 0..self.analyze_toclear.len() {
@@ -164,11 +158,11 @@ impl Analyze for SolverState {
             }
 
             self.solver_stats.max_literals += out_learnt.len() as f64;
-            out_learnt.truncate(out_learnt.len() - (i - j) as usize);
+            out_learnt.truncate(out_learnt.len() - (i - j));
             self.solver_stats.tot_literals += out_learnt.len() as f64;
         }
 
-        return out_btlevel;
+        out_btlevel
     }
 
     fn analyze_removeable(&mut self, _p: Lit, min_level: u32) -> bool {
@@ -179,16 +173,16 @@ impl Analyze for SolverState {
             line!(),
             _p,
         );
-        assert!(self.reason[var(&_p) as usize] != None);
+        assert!(self.reason[var(&_p) as usize].is_some());
 
         self.analyze_stack.clear();
-        self.analyze_stack.push(_p.clone());
+        self.analyze_stack.push(_p);
         let top: i32 = self.analyze_toclear.len() as i32;
 
-        while self.analyze_stack.len() > 0 {
-            assert!(self.reason[var(&self.analyze_stack.last().unwrap()) as usize] != None);
+        while !self.analyze_stack.is_empty() {
+            assert!(self.reason[var(self.analyze_stack.last().unwrap()) as usize].is_some());
             let c: &Clause;
-            match &self.reason[var(&self.analyze_stack.last().unwrap()) as usize] {
+            match &self.reason[var(self.analyze_stack.last().unwrap()) as usize] {
                 Some(clause) => {
                     c = &clause;
                     self.analyze_stack.pop();
@@ -197,7 +191,7 @@ impl Analyze for SolverState {
                         if self.analyze_seen[var(&p) as usize] == Lbool::Undef0
                             && self.level[var(&p) as usize] != 0
                         {
-                            if !self.reason[var(&p) as usize].is_none()
+                            if self.reason[var(&p) as usize].is_some()
                                 && ((1 << self.level[var(&p) as usize] & 31) & min_level) != 0
                             {
                                 self.analyze_seen[var(&p) as usize] = Lbool::True;
@@ -208,9 +202,9 @@ impl Analyze for SolverState {
                                     self.analyze_seen
                                         [var(&self.analyze_toclear[j as usize]) as usize] =
                                         Lbool::Undef0;
-                                    self.analyze_toclear.truncate(top as usize);
-                                    return false;
                                 }
+                                self.analyze_toclear.truncate(top as usize);
+                                return false;
                             }
                         }
                     }
@@ -221,6 +215,6 @@ impl Analyze for SolverState {
             }
         }
         self.analyze_toclear.push(_p);
-        return true;
+        true
     }
 }

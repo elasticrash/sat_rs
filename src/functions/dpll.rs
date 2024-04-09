@@ -1,10 +1,10 @@
 use crate::models::solverstate::*;
 
-pub trait DPLL {
+pub trait Dpll {
     fn model_found(&mut self) -> bool;
 }
 
-impl DPLL for SolverState {
+impl Dpll for SolverState {
     fn model_found(&mut self) -> bool {
         self.level_to_backtrack = i32::max_value();
         let res: bool = false;
@@ -12,6 +12,7 @@ impl DPLL for SolverState {
         if !self.ok {
             return false;
         }
-        return res;
+
+        res
     }
 }

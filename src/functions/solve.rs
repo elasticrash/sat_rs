@@ -49,8 +49,8 @@ impl Solver for SolverState {
         let mut status: Lbool = Lbool::Undef0;
 
         self.root_level = assumptions.len() as i32;
-        for y in 0..assumptions.len() {
-            let p: Lit = assumptions[y];
+        for assume in &assumptions {
+            let p: Lit = *assume;
             assert!(var(&p) < self.n_vars());
 
             if !self.assume(p) {
@@ -68,14 +68,11 @@ impl Solver for SolverState {
                 self.cancel_until(0);
                 return false;
             }
-            match self.propagate() {
-                Some(confl) => {
-                    self.analyse_final(&confl, false);
-                    assert!(self.conflict.len() > 0);
-                    self.cancel_until(0);
-                    return false;
-                }
-                None => {}
+            if let Some(confl) = self.propagate() {
+                self.analyse_final(&confl, false);
+                assert!(!self.conflict.is_empty());
+                self.cancel_until(0);
+                return false;
             }
         }
         assert!(self.root_level == self.decision_level());
@@ -110,7 +107,7 @@ impl Solver for SolverState {
 
         info!("==================================================================================");
         self.cancel_until(0);
-        return true;
+        true
     }
 
     fn solve_no_assumptions(&mut self) -> bool {
@@ -121,7 +118,7 @@ impl Solver for SolverState {
             line!(),
         );
         let assumptions: Vec<Lit> = Vec::new();
-        return self.solve(assumptions);
+        self.solve(assumptions)
     }
 
     fn progress_estimate(&mut self) -> f64 {

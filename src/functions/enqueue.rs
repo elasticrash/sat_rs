@@ -26,24 +26,18 @@ pub trait NQueue {
 
 impl NQueue for SolverState {
     fn enqueue(&mut self, p: &Lit, from: Option<Clause>) -> bool {
-        trace!(
-            "{}|{}|{}|{:?}",
-            "enqueue".to_string(),
-            file!(),
-            line!(),
-            p
-        );
+        trace!("{}|{}|{}|{:?}", "enqueue".to_string(), file!(), line!(), p);
 
         if !is_undefined(self.value_by_lit(*p)) {
-            return self.value_by_lit(*p) != L_FALSE;
+            self.value_by_lit(*p) != L_FALSE
         } else {
-            let x: usize = var(&p) as usize;
+            let x: usize = var(p) as usize;
             self.update_assigns(to_bool(!sign(p)), x);
             self.level[x] = self.decision_level();
             self.trail_pos[x] = self.trail.len() as i32;
             self.reason[x] = from;
             self.trail.push(*p);
-            return true;
+            true
         }
     }
 
@@ -56,6 +50,6 @@ impl NQueue for SolverState {
             _fact,
         );
 
-        return self.enqueue(&_fact, None);
+        self.enqueue(_fact, None)
     }
 }

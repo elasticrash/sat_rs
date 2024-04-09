@@ -110,7 +110,7 @@ impl NewState for SolverState {
         solver.add_unit_tmp.resize(2, Lit::new(-1, false));
         solver.add_binary_tmp.resize(2, Lit::new(-1, false));
         solver.add_ternary_tmp.resize(3, Lit::new(-1, false));
-        return solver;
+        solver
     }
 }
 
@@ -122,24 +122,28 @@ pub struct SearchParams {
 }
 
 pub trait ISearchParams {
-    fn new(self, v: f64, c: f64, r: f64);
+    fn new(v: f64, c: f64, r: f64) -> Self;
     fn clone(self, other: SearchParams);
-    fn unit(self);
+    fn unit(&mut self);
 }
 
 impl ISearchParams for SearchParams {
-    fn new(mut self, v: f64, c: f64, r: f64) {
-        self.var_decay = v;
-        self.clause_decay = c;
-        self.random_var_freq = r;
+    fn new(v: f64, c: f64, r: f64) -> Self {
+        Self {
+            var_decay: v,
+            clause_decay: c,
+            random_var_freq: r,
+        }
     }
     fn clone(mut self, other: SearchParams) {
         self.var_decay = other.var_decay;
         self.clause_decay = other.clause_decay;
         self.random_var_freq = other.random_var_freq;
     }
-    fn unit(self) {
-        self.new(1.0, 1.0, 0.0);
+    fn unit(&mut self) {
+        self.var_decay = 1.0;
+        self.clause_decay = 1.0;
+        self.random_var_freq = 0.0;
     }
 }
 
@@ -180,7 +184,7 @@ pub trait Setters {
 
 impl Setters for SolverState {
     fn value_by_var(&mut self, x: i32) -> Lbool {
-        return self.assigns.col[x as usize];
+        self.assigns.col[x as usize]
     }
 
     fn value_by_lit(&mut self, x: Lit) -> Lbool {
@@ -188,7 +192,7 @@ impl Setters for SolverState {
         if sign(&x) {
             assign = bit_not(assign);
         }
-        return assign;
+        assign
     }
     fn add_activity(&mut self, val: f64) {
         self.activity.col.push(val);
@@ -213,7 +217,7 @@ impl Internal for SolverState {
         self.analyse_final(&confl, false);
     }
     fn i_enqueue(&mut self, fact: Lit) -> bool {
-        return self.enqueue(&fact, None);
+        self.enqueue(&fact, None)
     }
     fn var_bump_activity(&mut self, p: Lit) {
         if self.var_decay < 0.0 {
@@ -247,31 +251,31 @@ impl Internal for SolverState {
         }
     }
     fn locked(&mut self, _c: &Clause) -> bool {
-        return match &self.reason[var(&_c.data[0]) as usize] {
+        match &self.reason[var(&_c.data[0]) as usize] {
             Some(x) => _c == x,
             _ => false,
-        };
+        }
     }
     fn decision_level(&mut self) -> i32 {
-        return self.trail_lim.len() as i32;
+        self.trail_lim.len() as i32
     }
 }
 
 impl SemiInternal for SolverState {
     fn n_assigns(self) -> usize {
-        return self.trail.len();
+        self.trail.len()
     }
     fn n_clauses(self) -> usize {
-        return self.clauses.len();
+        self.clauses.len()
     }
     fn n_learnts(self) -> usize {
-        return self.learnts.len();
+        self.learnts.len()
     }
 }
 
 impl NewVar for SolverState {
     fn n_vars(&mut self) -> i32 {
-        return self.assigns.col.len() as i32;
+        self.assigns.col.len() as i32
     }
     fn add_unit(&mut self, _p: Lit) {
         self.add_unit_tmp[0] = _p;
@@ -321,20 +325,20 @@ pub fn move_back(_l1: Lit, _l2: Lit, solver_state: &mut SolverState) {
 
     if lev1 < solver_state.level_to_backtrack || lev2 < solver_state.level_to_backtrack {
         if solver_state.value_by_lit(_l1) == Lbool::True {
-            if solver_state.value_by_lit(_l2) == Lbool::True {
-            } else if lev1 <= lev2 || solver_state.level_to_backtrack <= lev2 {
+            if solver_state.value_by_lit(_l2) == Lbool::True
+                || lev1 <= lev2
+                || solver_state.level_to_backtrack <= lev2
+            {
             } else {
                 solver_state.level_to_backtrack = lev2;
             }
-        } else {
-            if solver_state.value_by_lit(_l2) == Lbool::True {
-                if lev2 <= lev1 || solver_state.level_to_backtrack <= lev1 {
-                } else {
-                    solver_state.level_to_backtrack = lev1;
-                }
+        } else if solver_state.value_by_lit(_l2) == Lbool::True {
+            if lev2 <= lev1 || solver_state.level_to_backtrack <= lev1 {
             } else {
-                solver_state.level_to_backtrack = cmp::min(lev1, lev2);
+                solver_state.level_to_backtrack = lev1;
             }
+        } else {
+            solver_state.level_to_backtrack = cmp::min(lev1, lev2);
         }
     }
 }

@@ -19,18 +19,17 @@ pub trait IHeap {
 
 impl IHeap for Heap {
     fn new() -> Self {
-        let mut h = Vec::new();
-        h.push(-1);
-        return Self {
+        let h = vec![-1];
+        Self {
             heap: h,
             indices: Vec::new(),
-        };
+        }
     }
     fn set_bounds(&mut self, n: i32) {
         self.indices.resize(n as usize, 0);
     }
     fn in_heap(&self, n: i32) -> bool {
-        return self.indices[n as usize] != 0;
+        self.indices[n as usize] != 0
     }
     fn increase(&mut self, n: i32, act: Vec<f64>) {
         assert!(self.indices[n as usize] != 0);
@@ -60,7 +59,7 @@ impl IHeap for Heap {
         {
             self.heap[_i as usize] = self.heap[(_i >> 1) as usize];
             self.indices[self.heap[_i as usize] as usize] = _i;
-            _i = _i >> 1;
+            _i >>= 1;
         }
 
         self.heap[_i as usize] = x;
@@ -78,17 +77,15 @@ impl IHeap for Heap {
 
         let x = self.heap[_i as usize];
         while _i + _i < self.heap.len() as i32 {
-            let child: i32;
-            if (_i + _i + 1) < self.heap.len() as i32
+            let child: i32 = if (_i + _i + 1) < self.heap.len() as i32
                 && <Heap as IHeap>::compare(
                     act[self.heap[(_i + _i + 1) as usize] as usize],
                     act[self.heap[(_i + _i) as usize] as usize],
-                )
-            {
-                child = _i + _i + 1;
+                ) {
+                _i + _i + 1
             } else {
-                child = _i + _i;
-            }
+                _i + _i
+            };
 
             if !(<Heap as IHeap>::compare(act[self.heap[child as usize] as usize], act[x as usize]))
             {
@@ -104,7 +101,7 @@ impl IHeap for Heap {
         self.indices[x as usize] = _i;
     }
     fn empty(&self) -> bool {
-        return self.heap.len() == 1 as usize;
+        self.heap.len() == 1_usize
     }
     fn getmin(&mut self, act: Vec<f64>) -> i32 {
         let r = self.heap[1];
@@ -115,9 +112,9 @@ impl IHeap for Heap {
         if self.heap.len() > 1 {
             <Heap as IHeap>::percolate_down(self, 1, act.to_vec());
         }
-        return r;
+        r
     }
     fn compare(x: f64, y: f64) -> bool {
-        return x > y;
+        x > y
     }
 }

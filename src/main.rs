@@ -5,6 +5,7 @@ use crate::functions::solve::*;
 use crate::models::lit::*;
 use crate::models::solverstate::*;
 use simplelog::*;
+use std::cmp::Ordering;
 use std::env;
 use std::fs::File;
 use std::io::prelude::*;
@@ -47,37 +48,40 @@ fn process_problem(buffer: &str) -> SolverState {
     let problem_lines = regex::Regex::new(r"\n|\r").unwrap();
     let mut lits: Vec<Lit> = Vec::new();
     let mut last_var_zero = false;
-    for part in problem_lines.split(&buffer) {
+    for part in problem_lines.split(buffer) {
         if last_var_zero {
             lits = Vec::new();
             last_var_zero = false;
         }
-        if part != "" && !part.starts_with('c') && !part.starts_with('p') {
+        if !part.is_empty() && !part.starts_with('c') && !part.starts_with('p') {
             let line_vars = regex::Regex::new(r" ").unwrap();
-            for var in line_vars.split(&part) {
-                if var != "" {
+            for var in line_vars.split(part) {
+                if !var.is_empty() {
                     let parsed_lit: i32 = var.parse::<i32>().unwrap();
                     let zero_based_abs_var = parsed_lit.abs() - 1;
                     while zero_based_abs_var >= state.n_vars() {
                         state.new_var();
                     }
                     let solver_lit;
-                    if parsed_lit > 0 {
-                        solver_lit = Lit::simple(zero_based_abs_var);
-                        lits.push(solver_lit);
-                    } else if parsed_lit == 0 {
-                        last_var_zero = true;
-                    } else {
-                        solver_lit = !Lit::simple(zero_based_abs_var);
-                        lits.push(solver_lit);
+
+                    match parsed_lit.cmp(&0) {
+                        Ordering::Greater => {
+                            solver_lit = Lit::simple(zero_based_abs_var);
+                            lits.push(solver_lit);
+                        }
+                        Ordering::Less => {
+                            solver_lit = !Lit::simple(zero_based_abs_var);
+                            lits.push(solver_lit);
+                        }
+                        Ordering::Equal => {
+                            last_var_zero = true;
+                        }
                     }
                 }
             }
         }
-        if last_var_zero {
-            if lits.len() > 0 {
-                state.add_clause(&mut lits);
-            }
+        if last_var_zero && !lits.is_empty() {
+            state.add_clause(&mut lits);
         }
     }
 
@@ -239,7 +243,7 @@ p cnf 16 18
 
 #[test]
 fn aim_100_problem() {
-let problem = r#"
+    let problem = r#"
 c SOURCE: Kazuo Iwama, Eiji Miyano (miyano@cscu.kyushu-u.ac.jp),
 c          and Yuichi Asahiro
 c
@@ -410,11 +414,11 @@ p cnf 100 160
 34 -45 -69 0
 63 -86 -98 0
 "#;
-let state = process_problem(problem);
+    let state = process_problem(problem);
 
-assert_eq!(state.solver_stats.starts, 1.);
-assert_eq!(state.solver_stats.conflicts, 30.);
-assert_eq!(state.solver_stats.decisions, 147.);
-assert_eq!(state.solver_stats.propagations, 402.);
-assert_eq!(state.solver_stats.tot_literals, 77.);
+    assert_eq!(state.solver_stats.starts, 1.);
+    assert_eq!(state.solver_stats.conflicts, 30.);
+    assert_eq!(state.solver_stats.decisions, 147.);
+    assert_eq!(state.solver_stats.propagations, 402.);
+    assert_eq!(state.solver_stats.tot_literals, 77.);
 }

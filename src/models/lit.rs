@@ -32,17 +32,17 @@ impl ILit for Lit {
         Self { x: 0 }
     }
     fn to_string(lit: &Lit) -> String {
-        let temp_string = var(&lit).to_string();
-        return (if sign(&lit) { "-" } else { "" }).to_owned() + "x" + &temp_string;
+        let temp_string = var(lit).to_string();
+        (if sign(lit) { "-" } else { "" }).to_owned() + "x" + &temp_string
     }
     fn get_hash_code(lit: &Lit) -> i32 {
-        return lit.x;
+        lit.x
     }
     fn equals(&self, lit: &Lit) -> bool {
-        if self.x == lit.x {
-            return true;
+        match self.x == lit.x {
+            true => true,
+            false => false,
         }
-        return false;
     }
     fn undefined() -> Self {
         Self::new(VAR_UNDEFINED, false)
@@ -57,7 +57,7 @@ impl Not for Lit {
     fn not(self) -> Lit {
         let mut q: Lit = Lit { x: 0 };
         q.x = self.x ^ 1;
-        return q;
+        q
     }
 }
 
@@ -69,24 +69,24 @@ impl PartialOrd for Lit {
 
 impl PartialEq for Lit {
     fn eq(&self, other: &Self) -> bool {
-        return self.x == other.x;
+        self.x == other.x
     }
 }
 
 pub fn sign(lit: &Lit) -> bool {
     let t = &lit.x & 1;
-    let b = t != 0;
-
-    return b;
+    t != 0
 }
 
 pub fn var(lit: &Lit) -> i32 {
-    return lit.x >> 1;
+    lit.x >> 1
 }
 
-pub fn swap(i: i32, j: i32, data: &mut Vec<Lit>) {
+/*pub fn swap(i: i32, j: i32, data: &mut Vec<Lit>) {
     assert!((i as usize) < data.len() && (j as usize) < data.len());
-    let tmp = data[i as usize];
-    data[i as usize] = data[j as usize];
-    data[j as usize] = tmp;
-}
+    data.swap(i as usize, j as usize);
+
+    //let tmp = data[i as usize];
+    //data[i as usize] = data[j as usize];
+    //data[j as usize] = tmp;
+}*/

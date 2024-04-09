@@ -4,3 +4,4 @@ cs/bin/*
 cs/obj/*
 cs
 .vscode
+sat.log

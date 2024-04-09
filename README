@@ -1,20 +1,3 @@
 # Rust Port of MiniSAT2
 
-## Thought Log (2020)
-
-After 8 months and a hell more experience in Rust I decided to revisit this project and fix the remaining bugs. I am really surpriced with myself on how much I managed back then with minimal knowledge of the language
-
-
-## Thought Log (2019)
-
-22/11/2019
-
-Some simple problems seem to be working fine, more complicated ones give still the wrong results
-
-19/11/2019
-
-The results where completely wrong, it turned out I was reading the clauses incorrectly from the cnf files. This is now fixed. But the solver gives incorrects results.
-
-18/11/2019
-
-Got my first results, no idea yet if they are correct, there were a lot of wrong assumptions when I had to do bitwise operation on enums. Need time, to write tests.
+Not tested thoroughly, use it at your own risk. 

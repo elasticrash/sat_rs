@@ -36,7 +36,7 @@ impl Reduce for SolverState {
             if self.learnts[y].data.len() > 2 && !self.locked(&self.learnts[y].clone()) {
                 self.remove(self.learnts[y].clone(), false);
             } else {
-                self.learnts[j as usize] = self.learnts[y as usize].clone();
+                self.learnts[j as usize] = self.learnts[y].clone();
                 j += 1;
             }
             i = y as i32;

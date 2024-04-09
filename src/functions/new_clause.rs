@@ -62,11 +62,9 @@ impl NewClause for SolverState {
         let mut max2: i32 = std::i32::MIN;
         let mut max2_at: i32 = -1;
 
-        for i in 0.._ps.len() {
-            let mut lev: i32 = self.level[var(&_ps[i]) as usize];
-            if lev == -1 {
-                lev = std::i32::MAX;
-            } else if self.value_by_lit(_ps[i]) == Lbool::True {
+        for (i, lt) in _ps.iter().enumerate() {
+            let mut lev: i32 = self.level[var(lt) as usize];
+            if lev == -1 || self.value_by_lit(*lt) == Lbool::True {
                 lev = std::i32::MAX;
             }
 
@@ -82,16 +80,16 @@ impl NewClause for SolverState {
         }
 
         if max_at == 0 {
-            swap(1, max2_at, &mut _ps);
+            _ps.swap(1_usize, max2_at as usize);
         } else if max_at == 1 {
-            swap(0, max2_at, &mut _ps);
+            _ps.swap(0_usize, max2_at as usize);
         } else if max2_at == 0 {
-            swap(1, max_at, &mut _ps);
+            _ps.swap(1_usize, max_at as usize);
         } else if max2_at == 1 {
-            swap(0, max_at, &mut _ps);
+            _ps.swap(0_usize, max_at as usize);
         } else {
-            swap(0, max_at, &mut _ps);
-            swap(1, max2_at, &mut _ps);
+            _ps.swap(0_usize, max_at as usize);
+            _ps.swap(1_usize, max2_at as usize);
         }
     }
 
@@ -132,10 +130,8 @@ impl NewClause for SolverState {
                 None => return,
             };
 
-            for i in 0..unqs.len() {
-                if self.level[var(&unqs[i]) as usize] == 0
-                    && self.value_by_lit(unqs[i]) == Lbool::True
-                {
+            for unq in &unqs {
+                if self.level[var(unq) as usize] == 0 && self.value_by_lit(*unq) == Lbool::True {
                     return;
                 }
             }
@@ -155,14 +151,14 @@ impl NewClause for SolverState {
                     _j += 1;
                 }
             }
-            unqs.truncate(unqs.len() - (_i - _j) as usize);
+            unqs.truncate(unqs.len() - (_i - _j));
 
             ps = unqs;
         } else {
             ps = _ps.to_vec();
         }
 
-        if ps.len() == 0 {
+        if ps.is_empty() {
             self.ok = false;
         } else if ps.len() == 1 {
             if _theory_clause {
@@ -186,9 +182,9 @@ impl NewClause for SolverState {
                 if _learnt {
                     let mut max_i: usize = 1;
                     let mut max: i32 = self.level[var(&ps[1]) as usize];
-                    for y in 2..ps.len() {
-                        if self.level[var(&ps[y]) as usize] > max {
-                            max = self.level[var(&ps[y]) as usize];
+                    for (y, lt) in ps.iter().enumerate().skip(2) {
+                        if self.level[var(lt) as usize] > max {
+                            max = self.level[var(lt) as usize];
                             max_i = y;
                         }
                     }
@@ -244,12 +240,11 @@ impl NewClause for SolverState {
         );
         assert!(self.decision_level() == 0);
 
-        let c;
-        if t != 0 {
-            c = &self.learnts[k as usize];
+        let c = if t != 0 {
+            &self.learnts[k as usize]
         } else {
-            c = &self.clauses[k as usize];
-        }
+            &self.clauses[k as usize]
+        };
 
         for y in 0..c.size() {
             let f = self.clone().value_by_lit(c.data[y as usize]);
@@ -257,14 +252,13 @@ impl NewClause for SolverState {
                 return true;
             }
         }
-        return false;
+        false
     }
 
     fn new_var(&mut self) -> i32 {
         trace!("{}|{}|{}", "new_var".to_string(), file!(), line!(),);
 
-        let index: i32;
-        index = self.assigns.col.len() as i32;
+        let index: i32 = self.assigns.col.len() as i32;
         self.watches.push(Vec::new());
         self.watches.push(Vec::new());
         self.reason.push(None);
@@ -275,13 +269,13 @@ impl NewClause for SolverState {
         self.order.new_var();
         self.analyze_seen.push(Lbool::Undef0);
 
-        return index;
+        index
     }
     fn assume(&mut self, p: Lit) -> bool {
         trace!("{}|{}|{}|{:?}", "assume".to_string(), file!(), line!(), p);
 
         self.trail_lim.push(self.trail.len() as i32);
-        return self.i_enqueue(p);
+        self.i_enqueue(p)
     }
 
     fn cancel_until(&mut self, level: i32) {
@@ -340,7 +334,7 @@ fn basic_clause_simplification(_ps: Vec<Lit>, _copy: bool) -> Option<Vec<Lit>> {
                 }
             }
             None => {
-                dict.push(Dict { index: v, l: l });
+                dict.push(Dict { index: v, l });
                 qs[ptr as usize] = l;
                 ptr += 1;
             }
@@ -348,7 +342,7 @@ fn basic_clause_simplification(_ps: Vec<Lit>, _copy: bool) -> Option<Vec<Lit>> {
     }
     qs.truncate(ptr as usize);
 
-    return Some(qs);
+    Some(qs)
 }
 
 fn remove_watch(ws: &mut Vec<Clause>, elem: Clause) -> bool {
@@ -360,7 +354,7 @@ fn remove_watch(ws: &mut Vec<Clause>, elem: Clause) -> bool {
         ws
     );
 
-    if ws.len() == 0 {
+    if ws.is_empty() {
         return false;
     }
     let mut j: usize = 0;
@@ -372,5 +366,5 @@ fn remove_watch(ws: &mut Vec<Clause>, elem: Clause) -> bool {
         ws[y] = ws[y + 1].clone();
     }
     ws.pop();
-    return true;
+    true
 }
