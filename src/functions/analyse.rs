@@ -47,7 +47,7 @@ impl Analyze for SolverState {
                 assert!(confl.is_some());
                 let c: &Clause = &confl.unwrap();
 
-                if c.is_learnt {
+                if c.learnt() {
                     self.cla_bump_activity(&mut c.clone());
                 }
 
@@ -184,7 +184,7 @@ impl Analyze for SolverState {
             let c: &Clause;
             match &self.reason[var(self.analyze_stack.last().unwrap()) as usize] {
                 Some(clause) => {
-                    c = &clause;
+                    c = clause;
                     self.analyze_stack.pop();
                     for i in 1..c.data.len() {
                         let p: Lit = c.data[i];

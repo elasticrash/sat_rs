@@ -57,15 +57,15 @@ impl NewClause for SolverState {
             _ps,
         );
 
-        let mut max: i32 = std::i32::MIN;
+        let mut max: i32 = i32::MIN;
         let mut max_at: i32 = -1;
-        let mut max2: i32 = std::i32::MIN;
+        let mut max2: i32 = i32::MIN;
         let mut max2_at: i32 = -1;
 
         for (i, lt) in _ps.iter().enumerate() {
             let mut lev: i32 = self.level[var(lt) as usize];
             if lev == -1 || self.value_by_lit(*lt) == Lbool::True {
-                lev = std::i32::MAX;
+                lev = i32::MAX;
             }
 
             if lev >= max {
@@ -223,7 +223,7 @@ impl NewClause for SolverState {
             );
         }
 
-        if c.is_learnt {
+        if c.learnt() {
             self.solver_stats.learnts_literals -= c.size() as f64;
         } else {
             self.solver_stats.clauses_literals -= c.size() as f64;

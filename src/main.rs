@@ -45,17 +45,15 @@ fn main() {
 fn process_problem(buffer: &str) -> SolverState {
     let mut state: SolverState = SolverState::new();
 
-    let problem_lines = regex::Regex::new(r"\n|\r").unwrap();
     let mut lits: Vec<Lit> = Vec::new();
     let mut last_var_zero = false;
-    for part in problem_lines.split(buffer) {
+    for part in buffer.lines() {
         if last_var_zero {
             lits = Vec::new();
             last_var_zero = false;
         }
         if !part.is_empty() && !part.starts_with('c') && !part.starts_with('p') {
-            let line_vars = regex::Regex::new(r" ").unwrap();
-            for var in line_vars.split(part) {
+            for var in part.split_whitespace() {
                 if !var.is_empty() {
                     let parsed_lit: i32 = var.parse::<i32>().unwrap();
                     let zero_based_abs_var = parsed_lit.abs() - 1;
