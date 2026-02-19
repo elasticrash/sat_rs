@@ -20,7 +20,7 @@ impl IClause for Clause {
     fn new(_learnt: bool, _ps: &[Lit]) -> Self {
         Self {
             data: _ps.to_vec(),
-            is_learnt: false,
+            is_learnt: _learnt,
             activity: 0.0,
         }
     }

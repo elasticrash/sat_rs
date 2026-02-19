@@ -120,24 +120,26 @@ impl Analyze for SolverState {
                 self.analyze_toclear.clear();
                 i = 1;
                 j = 1;
-                let mut keep: bool = false;
                 for _y in 1..out_learnt.len() {
+                    let mut keep: bool = false;
                     match self.reason[var(&out_learnt[i]) as usize] {
+                        None => {
+                            out_learnt[j] = out_learnt[i];
+                            j += 1;
+                            keep = true;
+                        }
                         Some(ref p) => {
                             let c: &Clause = p;
                             for k in 1..c.data.len() {
                                 if self.analyze_seen[var(&c.data[k]) as usize] == Lbool::Undef0
                                     && self.level[var(&c.data[k]) as usize] != 0
                                 {
-                                    j += 1;
                                     out_learnt[j] = out_learnt[i];
+                                    j += 1;
                                     keep = true;
                                     break;
                                 }
                             }
-                        }
-                        None => {
-                            out_learnt[j] = out_learnt[i];
                         }
                     }
 
@@ -192,7 +194,7 @@ impl Analyze for SolverState {
                             && self.level[var(&p) as usize] != 0
                         {
                             if self.reason[var(&p) as usize].is_some()
-                                && ((1 << self.level[var(&p) as usize] & 31) & min_level) != 0
+                                && ((1 << (self.level[var(&p) as usize] & 31)) & min_level) != 0
                             {
                                 self.analyze_seen[var(&p) as usize] = Lbool::True;
                                 self.analyze_stack.push(p);

@@ -1,3 +1,2 @@
 # Rust Port of MiniSAT2 (kind of)
-
-Not tested thoroughly, use it at your own risk. 
+All tests pass but there isn't a great variety of them. 

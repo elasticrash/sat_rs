@@ -359,7 +359,7 @@ fn remove_watch(ws: &mut Vec<Clause>, elem: Clause) -> bool {
     }
     let mut j: usize = 0;
     while ws[j] != elem {
-        assert!(j < ws.len() - 1);
+        if j >= ws.len() - 1 { return false; }
         j += 1;
     }
     for y in j..ws.len() - 1 {

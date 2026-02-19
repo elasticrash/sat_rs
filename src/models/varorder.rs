@@ -49,11 +49,10 @@ impl IVarOrder for VarOrder {
         }
     }
     fn select(&mut self, random_var_freq: f64) -> Lit {
-        let random = drand(self.random_seed);
-        if random < random_var_freq && !self.heap.empty() {
-            let next: i32 = irand(random, self.assigns.col.len() as i32);
+        if !self.heap.empty() && drand(&mut self.random_seed) < random_var_freq {
+            let next: i32 = irand(&mut self.random_seed, self.assigns.col.len() as i32);
             if is_undefined(self.assigns.col[next as usize]) {
-                return Lit::simple(next);
+                return !Lit::simple(next);
             }
         }
 
@@ -61,8 +60,7 @@ impl IVarOrder for VarOrder {
             let next: i32 = self.heap.getmin(self.activity.col.clone());
 
             if is_undefined(self.assigns.col[next as usize]) {
-                let r = !Lit::simple(next);
-                return r;
+                return !Lit::simple(next);
             }
         }
 
