@@ -62,21 +62,11 @@ impl Prop for SolverState {
                             c.data[1] = c.data[k];
                             c.data[k] = false_lit;
                             self.watches[(!c.data[1]).x as usize].push(c.clone());
-                            let mut c_sorted: Vec<i32> = c.data.iter().map(|l| l.x).collect();
-                            c_sorted.sort_unstable();
                             let other_ws = &mut self.watches[(!first).x as usize];
                             for entry in other_ws.iter_mut() {
-                                let watches_pair = (entry.data[0] == first
-                                    && entry.data[1] == false_lit)
-                                    || (entry.data[0] == false_lit && entry.data[1] == first);
-                                if watches_pair {
-                                    let mut e_sorted: Vec<i32> =
-                                        entry.data.iter().map(|l| l.x).collect();
-                                    e_sorted.sort_unstable();
-                                    if c_sorted == e_sorted {
-                                        *entry = c.clone();
-                                        break;
-                                    }
+                                if entry.id == c.id {
+                                    *entry = c.clone();
+                                    break;
                                 }
                             }
                             foundwatch = true;

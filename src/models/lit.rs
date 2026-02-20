@@ -13,9 +13,6 @@ pub trait ILit {
     fn new(v: i32, sign: bool) -> Self;
     fn simple(v: i32) -> Self;
     fn empty() -> Self;
-    fn to_string(lit: &Lit) -> String;
-    fn get_hash_code(lit: &Lit) -> i32;
-    fn equals(&self, lit: &Lit) -> bool;
     fn undefined() -> Self;
 }
 
@@ -30,19 +27,6 @@ impl ILit for Lit {
     }
     fn empty() -> Self {
         Self { x: 0 }
-    }
-    fn to_string(lit: &Lit) -> String {
-        let temp_string = var(lit).to_string();
-        (if sign(lit) { "-" } else { "" }).to_owned() + "x" + &temp_string
-    }
-    fn get_hash_code(lit: &Lit) -> i32 {
-        lit.x
-    }
-    fn equals(&self, lit: &Lit) -> bool {
-        match self.x == lit.x {
-            true => true,
-            false => false,
-        }
     }
     fn undefined() -> Self {
         Self::new(VAR_UNDEFINED, false)

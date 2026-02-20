@@ -173,7 +173,8 @@ impl NewClause for SolverState {
                 self.reorder_by_level(&mut ps.to_vec())
             }
 
-            let mut c: Clause = Clause::new(_learnt || _theory_clause, &ps);
+            let mut c: Clause = Clause::new(_learnt || _theory_clause, &ps, self.clause_id_counter);
+            self.clause_id_counter += 1;
 
             if !_learnt && !_theory_clause {
                 self.clauses.push(c.clone());
@@ -359,7 +360,9 @@ fn remove_watch(ws: &mut Vec<Clause>, elem: Clause) -> bool {
     }
     let mut j: usize = 0;
     while ws[j] != elem {
-        if j >= ws.len() - 1 { return false; }
+        if j >= ws.len() - 1 {
+            return false;
+        }
         j += 1;
     }
     for y in j..ws.len() - 1 {

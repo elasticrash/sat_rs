@@ -1,4 +1,3 @@
-use crate::functions::analyse_final::*;
 use crate::functions::enqueue::*;
 use crate::functions::new_clause::*;
 use crate::functions::search::*;
@@ -59,6 +58,7 @@ pub struct SolverState {
     //MOO
     pub default_parms: SearchParams,
     pub expensive_ccmin: bool,
+    pub clause_id_counter: u32,
 }
 
 pub trait NewState {
@@ -105,6 +105,7 @@ impl NewState for SolverState {
             progress_estimate: 0.0,
             root_level: 0,
             level_to_backtrack: 0,
+            clause_id_counter: 0,
         };
 
         solver.add_unit_tmp.resize(2, Lit::new(-1, false));
@@ -121,39 +122,11 @@ pub struct SearchParams {
     pub random_var_freq: f64,
 }
 
-pub trait ISearchParams {
-    fn new(v: f64, c: f64, r: f64) -> Self;
-    fn clone(self, other: SearchParams);
-    fn unit(&mut self);
-}
-
-impl ISearchParams for SearchParams {
-    fn new(v: f64, c: f64, r: f64) -> Self {
-        Self {
-            var_decay: v,
-            clause_decay: c,
-            random_var_freq: r,
-        }
-    }
-    fn clone(mut self, other: SearchParams) {
-        self.var_decay = other.var_decay;
-        self.clause_decay = other.clause_decay;
-        self.random_var_freq = other.random_var_freq;
-    }
-    fn unit(&mut self) {
-        self.var_decay = 1.0;
-        self.clause_decay = 1.0;
-        self.random_var_freq = 0.0;
-    }
-}
-
 pub trait Internal {
-    fn i_analyze_final(&mut self, confl: Clause);
     fn i_enqueue(&mut self, fact: Lit) -> bool;
     fn var_bump_activity(&mut self, p: Lit);
     fn var_decay_activity(&mut self);
     fn cla_decay_activity(&mut self);
-    fn i_new_clause(self, ps: &mut Vec<Lit>);
     fn cla_bump_activity(&mut self, c: &mut Clause);
     fn locked(&mut self, _c: &Clause) -> bool;
     fn decision_level(&mut self) -> i32;
@@ -161,9 +134,6 @@ pub trait Internal {
 
 pub trait NewVar {
     fn n_vars(&mut self) -> i32;
-    fn add_unit(&mut self, p: Lit);
-    fn add_binary(&mut self, p: Lit, q: Lit);
-    fn add_ternary(&mut self, p: Lit, q: Lit, r: Lit);
     fn add_clause(&mut self, ps: &mut Vec<Lit>);
 }
 
@@ -213,9 +183,6 @@ impl Setters for SolverState {
 }
 
 impl Internal for SolverState {
-    fn i_analyze_final(&mut self, confl: Clause) {
-        self.analyse_final(&confl, false);
-    }
     fn i_enqueue(&mut self, fact: Lit) -> bool {
         self.enqueue(&fact, None)
     }
@@ -240,9 +207,6 @@ impl Internal for SolverState {
     }
     fn cla_decay_activity(&mut self) {
         self.cla_inc *= self.cla_decay;
-    }
-    fn i_new_clause(mut self, ps: &mut Vec<Lit>) {
-        self.new_clause(ps, false);
     }
     fn cla_bump_activity(&mut self, c: &mut Clause) {
         c.activity += self.cla_inc;
@@ -276,21 +240,6 @@ impl SemiInternal for SolverState {
 impl NewVar for SolverState {
     fn n_vars(&mut self) -> i32 {
         self.assigns.col.len() as i32
-    }
-    fn add_unit(&mut self, _p: Lit) {
-        self.add_unit_tmp[0] = _p;
-        self.add_clause(&mut self.add_unit_tmp.clone());
-    }
-    fn add_binary(&mut self, _p: Lit, _q: Lit) {
-        self.add_binary_tmp[0] = _p;
-        self.add_binary_tmp[1] = _q;
-        self.add_clause(&mut self.add_binary_tmp.clone());
-    }
-    fn add_ternary(&mut self, _p: Lit, _q: Lit, _r: Lit) {
-        self.add_ternary_tmp[0] = _p;
-        self.add_ternary_tmp[1] = _q;
-        self.add_ternary_tmp[1] = _r;
-        self.add_clause(&mut self.add_ternary_tmp.clone());
     }
     fn add_clause(&mut self, ps: &mut Vec<Lit>) {
         trace!(

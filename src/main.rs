@@ -19,7 +19,7 @@ fn main() {
     CombinedLogger::init(vec![
         TermLogger::new(LevelFilter::Info, Config::default(), TerminalMode::Mixed),
         WriteLogger::new(
-            LevelFilter::Trace,
+            LevelFilter::Info,
             Config::default(),
             File::create("sat.log").unwrap(),
         ),
